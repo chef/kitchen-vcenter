@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = KitchenVcenter::VERSION
   spec.authors       = ['Russell Seymour']
   spec.email         = ['russell@chef.io']
-  spec.summary       = 'Test Kitchen driver for VMWare Vcenter'
-  spec.description   = 'Test Kitchen driver for VMWare Vcenter using SDK'
-  spec.homepage      = 'https://github.com/chef-partners/kitchen-vcenter'
+  spec.summary       = 'Test Kitchen driver for VMare vCenter'
+  spec.description   = 'Test Kitchen driver for VMware vCenter using SDK'
+  spec.homepage      = 'https://github.com/chef/kitchen-vcenter'
   spec.license       = 'Apache-2.0'
 
   spec.files         = Dir['LICENSE', 'README.md', 'CHANGELOG.md', 'lib/**/*', 'kitchen-vcenter/version.rb']
@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'savon', '~> 2.11'
 
   spec.add_development_dependency 'bundler', '~> 1.7'
+  spec.add_development_dependency 'github_changelog_generator'
   spec.add_development_dependency 'rake',    '~> 10.0'
   spec.add_development_dependency 'rubocop', '~> 0.49'
 end
