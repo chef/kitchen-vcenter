@@ -8,6 +8,7 @@ require 'com/vmware/cis'
 require 'com/vmware/vcenter'
 require 'com/vmware/vcenter/vm'
 require 'support/clone_vm'
+require 'securerandom'
 
 module Kitchen
   module Driver
@@ -26,9 +27,14 @@ module Kitchen
       default_config :vcenter_host
       default_config :vcenter_disable_ssl_verify, false
       default_config :poweron, true
-      default_config :vm_name, format('vm-%s', Time.now.to_i)
+      default_config :vm_name, nil
 
       def create(state)
+        # If the vm_name has not been set then set it now based on the suite, platform and a random number
+        if config[:vm_name].nil?
+          config[:vm_name] = format('%s-%s-%s', instance.suite.name, instance.platform.name, SecureRandom.hex(4))
+        end
+
         connect
 
         # Using the clone class, create a machine for TK
