@@ -3,7 +3,7 @@ require 'rbvmomi'
 class Support
   class CloneVm
     attr_reader :vim, :options
-    
+
     def initialize(conn_opts, options)
       @options = options
 
@@ -26,11 +26,11 @@ class Support
       clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(location: relocate_spec,
                                                   powerOn: options[:poweron],
                                                   template: false)
-      
+
       # Set the folder to use
       dest_folder = options[:folder].nil? ? src_vm.parent : options[:folder][:id]
 
-      puts "Creating new machine"
+      puts "Cloning the template #{options[:template]} to create the VM..."
       task = src_vm.CloneVM_Task(folder: dest_folder, name: options[:name], spec: clone_spec)
       task.wait_for_completion
 

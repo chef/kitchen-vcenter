@@ -5,6 +5,15 @@
 [![Dependency Status](https://gemnasium.com/chef/kitchen-vcenter.svg)](https://gemnasium.com/chef/kitchen-vcenter)
 [![Inline docs](http://inch-ci.org/github/chef/kitchen-vcenter.svg?branch=master)](http://inch-ci.org/github/chef/kitchen-vcenter)
 
+This is the official Chef test-kitchen plugin for VMware REST API. This plugin gives kitchen the ability to create, bootstrap, and test VMware vms.
+- Documentation: [https://github.com/chef/kitchen-vcenter/blob/master/README.md](https://github.com/chef/kitchen-vcenter/blob/master/README.md)
+- Source: [https://github.com/chef/kitchen-vcenter/tree/master](https://github.com/chef/kitchen-vcenter/tree/master)
+- Issues: [https://github.com/chef/kitchen-vcenter/issues](https://github.com/chef/knife-vcenter/issues)
+- Slack: sign up: https://code.vmware.com/slack/ slack channel: #chef
+- Mailing list: [https://discourse.chef.io/](https://discourse.chef.io/)
+
+This is a `test-kitchen` plugin that allows interaction with vSphere using the vSphere Automation SDK.
+
 Please refer to the [CHANGELOG](CHANGELOG.md) for version history and known issues.
 
 ## Requirements
@@ -20,6 +29,13 @@ Using [ChefDK](https://downloads.chef.io/chef-dk/), simply install the Gem:
 chef gem install kitchen-vcenter
 ```
 
+If you're using bundler, simply add Chef and kitchen-vcenter to your Gemfile:
+
+```ruby
+gem 'chef'
+gem 'kitchen-vcenter'
+```
+
 ## Usage
 
 A sample `.kitchen.yml` file, details are below.
@@ -33,8 +49,16 @@ driver:
   vcenter_disable_ssl_verify: true
   driver_config:
     targethost: 172.16.20.41
-    template: ubuntu1604
     datacenter: "Datacenter"
+
+platforms:
+  - name: ubuntu-1604
+    driver_config:
+      template: ubuntu16-template
+  - name: centos-7
+    driver_config:
+      template: centos7-template
+
 ```
 
 ### Required parameters:
