@@ -1,8 +1,9 @@
 # Change Log
 
-## [0.0.1](https://github.com/chef/kitchen-vcenter/tree/0.0.1) (2017-08-10)
+## [1.0.0](https://github.com/chef/kitchen-vcenter/tree/1.0.0) (2017-08-10)
 **Merged pull requests:**
 
+- 1.0.0 release [\#4](https://github.com/chef/kitchen-vcenter/pull/4) ([jjasghar](https://github.com/jjasghar))
 - Second walk through [\#3](https://github.com/chef/kitchen-vcenter/pull/3) ([jjasghar](https://github.com/jjasghar))
 - Updated so that the vm\_name is set according to suite and platform. [\#2](https://github.com/chef/kitchen-vcenter/pull/2) ([russellseymour](https://github.com/russellseymour))
 - Prep-for-public release [\#1](https://github.com/chef/kitchen-vcenter/pull/1) ([jjasghar](https://github.com/jjasghar))
