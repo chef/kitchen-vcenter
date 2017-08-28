@@ -112,7 +112,7 @@ module Kitchen
       def get_host(name)
         filter = Com::Vmware::Vcenter::Host::FilterSpec.new({names: Set.new([name])})
         host_obj = Com::Vmware::Vcenter::Host.new(vapi_config)
-        host = host_obj.list(filter)
+        host = host_obj.list
         host[0].host
       end
 
