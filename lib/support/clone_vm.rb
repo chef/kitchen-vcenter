@@ -12,35 +12,33 @@ class Support
     end
 
     def clone
-
       # set the datacenter name
       dc = vim.serviceInstance.find_datacenter(options[:datacenter])
       src_vm = dc.find_vm(options[:template])
-      hosts = dc.hostFolder.children
 
       # Specify where the machine is going to be created
       relocate_spec = RbVmomi::VIM.VirtualMachineRelocateSpec
       relocate_spec.host = options[:targethost]
-      relocate_spec.pool = hosts.first.resourcePool
+      relocate_spec.pool = options[:resource_pool]
 
       clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(location: relocate_spec,
-                                                  powerOn: options[:poweron],
-                                                  template: false)
+                                                        powerOn: options[:poweron],
+                                                        template: false)
 
       # Set the folder to use
       dest_folder = options[:folder].nil? ? src_vm.parent : options[:folder][:id]
 
-      puts "Cloning the template #{options[:template]} to create the VM..."
+      puts "Cloning the template '#{options[:template]}' to create the VM..."
       task = src_vm.CloneVM_Task(folder: dest_folder, name: options[:name], spec: clone_spec)
       task.wait_for_completion
 
       # get the IP address of the machine for bootstrapping
       # machine name is based on the path, e.g. that includes the folder
-      name = options[:folder].nil? ? options[:name] : format("%s/%s", options[:folder][:name], options[:name])
+      name = options[:folder].nil? ? options[:name] : format('%s/%s', options[:folder][:name], options[:name])
       new_vm = dc.find_vm(name)
 
       if new_vm.nil?
-        puts format("Unable to find machine: %s", name)
+        puts format('Unable to find machine: %s', name)
       else
         puts 'Waiting for network interfaces to become available...'
         sleep 2 while new_vm.guest.net.empty? || !new_vm.guest.ipAddress
