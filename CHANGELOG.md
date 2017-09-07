@@ -1,6 +1,18 @@
 # Change Log
 
-## [1.0.0](https://github.com/chef/kitchen-vcenter/tree/1.0.0) (2017-08-10)
+## [1.1.0](https://github.com/chef/kitchen-vcenter/tree/1.1.0) (2017-09-07)
+[Full Changelog](https://github.com/chef/kitchen-vcenter/compare/v1.0.0...1.1.0)
+
+**Closed issues:**
+
+- Resource pool is not specified when creating a new machine [\#7](https://github.com/chef/kitchen-vcenter/issues/7)
+- Unhelpful messages from driver if specified item does not exist [\#6](https://github.com/chef/kitchen-vcenter/issues/6)
+
+**Merged pull requests:**
+
+- Updated to handle resource\_pools [\#8](https://github.com/chef/kitchen-vcenter/pull/8) ([russellseymour](https://github.com/russellseymour))
+
+## [v1.0.0](https://github.com/chef/kitchen-vcenter/tree/v1.0.0) (2017-08-28)
 **Merged pull requests:**
 
 - 1.0.0 release [\#4](https://github.com/chef/kitchen-vcenter/pull/4) ([jjasghar](https://github.com/jjasghar))
