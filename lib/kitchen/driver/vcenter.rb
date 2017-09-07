@@ -47,6 +47,7 @@ module Kitchen
       default_config :vcenter_disable_ssl_verify, false
       default_config :poweron, true
       default_config :vm_name, nil
+      default_config :resource_pool, nil
 
       def create(state)
         # If the vm_name has not been set then set it now based on the suite, platform and a random number
@@ -54,16 +55,24 @@ module Kitchen
           config[:vm_name] = format('%s-%s-%s', instance.suite.name, instance.platform.name, SecureRandom.hex(4))
         end
 
+        raise "Please set the resource pool name using `resource_pool` parameter in the 'drive_config' section of your .kitchen.yml file" if config[:resource_pool].nil?
+
         connect
 
         # Using the clone class, create a machine for TK
         # Find the identifier for the targethost to pass to rbvmomi
         config[:targethost] = get_host(config[:targethost])
 
+        # Find the resource pool
+        config[:resource_pool] = get_resource_pool(config[:resource_pool])
+
+        # Check that the datacenter exists
+        datacenter_exists?(config[:datacenter])
+
         # Same thing needs to happen with the folder name if it has been set
         config[:folder] = {
           name: config[:folder],
-          id: get_folder(config[:folder])
+          id: get_folder(config[:folder]),
         } unless config[:folder].nil?
 
         # Create a hash of options that the clone requires
@@ -73,7 +82,8 @@ module Kitchen
           poweron: config[:poweron],
           template: config[:template],
           datacenter: config[:datacenter],
-          folder: config[:folder]
+          folder: config[:folder],
+          resource_pool: config[:resource_pool],
         }
 
         # Create an object from which the clone operation can be called
@@ -90,7 +100,7 @@ module Kitchen
         vm_obj = Com::Vmware::Vcenter::VM.new(vapi_config)
 
         # shut the machine down if it is running
-        if vm.power_state.value == "POWERED_ON"
+        if vm.power_state.value == 'POWERED_ON'
           power = Com::Vmware::Vcenter::Vm::Power.new(vapi_config)
           power.stop(vm.vm)
         end
@@ -102,34 +112,57 @@ module Kitchen
       private
 
       def validate_state(state = {})
-
       end
 
       def existing_state_value?(state, property)
         state.key?(property) && !state[property].nil?
       end
 
+      def datacenter_exists?(name)
+        filter = Com::Vmware::Vcenter::Datacenter::FilterSpec.new(names: Set.new([name]))
+        dc_obj = Com::Vmware::Vcenter::Datacenter.new(vapi_config)
+        dc = dc_obj.list(filter)
+
+        raise format('Unable to find data center: %s', name) if dc.empty?
+      end
+
       def get_host(name)
-        filter = Com::Vmware::Vcenter::Host::FilterSpec.new({names: Set.new([name])})
+        filter = Com::Vmware::Vcenter::Host::FilterSpec.new(names: Set.new([name]))
         host_obj = Com::Vmware::Vcenter::Host.new(vapi_config)
-        host = host_obj.list
+        host = host_obj.list(filter)
+
+        raise format('Unable to find target host: %s', name) if host.empty?
+
         host[0].host
       end
 
       def get_folder(name)
         # Create a filter to ensure that only the named folder is returned
-        filter = Com::Vmware::Vcenter::Folder::FilterSpec.new({names: Set.new([name])})
+        filter = Com::Vmware::Vcenter::Folder::FilterSpec.new(names: Set.new([name]))
         # filter.names = name
         folder_obj = Com::Vmware::Vcenter::Folder.new(vapi_config)
         folder = folder_obj.list(filter)
+
+        raise format('Unable to find folder: %s', name) if folder.empty?
 
         folder[0].folder
       end
 
       def get_vm(name)
-        filter = Com::Vmware::Vcenter::VM::FilterSpec.new({names: Set.new([name])})
+        filter = Com::Vmware::Vcenter::VM::FilterSpec.new(names: Set.new([name]))
         vm_obj = Com::Vmware::Vcenter::VM.new(vapi_config)
         vm_obj.list(filter)[0]
+      end
+
+      def get_resource_pool(name)
+        # Create a filter to ensure that only the specified resource pool is returned, if it exists
+        filter = Com::Vmware::Vcenter::ResourcePool::FilterSpec.new(names: Set.new([name]))
+        rp_obj = Com::Vmware::Vcenter::ResourcePool.new(vapi_config)
+        resource_pool = rp_obj.list(filter)
+
+        raise format('Unable to find Resource Pool: %s', name) if resource_pool.empty?
+
+        resource_pool[0].resource_pool
       end
 
       def connect

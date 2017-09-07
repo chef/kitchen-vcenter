@@ -50,6 +50,7 @@ driver:
   driver_config:
     targethost: 172.16.20.41
     datacenter: "Datacenter"
+    resource_pool: "testkitchen"
 
 platforms:
   - name: ubuntu-1604
@@ -75,6 +76,7 @@ The following parameters should be set in the `driver_config` for the individual
  - `targethost` - Host on which the new virtual machine should be created
  - `template` - Template or virtual machine to use when cloning the new machine
  - `datacenter` - Name of the datacenter to use to deploy into
+ - `resource_pool` - Name of the resource pool to use when creating the machine. The resource pool _must_ already exist
 
 ### Optional Parameters
 
