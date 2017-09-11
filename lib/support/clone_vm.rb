@@ -19,6 +19,8 @@ class Support
       # Specify where the machine is going to be created
       relocate_spec = RbVmomi::VIM.VirtualMachineRelocateSpec
       relocate_spec.host = options[:targethost]
+
+      # Set the resource pool
       relocate_spec.pool = options[:resource_pool]
 
       clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(location: relocate_spec,
