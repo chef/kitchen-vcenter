@@ -1,7 +1,14 @@
 # Change Log
 
-## [1.1.0](https://github.com/chef/kitchen-vcenter/tree/1.1.0) (2017-09-07)
-[Full Changelog](https://github.com/chef/kitchen-vcenter/compare/v1.0.0...1.1.0)
+## [1.2.0](https://github.com/chef/kitchen-vcenter/tree/1.2.0) (2017-09-12)
+[Full Changelog](https://github.com/chef/kitchen-vcenter/compare/v1.1.0...1.2.0)
+
+**Merged pull requests:**
+
+- Resource pool and target host no longer have to be specified. [\#10](https://github.com/chef/kitchen-vcenter/pull/10) ([russellseymour](https://github.com/russellseymour))
+
+## [v1.1.0](https://github.com/chef/kitchen-vcenter/tree/v1.1.0) (2017-09-07)
+[Full Changelog](https://github.com/chef/kitchen-vcenter/compare/v1.0.0...v1.1.0)
 
 **Closed issues:**
 
