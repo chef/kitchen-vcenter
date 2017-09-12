@@ -16,9 +16,13 @@ class Support
       dc = vim.serviceInstance.find_datacenter(options[:datacenter])
       src_vm = dc.find_vm(options[:template])
 
+      raise format("Unable to find template: %s", options[:template]) if src_vm.nil?
+
       # Specify where the machine is going to be created
       relocate_spec = RbVmomi::VIM.VirtualMachineRelocateSpec
       relocate_spec.host = options[:targethost]
+
+      # Set the resource pool
       relocate_spec.pool = options[:resource_pool]
 
       clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(location: relocate_spec,

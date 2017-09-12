@@ -48,9 +48,7 @@ driver:
   vcenter_host: vcenter.chef.io
   vcenter_disable_ssl_verify: true
   driver_config:
-    targethost: 172.16.20.41
     datacenter: "Datacenter"
-    resource_pool: "testkitchen"
 
 platforms:
   - name: ubuntu-1604
@@ -73,16 +71,16 @@ The following parameters should be set in the main `driver_config` section as th
 
 The following parameters should be set in the `driver_config` for the individual platform.
 
- - `targethost` - Host on which the new virtual machine should be created
  - `template` - Template or virtual machine to use when cloning the new machine
  - `datacenter` - Name of the datacenter to use to deploy into
- - `resource_pool` - Name of the resource pool to use when creating the machine. The resource pool _must_ already exist
 
 ### Optional Parameters
 
 The following optional parameters should be used in the `driver_config` for the platform.
 
- - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist
+ - `targethost` - Host on which the new virtual machine should be created. If not specified then the first host in the cluster is used.
+ - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist.
+ - `resource_pool` - Name of the resource pool to use when creating the machine. If specified the resource pool _must_ already exist
 
 ## Contributing
 
