@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'test-kitchen', '~> 1.16'
-  spec.add_dependency 'vsphere-automation-sdk', '~> 2.5'
+  spec.add_dependency 'vsphere-automation-sdk', '~> 6.6'
   spec.add_dependency 'rbvmomi', '~> 1.11'
   spec.add_dependency 'savon', '~> 2.11'
 
