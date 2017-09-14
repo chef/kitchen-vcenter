@@ -11,5 +11,9 @@ branches:
     - master
 
 script:
+  - git clone https://github.com/vmware/vsphere-automation-sdk-ruby.git
+  - cd vsphere-automation-sdk-ruby
+  - gem build vsphere-automation-sdk-ruby.gemspec
+  - gem install pkg/*.gem
   - bundle exec rake style
   - bundle exec rake spec
