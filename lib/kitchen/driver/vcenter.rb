@@ -29,11 +29,11 @@ require 'com/vmware/vcenter/vm'
 require 'support/clone_vm'
 require 'securerandom'
 
+# The main kitchen module
 module Kitchen
+  # The main driver module for kitchen-vcenter
   module Driver
-    #
-    # Vcenter
-    #
+    # Extends the Base class for vCenter
     class Vcenter < Kitchen::Driver::Base
       attr_accessor :connection_options, :ipaddress, :vapi_config, :session_svc, :session_id
 
@@ -49,6 +49,9 @@ module Kitchen
       default_config :vm_name, nil
       default_config :resource_pool, nil
 
+      # The main create method
+      #
+      # @param [Object] state is the state of the vm
       def create(state)
         # If the vm_name has not been set then set it now based on the suite, platform and a random number
         if config[:vm_name].nil?
@@ -92,6 +95,9 @@ module Kitchen
         state[:vm_name] = config[:vm_name]
       end
 
+      # The main destroy method
+      #
+      # @param [Object] state is the state of the vm
       def destroy(state)
         return if state[:vm_name].nil?
         connect
@@ -111,6 +117,9 @@ module Kitchen
 
       private
 
+      # A helper method to validate the state
+      #
+      # @param [Object] state is the state of the vm
       def validate_state(state = {})
       end
 
@@ -118,6 +127,9 @@ module Kitchen
         state.key?(property) && !state[property].nil?
       end
 
+      # Sees in the datacenter exists or not
+      #
+      # @param [name] name is the name of the datacenter
       def datacenter_exists?(name)
         filter = Com::Vmware::Vcenter::Datacenter::FilterSpec.new(names: Set.new([name]))
         dc_obj = Com::Vmware::Vcenter::Datacenter.new(vapi_config)
@@ -126,6 +138,9 @@ module Kitchen
         raise format('Unable to find data center: %s', name) if dc.empty?
       end
 
+      # Validates the host name of the server you can connect to
+      #
+      # @param [name] name is the name of the host
       def get_host(name)
         # create a host object to work with
         host_obj = Com::Vmware::Vcenter::Host.new(vapi_config)
@@ -142,6 +157,9 @@ module Kitchen
         host[0].host
       end
 
+      # Gets the folder you want to create the VM
+      #
+      # @param [name] name is the name of the folder
       def get_folder(name)
         # Create a filter to ensure that only the named folder is returned
         filter = Com::Vmware::Vcenter::Folder::FilterSpec.new(names: Set.new([name]))
@@ -153,12 +171,18 @@ module Kitchen
         folder[0].folder
       end
 
+      # Gets the name of the VM you are creating
+      #
+      # @param [name] name is the name of the VM
       def get_vm(name)
         filter = Com::Vmware::Vcenter::VM::FilterSpec.new(names: Set.new([name]))
         vm_obj = Com::Vmware::Vcenter::VM.new(vapi_config)
         vm_obj.list(filter)[0]
       end
 
+      # Gets the name of the resource pool
+      #
+      # @param [name] name is the name of the ResourcePool
       def get_resource_pool(name)
         # Create a resource pool object
         rp_obj = Com::Vmware::Vcenter::ResourcePool.new(vapi_config)
@@ -178,6 +202,8 @@ module Kitchen
         resource_pool[0].resource_pool
       end
 
+      # The main connect method
+      #
       def connect
         # Configure the connection to vCenter
         lookup_service_helper = LookupServiceHelper.new(config[:vcenter_host])
