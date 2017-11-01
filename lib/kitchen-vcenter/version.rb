@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+# The main kitchen-vcenter module
 module KitchenVcenter
+  # The version of this version of test-kitchen we assume enterprises want.
   VERSION = '1.2.1'.freeze
 end
