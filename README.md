@@ -49,23 +49,58 @@ gem 'kitchen-vcenter'
 A sample `.kitchen.yml` file, details are below.
 
 ```yml
+---
 driver:
   name: vcenter
-  vcenter_username: <%= ENV['VCENTER_USER'] || "administrator@vsphere.local" %>
-  vcenter_password: <%= ENV['VCENTER_PASSWORD'] || "P@ssw0rd!" %>
-  vcenter_host: vcenter.chef.io
+  vcenter_username: 'administrator@vsphere.local'
+  vcenter_password: <%= ENV['VCENTER_PASSWORD'] %>
+  vcenter_host:  <%= ENV['VCENTER_HOST'] %>
   vcenter_disable_ssl_verify: true
-  driver_config:
-    datacenter: "Datacenter"
+
+provisioner:
+  name: chef_zero
+  sudo_command: sudo
+  deprecations_as_errors: true
+  retry_on_exit_code:
+    - 35 # 35 is the exit code signaling that the node is rebooting
+  max_retries: 2
+  wait_for_retry: 90
+
+verifier:
+  name: inspec
 
 platforms:
   - name: ubuntu-1604
     driver_config:
+      targethost: 10.0.0.42
       template: ubuntu16-template
+      datacenter: "Datacenter"
+    transport:
+      username: "admini"
+      password: admini
+
   - name: centos-7
     driver_config:
+      targethost: 10.0.0.42
       template: centos7-template
+      datacenter: "Datacenter"
+    transport:
+      username: "root"
+      password: admini
 
+  - name: windows2012R2
+    driver_config:
+      targethost: 10.0.0.42
+      template: windows2012R2-template
+      datacenter: "Datacenter"
+    transport:
+      username: "Administrator"
+      password: "p@ssW0rd!"
+
+suites:
+  - name: default
+    run_list:
+      - recipe[cookbook::default]
 ```
 
 ### Required parameters:
