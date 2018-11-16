@@ -123,7 +123,7 @@ The following optional parameters should be used in the `driver_config` for the 
 
  - `targethost` - Host on which the new virtual machine should be created. If not specified then the first host in the cluster is used.
  - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist.
- - `resource_pool` - Name of the resource pool to use when creating the machine. If specified the resource pool _must_ already exist
+ - `resource_pool` - Name of the resource pool to use when creating the machine. Will search first pool by default, can use value 'Resources' for none
 
 ## Contributing
 
