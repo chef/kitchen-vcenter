@@ -22,6 +22,9 @@ class Support
       relocate_spec = RbVmomi::VIM.VirtualMachineRelocateSpec
       relocate_spec.host = options[:targethost]
 
+      # Change to delta disks for linked clones
+      relocate_spec.diskMoveType = :moveChildMostDiskBacking if options[:clone_type] == :linked
+
       # Set the resource pool
       relocate_spec.pool = options[:resource_pool]
 
