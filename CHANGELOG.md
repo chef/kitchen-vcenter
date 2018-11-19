@@ -1,7 +1,12 @@
 # Change Log
 
-## [1.2.0](https://github.com/chef/kitchen-vcenter/tree/1.2.0) (2017-09-14)
-[Full Changelog](https://github.com/chef/kitchen-vcenter/compare/v1.2.0...1.2.0)
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+<!-- latest_stable_release -->
+## [1.2.0](https://github.com/chef/kitchen-vcenter/tree/1.2.1) (2017-09-14)
+[Full Changelog](https://github.com/chef/kitchen-vcenter/compare/v1.2.0...1.2.1)
 
 **Closed issues:**
 
@@ -10,6 +15,7 @@
 **Merged pull requests:**
 
 - Update dependency reqs. Update README for dep install. [\#12](https://github.com/chef/kitchen-vcenter/pull/12) ([akulbe](https://github.com/akulbe))
+<!-- latest_stable_release -->
 
 ## [v1.2.0](https://github.com/chef/kitchen-vcenter/tree/v1.2.0) (2017-09-12)
 [Full Changelog](https://github.com/chef/kitchen-vcenter/compare/v1.1.0...v1.2.0)
