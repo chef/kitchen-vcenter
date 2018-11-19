@@ -17,4 +17,4 @@ YARD::Rake::YardocTask.new do |t|
   t.stats_options = ["--list-undoc"] # optional
 end
 
-task default: [:style, :spec]
+task default: [:style]
