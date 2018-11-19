@@ -48,6 +48,7 @@ module Kitchen
       default_config :poweron, true
       default_config :vm_name, nil
       default_config :resource_pool, nil
+      default_config :clone_type, :full
 
       # The main create method
       #
@@ -78,6 +79,9 @@ module Kitchen
           id: get_folder(config[:folder]),
         } unless config[:folder].nil?
 
+        # Allow different clone types
+        config[:clone_type] = :linked if config[:clone_type] == 'linked'
+
         # Create a hash of options that the clone requires
         options = {
           name: config[:vm_name],
@@ -87,6 +91,7 @@ module Kitchen
           datacenter: config[:datacenter],
           folder: config[:folder],
           resource_pool: config[:resource_pool],
+          clone_type: config[:clone_type],
         }
 
         # Create an object from which the clone operation can be called

@@ -114,7 +114,7 @@ The following parameters should be set in the main `driver_config` section as th
 
 The following parameters should be set in the `driver_config` for the individual platform.
 
- - `template` - Template or virtual machine to use when cloning the new machine
+ - `template` - Template or virtual machine to use when cloning the new machine (needs to be a VM for linked clones)
  - `datacenter` - Name of the datacenter to use to deploy into
 
 ### Optional Parameters
@@ -124,6 +124,7 @@ The following optional parameters should be used in the `driver_config` for the 
  - `targethost` - Host on which the new virtual machine should be created. If not specified then the first host in the cluster is used.
  - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist.
  - `resource_pool` - Name of the resource pool to use when creating the machine. If specified the resource pool _must_ already exist
+ - `clone_type` - Type of clone, will default to "full" to create complete copies of template. Needs a VM as template parameter, if "linked" clone desired
 
 ## Contributing
 
