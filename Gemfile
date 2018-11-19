@@ -1,5 +1,5 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 gemspec
 
-  gem "vsphere-automation-sdk", git: "https://github.com/vmware/vsphere-automation-sdk-ruby.git", branch: "master"
+gem "vsphere-automation-sdk", git: "https://github.com/vmware/vsphere-automation-sdk-ruby.git", branch: "master"

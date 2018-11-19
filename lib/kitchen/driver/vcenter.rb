@@ -17,17 +17,17 @@
 # limitations under the License.
 #
 
-require 'kitchen'
-require 'rbvmomi'
-require 'sso'
-require 'base'
-require 'lookup_service_helper'
-require 'vapi'
-require 'com/vmware/cis'
-require 'com/vmware/vcenter'
-require 'com/vmware/vcenter/vm'
-require 'support/clone_vm'
-require 'securerandom'
+require "kitchen"
+require "rbvmomi"
+require "sso"
+require "base"
+require "lookup_service_helper"
+require "vapi"
+require "com/vmware/cis"
+require "com/vmware/vcenter"
+require "com/vmware/vcenter/vm"
+require "support/clone_vm"
+require "securerandom"
 
 # The main kitchen module
 module Kitchen
@@ -56,7 +56,7 @@ module Kitchen
       def create(state)
         # If the vm_name has not been set then set it now based on the suite, platform and a random number
         if config[:vm_name].nil?
-          config[:vm_name] = format('%s-%s-%s', instance.suite.name, instance.platform.name, SecureRandom.hex(4))
+          config[:vm_name] = format("%s-%s-%s", instance.suite.name, instance.platform.name, SecureRandom.hex(4))
         end
 
         connect
@@ -72,13 +72,15 @@ module Kitchen
         datacenter_exists?(config[:datacenter])
 
         # Same thing needs to happen with the folder name if it has been set
-        config[:folder] = {
-          name: config[:folder],
-          id: get_folder(config[:folder]),
-        } unless config[:folder].nil?
+        unless config[:folder].nil?
+          config[:folder] = {
+            name: config[:folder],
+            id: get_folder(config[:folder]),
+          }
+        end
 
         # Allow different clone types
-        config[:clone_type] = :linked if config[:clone_type] == 'linked'
+        config[:clone_type] = :linked if config[:clone_type] == "linked"
 
         # Create a hash of options that the clone requires
         options = {
@@ -94,7 +96,7 @@ module Kitchen
 
         # Create an object from which the clone operation can be called
         clone_obj = Support::CloneVm.new(connection_options, options)
-        state[:hostname] = clone_obj.clone()
+        state[:hostname] = clone_obj.clone
         state[:vm_name] = config[:vm_name]
       end
 
@@ -103,13 +105,14 @@ module Kitchen
       # @param [Object] state is the state of the vm
       def destroy(state)
         return if state[:vm_name].nil?
+
         connect
         vm = get_vm(state[:vm_name])
 
         vm_obj = Com::Vmware::Vcenter::VM.new(vapi_config)
 
         # shut the machine down if it is running
-        if vm.power_state.value == 'POWERED_ON'
+        if vm.power_state.value == "POWERED_ON"
           power = Com::Vmware::Vcenter::Vm::Power.new(vapi_config)
           power.stop(vm.vm)
         end
@@ -123,8 +126,7 @@ module Kitchen
       # A helper method to validate the state
       #
       # @param [Object] state is the state of the vm
-      def validate_state(state = {})
-      end
+      def validate_state(state = {}); end
 
       def existing_state_value?(state, property)
         state.key?(property) && !state[property].nil?
@@ -138,7 +140,7 @@ module Kitchen
         dc_obj = Com::Vmware::Vcenter::Datacenter.new(vapi_config)
         dc = dc_obj.list(filter)
 
-        raise format('Unable to find data center: %s', name) if dc.empty?
+        raise format("Unable to find data center: %s", name) if dc.empty?
       end
 
       # Validates the host name of the server you can connect to
@@ -155,7 +157,7 @@ module Kitchen
           host = host_obj.list(filter)
         end
 
-        raise format('Unable to find target host: %s', name) if host.empty?
+        raise format("Unable to find target host: %s", name) if host.empty?
 
         host[0].host
       end
@@ -169,7 +171,7 @@ module Kitchen
         folder_obj = Com::Vmware::Vcenter::Folder.new(vapi_config)
         folder = folder_obj.list(filter)
 
-        raise format('Unable to find folder: %s', name) if folder.empty?
+        raise format("Unable to find folder: %s", name) if folder.empty?
 
         folder[0].folder
       end
@@ -195,20 +197,20 @@ module Kitchen
         # otherwise try to find by given name
         if name.nil?
           # Remove default pool for first pass (<= 1.2.1 behaviour to pick first user-defined pool found)
-          resource_pool = rp_obj.list.delete_if { |pool| pool.name == 'Resources' }
-          debug('Search of all resource pools found: ' + resource_pool.map { |pool| pool.name }.to_s)
+          resource_pool = rp_obj.list.delete_if { |pool| pool.name == "Resources" }
+          debug("Search of all resource pools found: " + resource_pool.map { |pool| pool.name }.to_s)
 
           # Revert to default pool, if no user-defined pool found (> 1.2.1 behaviour)
           # (This one might not be found under some circumstances by the statement above)
-          resource_pool = get_resource_pool('Resources') if resource_pool.empty?
+          resource_pool = get_resource_pool("Resources") if resource_pool.empty?
         else
           # create a filter to find the named resource pool
           filter = Com::Vmware::Vcenter::ResourcePool::FilterSpec.new(names: Set.new([name]))
           resource_pool = rp_obj.list(filter)
-          debug('Search for resource pools found: ' + resource_pool.map { |pool| pool.name }.to_s)
+          debug("Search for resource pools found: " + resource_pool.map { |pool| pool.name }.to_s)
         end
 
-        raise format('Unable to find Resource Pool: %s', name) if resource_pool.empty?
+        raise format("Unable to find Resource Pool: %s", name) if resource_pool.empty?
 
         resource_pool[0].resource_pool
       end
@@ -218,7 +220,7 @@ module Kitchen
       def connect
         # Configure the connection to vCenter
         lookup_service_helper = LookupServiceHelper.new(config[:vcenter_host])
-        vapi_urls = lookup_service_helper.find_vapi_urls()
+        vapi_urls = lookup_service_helper.find_vapi_urls
         vapi_url = vapi_urls.values[0]
 
         # Create the VAPI config object
@@ -227,16 +229,16 @@ module Kitchen
         @vapi_config = VAPI::Bindings::VapiConfig.new(vapi_url, ssl_options)
 
         # get the SSO url
-        sso_url = lookup_service_helper.find_sso_url()
+        sso_url = lookup_service_helper.find_sso_url
         sso = SSO::Connection.new(sso_url).login(config[:vcenter_username], config[:vcenter_password])
-        token = sso.request_bearer_token()
+        token = sso.request_bearer_token
         vapi_config.set_security_context(
           VAPI::Security.create_saml_bearer_security_context(token.to_s)
         )
 
         # Login and get the session information
         @session_svc = Com::Vmware::Cis::Session.new(vapi_config)
-        @session_id = session_svc.create()
+        @session_id = session_svc.create
         vapi_config.set_security_context(
           VAPI::Security.create_session_security_context(session_id)
         )

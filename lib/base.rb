@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-require 'logger'
+require "logger"
 
 module Base
   attr_accessor :log
@@ -28,7 +28,7 @@ module Base
 
   def self.init_logger
     log = Logger.new(STDOUT)
-    log.progname = 'Knife VCenter'
+    log.progname = "Knife VCenter"
     log.level = Logger::INFO
     log
   end
