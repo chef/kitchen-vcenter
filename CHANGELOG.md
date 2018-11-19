@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 1.2.2 -->
-## [v1.2.2](https://github.com/chef/kitchen-vcenter/tree/v1.2.2) (2018-11-19)
+<!-- latest_release 1.3.0 -->
+## [v1.3.0](https://github.com/chef/kitchen-vcenter/tree/v1.3.0) (2018-11-19)
 
 #### Merged Pull Requests
-- Fixed behaviour when not having any resource pools (Issue #28) [#31](https://github.com/chef/kitchen-vcenter/pull/31) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Implement support for linked clones (feature #18) [#32](https://github.com/chef/kitchen-vcenter/pull/32) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
 <!-- release_rollup since=1.2.1 -->
 ### Changes since 1.2.1 release
 
 #### Merged Pull Requests
+- Implement support for linked clones (feature #18) [#32](https://github.com/chef/kitchen-vcenter/pull/32) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.3.0 -->
 - Fixed behaviour when not having any resource pools (Issue #28) [#31](https://github.com/chef/kitchen-vcenter/pull/31) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.2.2 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
