@@ -2,7 +2,6 @@
 
 [![Gem Version](https://badge.fury.io/rb/kitchen-vcenter.svg)](https://rubygems.org/gems/kitchen-vcenter)
 [![Build Status](https://travis-ci.org/chef/kitchen-vcenter.svg?branch=master)](https://travis-ci.org/chef/kitchen-vcenter)
-[![Dependency Status](https://gemnasium.com/chef/kitchen-vcenter.svg)](https://gemnasium.com/chef/kitchen-vcenter)
 [![Inline docs](http://inch-ci.org/github/chef/kitchen-vcenter.svg?branch=master)](http://inch-ci.org/github/chef/kitchen-vcenter)
 
 This is the official Chef test-kitchen plugin for VMware REST API. This plugin gives kitchen the ability to create, bootstrap, and test VMware vms.
@@ -123,7 +122,7 @@ The following optional parameters should be used in the `driver_config` for the 
 
  - `targethost` - Host on which the new virtual machine should be created. If not specified then the first host in the cluster is used.
  - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist.
- - `resource_pool` - Name of the resource pool to use when creating the machine. If specified the resource pool _must_ already exist
+ - `resource_pool` - Name of the resource pool to use when creating the machine. Will search first pool by default, can use value 'Resources' for none
  - `clone_type` - Type of clone, will default to "full" to create complete copies of template. Needs a VM as template parameter, if "linked" clone desired
 
 ## Contributing
@@ -152,7 +151,7 @@ Author:: Russell Seymour ([rseymour@chef.io](mailto:rseymour@chef.io))
 
 Author:: JJ Asghar ([jj@chef.io](mailto:jj@chef.io))
 
-Copyright:: Copyright (c) 2017 Chef Software, Inc.
+Copyright:: Copyright (c) 2017-2018 Chef Software, Inc.
 
 License:: Apache License, Version 2.0
 

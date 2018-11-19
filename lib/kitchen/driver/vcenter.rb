@@ -59,8 +59,6 @@ module Kitchen
           config[:vm_name] = format('%s-%s-%s', instance.suite.name, instance.platform.name, SecureRandom.hex(4))
         end
 
-        # raise "Please set the resource pool name using `resource_pool` parameter in the 'drive_config' section of your .kitchen.yml file" if config[:resource_pool].nil?
-
         connect
 
         # Using the clone class, create a machine for TK
@@ -187,22 +185,30 @@ module Kitchen
 
       # Gets the name of the resource pool
       #
+      # @todo Will not yet work with nested pools ("Pool1/Subpool1")
       # @param [name] name is the name of the ResourcePool
       def get_resource_pool(name)
         # Create a resource pool object
         rp_obj = Com::Vmware::Vcenter::ResourcePool.new(vapi_config)
 
-        # If a name has been set then try to find it, otherwise use the first
-        # resource pool that can be found
+        # If no name has been set, use the first resource pool that can be found,
+        # otherwise try to find by given name
         if name.nil?
-          resource_pool = rp_obj.list
+          # Remove default pool for first pass (<= 1.2.1 behaviour to pick first user-defined pool found)
+          resource_pool = rp_obj.list.delete_if { |pool| pool.name == 'Resources' }
+          debug('Search of all resource pools found: ' + resource_pool.map { |pool| pool.name }.to_s)
+
+          # Revert to default pool, if no user-defined pool found (> 1.2.1 behaviour)
+          # (This one might not be found under some circumstances by the statement above)
+          resource_pool = get_resource_pool('Resources') if resource_pool.empty?
         else
           # create a filter to find the named resource pool
           filter = Com::Vmware::Vcenter::ResourcePool::FilterSpec.new(names: Set.new([name]))
           resource_pool = rp_obj.list(filter)
+          debug('Search for resource pools found: ' + resource_pool.map { |pool| pool.name }.to_s)
         end
 
-        raise format('Unable to find Resource Pool: %s', name) if resource_pool.nil?
+        raise format('Unable to find Resource Pool: %s', name) if resource_pool.empty?
 
         resource_pool[0].resource_pool
       end
