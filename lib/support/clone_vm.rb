@@ -1,4 +1,4 @@
-require 'rbvmomi'
+require "rbvmomi"
 
 class Support
   class CloneVm
@@ -41,16 +41,16 @@ class Support
 
       # get the IP address of the machine for bootstrapping
       # machine name is based on the path, e.g. that includes the folder
-      name = options[:folder].nil? ? options[:name] : format('%s/%s', options[:folder][:name], options[:name])
+      name = options[:folder].nil? ? options[:name] : format("%s/%s", options[:folder][:name], options[:name])
       new_vm = dc.find_vm(name)
 
       if new_vm.nil?
-        puts format('Unable to find machine: %s', name)
+        puts format("Unable to find machine: %s", name)
       else
-        puts 'Waiting for network interfaces to become available...'
+        puts "Waiting for network interfaces to become available..."
         sleep 2 while new_vm.guest.net.empty? || !new_vm.guest.ipAddress
         new_vm.guest.net[0].ipConfig.ipAddress.detect do |addr|
-          addr.origin != 'linklayer'
+          addr.origin != "linklayer"
         end.ipAddress
       end
     end
