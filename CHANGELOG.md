@@ -15,7 +15,7 @@
 - Fixed behaviour when not having any resource pools (Issue #28) [#31](https://github.com/chef/kitchen-vcenter/pull/31) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.2.2 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
-## [1.2.0](https://github.com/chef/kitchen-vcenter/tree/1.2.1) (2017-09-14)
+## [1.2.1](https://github.com/chef/kitchen-vcenter/tree/1.2.1) (2017-09-14)
 [Full Changelog](https://github.com/chef/kitchen-vcenter/compare/v1.2.0...1.2.1)
 
 **Closed issues:**
