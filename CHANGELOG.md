@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 1.3.2 -->
+## [v1.3.2](https://github.com/chef/kitchen-vcenter/tree/v1.3.2) (2018-11-20)
+
+#### Merged Pull Requests
+- README edits [#38](https://github.com/chef/kitchen-vcenter/pull/38) ([mjingle](https://github.com/mjingle))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=1.3.1 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- README edits [#38](https://github.com/chef/kitchen-vcenter/pull/38) ([mjingle](https://github.com/mjingle)) <!-- 1.3.2 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [v1.3.1](https://github.com/chef/kitchen-vcenter/tree/v1.3.1) (2018-11-19)
