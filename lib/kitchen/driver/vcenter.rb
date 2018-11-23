@@ -41,11 +41,11 @@ module Kitchen
       required_config :vcenter_password
       required_config :vcenter_host
       required_config :datacenter
-      required_config :targethost
       required_config :template
 
-      default_config :folder, nil
       default_config :vcenter_disable_ssl_verify, false
+      default_config :targethost, nil
+      default_config :folder, nil
       default_config :poweron, true
       default_config :vm_name, nil
       default_config :resource_pool, nil
