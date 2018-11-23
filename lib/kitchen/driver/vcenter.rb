@@ -37,13 +37,14 @@ module Kitchen
     class Vcenter < Kitchen::Driver::Base
       attr_accessor :connection_options, :ipaddress, :vapi_config, :session_svc, :session_id
 
-      default_config :targethost
-      default_config :folder
-      default_config :template
-      default_config :datacenter
-      default_config :vcenter_username
-      default_config :vcenter_password
-      default_config :vcenter_host
+      required_config :vcenter_username
+      required_config :vcenter_password
+      required_config :vcenter_host
+      required_config :datacenter
+      required_config :targethost
+      required_config :template
+
+      default_config :folder, nil
       default_config :vcenter_disable_ssl_verify, false
       default_config :poweron, true
       default_config :vm_name, nil
