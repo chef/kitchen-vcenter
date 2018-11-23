@@ -109,19 +109,23 @@ The following parameters should be set in the main `driver_config` section as th
  - `vcenter_username` - Name to use when connecting to the vSphere environment
  - `vcenter_password` - Password associated with the specified user
  - `vcenter_host` - Host against which logins should be attempted
- - `vcenter_disable_ssl_verify` - Whether or not to disable SSL verification checks. Good when using self signed certificates. Default: false
 
 The following parameters should be set in the `driver_config` for the individual platform:
 
- - `template` - Template or virtual machine to use when cloning the new machine (needs to be a VM for linked clones)
  - `datacenter` - Name of the datacenter to use to deploy into
+ - `template` - Template or virtual machine to use when cloning the new machine (needs to be a VM for linked clones)
 
 ### Optional Parameters
+
+The following parameters should be set in the main `driver_config` section as they are common to all platforms:
+ - `vcenter_disable_ssl_verify` - Whether or not to disable SSL verification checks. Good when using self signed certificates. Default: false
 
 The following optional parameters should be used in the `driver_config` for the platform.
 
  - `targethost` - Host on which the new virtual machine should be created. If not specified then the first host in the cluster is used.
  - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist.
+ - `poweron` - Power on the new virtual machine. Default: true
+ - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
  - `resource_pool` - Name of the resource pool to use when creating the machine. Will search first pool by default, can use value 'Resources' for none.
  - `clone_type` - Type of clone, will default to "full" to create complete copies of template. Needs a VM as template parameter, if "linked" clone desired.
 
