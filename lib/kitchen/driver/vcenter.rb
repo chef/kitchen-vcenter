@@ -82,6 +82,7 @@ module Kitchen
 
         # Allow different clone types
         config[:clone_type] = :linked if config[:clone_type] == "linked"
+        config[:clone_type] = :instant if config[:clone_type] == "instant"
 
         # Create a hash of options that the clone requires
         options = {
@@ -160,7 +161,7 @@ module Kitchen
 
         raise format("Unable to find target host: %s", name) if host.empty?
 
-        host[0].host
+        host[0]
       end
 
       # Gets the folder you want to create the VM
@@ -250,6 +251,7 @@ module Kitchen
           password: config[:vcenter_password],
           insecure: config[:vcenter_disable_ssl_verify] ? true : false,
           host: config[:vcenter_host],
+          rev: config[:clone_type] == 'instant' ? '6.7' : nil,
         }
       end
     end
