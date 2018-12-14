@@ -126,8 +126,10 @@ The following optional parameters should be used in the `driver_config` for the 
  - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist.
  - `poweron` - Power on the new virtual machine. Default: true
  - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
- - `resource_pool` - Name of the resource pool to use when creating the machine. Will search first pool by default, can use value 'Resources' for none.
- - `clone_type` - Type of clone, will default to "full" to create complete copies of template. Needs a VM as template parameter, if "linked" clone desired.
+
+Only one of the following optional parameters can be given:
+ - `resource_pool` - Name of the resource pool to use when creating the machine. Will use first pool by default.
+ - `cluster` - Cluster on which the new virtual machine should be created. Will provision in the root pool, if paramter given and choose a targethost within
 
 ## Contributing
 
