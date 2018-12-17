@@ -251,7 +251,7 @@ module Kitchen
           password: config[:vcenter_password],
           insecure: config[:vcenter_disable_ssl_verify] ? true : false,
           host: config[:vcenter_host],
-          rev: config[:clone_type] == 'instant' ? '6.7' : nil,
+          rev: config[:clone_type] == "instant" ? "6.7" : nil,
         }
       end
     end

@@ -36,23 +36,23 @@ class Support
       puts "Cloning '#{options[:template]}' to create the VM..."
       if options[:clone_type] == :instant
         vcenter_data = vim.serviceInstance.content.about
-        raise 'Instant clones only supported with vCenter 6.7 or higher' unless vcenter_data.version.to_f >= 6.7
+        raise "Instant clones only supported with vCenter 6.7 or higher" unless vcenter_data.version.to_f >= 6.7
         puts "- Detected #{vcenter_data.fullName}"
 
         resources = dc.hostFolder.children
-        hosts = resources.select { |resource| resource.class.to_s == 'ComputeResource' }.map { |c| c.host }.flatten
+        hosts = resources.select { |resource| resource.class.to_s == "ComputeResource" }.map { |c| c.host }.flatten
         targethost = hosts.select { |host| host.summary.config.name == options[:targethost].name }.first
         esx_data = targethost.summary.config.product
-        raise 'Instant clones only supported with ESX 6.7 or higher' unless esx_data.version.to_f >= 6.7
+        raise "Instant clones only supported with ESX 6.7 or higher" unless esx_data.version.to_f >= 6.7
         puts "- Detected #{esx_data.fullName}"
 
         # Other tools check for VMWare Tools status, but that will be toolsNotRunning on frozen VMs
-        raise 'Need a running VM for instant clones' unless src_vm.runtime.powerState == 'poweredOn'
+        raise "Need a running VM for instant clones" unless src_vm.runtime.powerState == "poweredOn"
 
         # In first iterations, only support the Frozen Source VM workflow. This is more efficient
         #   but needs preparations (freezing the source VM). Running Source VM support is to be
         #   added later
-        raise 'Need a frozen VM for instant clones, running source VM not supported yet' unless src_vm.runtime.instantCloneFrozen
+        raise "Need a frozen VM for instant clones, running source VM not supported yet" unless src_vm.runtime.instantCloneFrozen
 
         # Swapping NICs not needed anymore (blog posts mention this), instant clones get a new
         # MAC at least with 6.7.0 build 9433931
