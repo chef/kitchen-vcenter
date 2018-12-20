@@ -128,8 +128,8 @@ The following optional parameters should be used in the `driver_config` for the 
  - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
 
 Only one of the following optional parameters can be given:
- - `resource_pool` - Name of the resource pool to use when creating the machine. Will use first pool by default.
- - `cluster` - Cluster on which the new virtual machine should be created. Will provision in the root pool, if paramter given and choose a targethost within
+ - `resource_pool` - Name of the resource pool to use when creating the machine. Default: first pool
+ - `cluster` - Cluster on which the new virtual machine should be created. Default: cluster of the `targethost` machine.
 
 ## Contributing
 
