@@ -127,7 +127,7 @@ The following optional parameters should be used in the `driver_config` for the 
  - `poweron` - Power on the new virtual machine. Default: true
  - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
  - `resource_pool` - Name of the resource pool to use when creating the machine. Will search first pool by default, can use value 'Resources' for none.
- - `clone_type` - Type of clone, will default to "full" to create complete copies of template. Other values: "linked", "instant"
+ - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
 
 ## Clone types
 
@@ -137,13 +137,13 @@ This takes a VM or template, copies the whole disk and then boots up the machine
 
 ### Clone mode: linked
 
-Instead of a full copy, this will use delta disks to speed up the cloning process and uses much less IO operations. The `template` parameter has to be a VM in this case, as a template is not usable. After creation of the delta disks, the machine is booted up and writes to its delta only.
+Instead of a full copy, "linked" uses delta disks to speed up the cloning process and uses many fewer IO operations. The `template` parameter has to reference a VM in this case, a template will not work. After creation of the delta disks, the machine is booted up and writes only to its delta disks.
 
-Depending on the underlying storage system, performance might vary greatly compared to full clones.
+Depending on the underlying storage system, performance may vary greatly compared to full clones.
 
 ### Clone mode: instant
 
-The instant clone feature has been available as VMFork in earlier vSphere versions, but without a proper public API. With version 6.7.0, this became an official feature. Instant clones work by not only using a delta disk like linked clones, but also share memory with the source machine. Due to this property, the new machines are already booted up after cloning.
+The instant clone feature has been available under the name "VMFork" in earlier vSphere versions, but without a proper public API. With version 6.7.0, instant clones became an official feature. They work by not only using a delta disk like linked clones, but also share memory with the source machine. Because of sharing memory contents, the new machines are already booted up after cloning.
 
 Prerequisites:
 - vCenter version 6.7.0 or higher
@@ -152,15 +152,15 @@ Prerequisites:
 - a running source virtual machine (`template` parameter)
 
 Limitations:
-- new VM will always be on the same host due to memory sharing
-- current driver only supports the "Frozen Source VM" workflow (as it is more efficient than "Running Source VM" version)
+- A new VM is always on the same host because of memory sharing
+- The current driver supports only the "Frozen Source VM" workflow, which is more efficient than the "Running Source VM" version
 
 Freezing the source VM:
 - Login to the machine
-- Execute the freeze operation via `vmtoolsd -cmd "instantclone.freeze"`
-- The machine does not execute any CPU instructions from this point on
+- Execute the freeze operation, for example via `vmtoolsd -cmd "instantclone.freeze"`
+- The machine does not execute any CPU instructions after this point
 
-New clones will resume exactly at the frozen point in time and resume CPU activity automatically. In contrast to some early blog posts, they do not
+New clones resume from exactly the frozen point in time and also resume CPU activity automatically. In contrast to some early blog posts, they do not
 duplicate the source MAC address, but get a different one.
 
 Architectural description see <https://www.virtuallyghetto.com/2018/04/new-instant-clone-architecture-in-vsphere-6-7-part-1.html>
