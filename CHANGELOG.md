@@ -10,7 +10,7 @@
 #### Merged Pull Requests
 - Require Ruby 2.3+ and slim the files we ship in the gem [#45](https://github.com/chef/kitchen-vcenter/pull/45) ([tas50](https://github.com/tas50))
 - Add support for provisioning on a specific cluster [#42](https://github.com/chef/kitchen-vcenter/pull/42) ([tecracer-theinen](https://github.com/tecracer-theinen))
-- Add support for instant clones and documentation [#43](https://github.com/chef/kitchen-vcenter/pull/43) ([siemensgamesa-theinen](https://github.com/siemensgamesa-theinen))
+- Add support for instant clones and documentation [#43](https://github.com/chef/kitchen-vcenter/pull/43) - Thank you [Siemens Gamesa](https://www.siemensgamesa.com) for sponsoring this contribution.
 <!-- latest_stable_release -->
 
 ## [v1.3.4](https://github.com/chef/kitchen-vcenter/tree/v1.3.4) (2019-01-04)
