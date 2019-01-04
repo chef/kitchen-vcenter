@@ -126,12 +126,48 @@ The following optional parameters should be used in the `driver_config` for the 
  - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist.
  - `poweron` - Power on the new virtual machine. Default: true
  - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
- - `clone_type` - Type of clone, will default to "full" to create complete copies of template. Needs a VM as template parameter, if "linked" clone desired.
+ - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
  - `lookup_service_host` - Specify hostname of Lookup Service for setups with external PSC. Default: autodetect
 
 Only one of the following optional parameters can be given:
  - `resource_pool` - Name of the resource pool to use when creating the machine. Default: first pool
  - `cluster` - Cluster on which the new virtual machine should be created. Default: cluster of the `targethost` machine.
+
+## Clone types
+
+### Clone type: full
+
+This takes a VM or template, copies the whole disk and then boots up the machine. Default mode of operation.
+
+### Clone mode: linked
+
+Instead of a full copy, "linked" uses delta disks to speed up the cloning process and uses many fewer IO operations. The `template` parameter has to reference a VM in this case, a template will not work. After creation of the delta disks, the machine is booted up and writes only to its delta disks.
+
+Depending on the underlying storage system, performance may vary greatly compared to full clones.
+
+### Clone mode: instant
+
+The instant clone feature has been available under the name "VMFork" in earlier vSphere versions, but without a proper public API. With version 6.7.0, instant clones became an official feature. They work by not only using a delta disk like linked clones, but also share memory with the source machine. Because of sharing memory contents, the new machines are already booted up after cloning.
+
+Prerequisites:
+- vCenter version 6.7.0 or higher
+- vSphere Hypervisor (aka ESXi) version 6.7.0 or higher
+- VMware Tools installed and running
+- a running source virtual machine (`template` parameter)
+
+Limitations:
+- A new VM is always on the same host because of memory sharing
+- The current driver supports only the "Frozen Source VM" workflow, which is more efficient than the "Running Source VM" version
+
+Freezing the source VM:
+- Login to the machine
+- Execute the freeze operation, for example via `vmtoolsd -cmd "instantclone.freeze"`
+- The machine does not execute any CPU instructions after this point
+
+New clones resume from exactly the frozen point in time and also resume CPU activity automatically. In contrast to some early blog posts, they do not
+duplicate the source MAC address, but get a different one.
+
+Architectural description see <https://www.virtuallyghetto.com/2018/04/new-instant-clone-architecture-in-vsphere-6-7-part-1.html>
 
 ## Contributing
 

@@ -20,7 +20,9 @@ class Support
 
       # Specify where the machine is going to be created
       relocate_spec = RbVmomi::VIM.VirtualMachineRelocateSpec
-      relocate_spec.host = options[:targethost]
+
+      # Setting the host is not allowed for instant clone due to VM memory sharing
+      relocate_spec.host = options[:targethost].host unless options[:clone_type] == :instant
 
       # Change to delta disks for linked clones
       relocate_spec.diskMoveType = :moveChildMostDiskBacking if options[:clone_type] == :linked
@@ -28,15 +30,46 @@ class Support
       # Set the resource pool
       relocate_spec.pool = options[:resource_pool]
 
-      clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(location: relocate_spec,
-                                                        powerOn: options[:poweron],
-                                                        template: false)
-
       # Set the folder to use
       dest_folder = options[:folder].nil? ? src_vm.parent : options[:folder][:id]
 
-      puts "Cloning the template '#{options[:template]}' to create the VM..."
-      task = src_vm.CloneVM_Task(folder: dest_folder, name: options[:name], spec: clone_spec)
+      puts "Cloning '#{options[:template]}' to create the VM..."
+      if options[:clone_type] == :instant
+        vcenter_data = vim.serviceInstance.content.about
+        raise "Instant clones only supported with vCenter 6.7 or higher" unless vcenter_data.version.to_f >= 6.7
+        puts "- Detected #{vcenter_data.fullName}"
+
+        resources = dc.hostFolder.children
+        hosts = resources.select { |resource| resource.class.to_s == "ComputeResource" }.map { |c| c.host }.flatten
+        targethost = hosts.select { |host| host.summary.config.name == options[:targethost].name }.first
+        esx_data = targethost.summary.config.product
+        raise "Instant clones only supported with ESX 6.7 or higher" unless esx_data.version.to_f >= 6.7
+        puts "- Detected #{esx_data.fullName}"
+
+        # Other tools check for VMWare Tools status, but that will be toolsNotRunning on frozen VMs
+        raise "Need a running VM for instant clones" unless src_vm.runtime.powerState == "poweredOn"
+
+        # In first iterations, only support the Frozen Source VM workflow. This is more efficient
+        #   but needs preparations (freezing the source VM). Running Source VM support is to be
+        #   added later
+        raise "Need a frozen VM for instant clones, running source VM not supported yet" unless src_vm.runtime.instantCloneFrozen
+
+        # Swapping NICs not needed anymore (blog posts mention this), instant clones get a new
+        # MAC at least with 6.7.0 build 9433931
+
+        # @todo not working yet
+        # relocate_spec.folder = dest_folder
+        clone_spec = RbVmomi::VIM.VirtualMachineInstantCloneSpec(location: relocate_spec,
+                                                                 name: options[:name])
+
+        task = src_vm.InstantClone_Task(spec: clone_spec)
+      else
+        clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(location: relocate_spec,
+                                                          powerOn: options[:poweron],
+                                                          template: false)
+
+        task = src_vm.CloneVM_Task(spec: clone_spec, folder: dest_folder, name: options[:name])
+      end
       task.wait_for_completion
 
       # get the IP address of the machine for bootstrapping
