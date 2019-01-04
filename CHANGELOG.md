@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 1.4.1 -->
-## [v1.4.1](https://github.com/chef/kitchen-vcenter/tree/v1.4.1) (2019-01-04)
+<!-- latest_release 1.4.2 -->
+## [v1.4.2](https://github.com/chef/kitchen-vcenter/tree/v1.4.2) (2019-01-04)
 
 #### Merged Pull Requests
-- Add support for provisioning on a specific cluster [#42](https://github.com/chef/kitchen-vcenter/pull/42) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Add support for instant clones and documentation [#43](https://github.com/chef/kitchen-vcenter/pull/43) ([siemensgamesa-theinen](https://github.com/siemensgamesa-theinen))
 <!-- latest_release -->
 <!-- release_rollup since=1.3.4 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Add support for instant clones and documentation [#43](https://github.com/chef/kitchen-vcenter/pull/43) ([siemensgamesa-theinen](https://github.com/siemensgamesa-theinen)) <!-- 1.4.2 -->
 - Add support for provisioning on a specific cluster [#42](https://github.com/chef/kitchen-vcenter/pull/42) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.1 -->
 - Require Ruby 2.3+ and slim the files we ship in the gem [#45](https://github.com/chef/kitchen-vcenter/pull/45) ([tas50](https://github.com/tas50)) <!-- 1.4.0 -->
 <!-- release_rollup -->
