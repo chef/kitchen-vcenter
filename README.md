@@ -128,6 +128,7 @@ The following optional parameters should be used in the `driver_config` for the 
  - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
  - `resource_pool` - Name of the resource pool to use when creating the machine. Will search first pool by default, can use value 'Resources' for none.
  - `clone_type` - Type of clone, will default to "full" to create complete copies of template. Needs a VM as template parameter, if "linked" clone desired.
+ - `lookup_service_host` - Specify hostname of Lookup Service for setups with external PSC. Default: autodetect
 
 ## Contributing
 
