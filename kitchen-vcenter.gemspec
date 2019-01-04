@@ -13,8 +13,10 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/chef/kitchen-vcenter"
   spec.license       = "Apache-2.0"
 
-  spec.files         = Dir["LICENSE", "README.md", "CHANGELOG.md", "lib/**/*", "kitchen-vcenter/version.rb"]
+  spec.files         = Dir["LICENSE", "lib/**/*"]
   spec.require_paths = ["lib"]
+
+  s.required_ruby_version = ">= 2.2"
 
   spec.add_dependency "rbvmomi", "~> 1.11"
   spec.add_dependency "savon", "~> 2.11"
