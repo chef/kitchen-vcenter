@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 1.3.3 -->
-## [v1.3.3](https://github.com/chef/kitchen-vcenter/tree/v1.3.3) (2018-11-23)
+<!-- latest_release 1.3.4 -->
+## [v1.3.4](https://github.com/chef/kitchen-vcenter/tree/v1.3.4) (2019-01-04)
 
 #### Merged Pull Requests
-- Feature/check parameters [#40](https://github.com/chef/kitchen-vcenter/pull/40) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Fix for Issues #26 and #30 [#44](https://github.com/chef/kitchen-vcenter/pull/44) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
 <!-- release_rollup since=1.3.1 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Fix for Issues #26 and #30 [#44](https://github.com/chef/kitchen-vcenter/pull/44) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.3.4 -->
 - Feature/check parameters [#40](https://github.com/chef/kitchen-vcenter/pull/40) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.3.3 -->
 - README edits [#38](https://github.com/chef/kitchen-vcenter/pull/38) ([mjingle](https://github.com/mjingle)) <!-- 1.3.2 -->
 <!-- release_rollup -->
