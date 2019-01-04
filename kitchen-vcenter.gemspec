@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.files         = Dir["LICENSE", "lib/**/*"]
   spec.require_paths = ["lib"]
 
-  s.required_ruby_version = ">= 2.2"
+  spec.required_ruby_version = ">= 2.2"
 
   spec.add_dependency "rbvmomi", "~> 1.11"
   spec.add_dependency "savon", "~> 2.11"
