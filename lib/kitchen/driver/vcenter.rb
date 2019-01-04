@@ -28,6 +28,7 @@ require "com/vmware/vcenter"
 require "com/vmware/vcenter/vm"
 require "support/clone_vm"
 require "securerandom"
+require "uri"
 
 # The main kitchen module
 module Kitchen
@@ -51,11 +52,20 @@ module Kitchen
       default_config :resource_pool, nil
       default_config :clone_type, :full
       default_config :cluster, nil
+      default_config :lookup_service_host, nil
 
       # The main create method
       #
       # @param [Object] state is the state of the vm
       def create(state)
+        # Configure the hash for use when connecting for cloning a machine
+        @connection_options = {
+          user: config[:vcenter_username],
+          password: config[:vcenter_password],
+          insecure: config[:vcenter_disable_ssl_verify] ? true : false,
+          host: config[:vcenter_host],
+        }
+
         # If the vm_name has not been set then set it now based on the suite, platform and a random number
         if config[:vm_name].nil?
           config[:vm_name] = format("%s-%s-%s", instance.suite.name, instance.platform.name, SecureRandom.hex(4))
@@ -242,13 +252,48 @@ module Kitchen
         resource_pool[0].resource_pool
       end
 
+      # Get location of lookup service
+      def lookup_service_host
+        # Allow manual overrides
+        return config[:lookup_service_host] unless config[:lookup_service_host].nil?
+
+        # Retrieve SSO service via RbVmomi, which is always co-located with the Lookup Service.
+        vim = RbVmomi::VIM.connect @connection_options
+        vim_settings = vim.serviceContent.setting.setting
+        sso_url = vim_settings.select { |o| o.key == "config.vpxd.sso.sts.uri" }&.first&.value
+
+        # Configuration fallback, if no SSO URL found for some reason
+        ls_host = sso_url.nil? ? config[:vcenter_host] : URI.parse(sso_url).host
+        debug("Using Lookup Service at: " + ls_host)
+
+        ls_host
+      end
+
+      # Get vCenter FQDN
+      def vcenter_host
+        # Retrieve SSO service via RbVmomi, which is always co-located with the Lookup Service.
+        vim = RbVmomi::VIM.connect @connection_options
+        vim_settings = vim.serviceContent.setting.setting
+
+        vim_settings.select { |o| o.key == "VirtualCenter.FQDN" }.first.value
+      end
+
       # The main connect method
       #
       def connect
         # Configure the connection to vCenter
-        lookup_service_helper = LookupServiceHelper.new(config[:vcenter_host])
+        lookup_service_helper = LookupServiceHelper.new(lookup_service_host)
         vapi_urls = lookup_service_helper.find_vapi_urls
-        vapi_url = vapi_urls.values[0]
+        debug("Found vAPI endpoints: [" + vapi_urls.to_s + "]")
+
+        vim_urls = lookup_service_helper.find_vim_urls
+        debug("Found VIM endpoints: [" + vim_urls.to_s + "]")
+
+        node_id = vim_urls.select { |id, url| url.include? vcenter_host }.keys.first
+        debug("NodeID of vCenter " + config[:vcenter_host] + " is " + node_id.to_s)
+
+        vapi_url = lookup_service_helper.find_vapi_url(node_id)
+        debug("vAPI Endpoint for vCenter is " + vapi_url)
 
         # Create the VAPI config object
         ssl_options = {}
@@ -269,14 +314,6 @@ module Kitchen
         vapi_config.set_security_context(
           VAPI::Security.create_session_security_context(session_id)
         )
-
-        # Configure the hash for use when connecting for cloning a machine
-        @connection_options = {
-          user: config[:vcenter_username],
-          password: config[:vcenter_password],
-          insecure: config[:vcenter_disable_ssl_verify] ? true : false,
-          host: config[:vcenter_host],
-        }
       end
     end
   end
