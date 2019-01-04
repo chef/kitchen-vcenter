@@ -51,6 +51,7 @@ module Kitchen
       default_config :vm_name, nil
       default_config :resource_pool, nil
       default_config :clone_type, :full
+      default_config :cluster, nil
       default_config :lookup_service_host, nil
 
       # The main create method
@@ -70,14 +71,24 @@ module Kitchen
           config[:vm_name] = format("%s-%s-%s", instance.suite.name, instance.platform.name, SecureRandom.hex(4))
         end
 
+        raise format("Cannot specify both cluster and resource_pool") if !config[:cluster].nil? && !config[:resource_pool].nil?
+
         connect
 
         # Using the clone class, create a machine for TK
         # Find the identifier for the targethost to pass to rbvmomi
         config[:targethost] = get_host(config[:targethost])
 
-        # Find the resource pool
-        config[:resource_pool] = get_resource_pool(config[:resource_pool])
+        # Use the root resource pool of a specified cluster, if any
+        # @todo This does not allow to specify cluster AND pool yet
+        unless config[:cluster].nil?
+          cluster = get_cluster(config[:cluster])
+          # @todo Check for active hosts, to avoid "A specified parameter was not correct: spec.pool"
+          config[:resource_pool] = cluster.resource_pool
+        else
+          # Find the first resource pool on any cluster
+          config[:resource_pool] = get_resource_pool(config[:resource_pool])
+        end
 
         # Check that the datacenter exists
         datacenter_exists?(config[:datacenter])
@@ -196,6 +207,21 @@ module Kitchen
         vm_obj.list(filter)[0]
       end
 
+      # Gets the info of the cluster
+      #
+      # @param [name] name is the name of the Cluster
+      def get_cluster(name)
+        cl_obj = Com::Vmware::Vcenter::Cluster.new(vapi_config)
+
+        # @todo: Use Cluster::FilterSpec to only get the cluster which was asked
+        # filter = Com::Vmware::Vcenter::Cluster::FilterSpec.new(clusters: Set.new(['...']))
+        clusters = cl_obj.list.select { |cluster| cluster.name == name }
+        raise format("Unable to find Cluster: %s", name) if clusters.empty?
+
+        cluster_id = clusters[0].cluster
+        cl_obj.get(cluster_id)
+      end
+
       # Gets the name of the resource pool
       #
       # @todo Will not yet work with nested pools ("Pool1/Subpool1")
@@ -213,7 +239,7 @@ module Kitchen
 
           # Revert to default pool, if no user-defined pool found (> 1.2.1 behaviour)
           # (This one might not be found under some circumstances by the statement above)
-          resource_pool = get_resource_pool("Resources") if resource_pool.empty?
+          return get_resource_pool("Resources") if resource_pool.empty?
         else
           # create a filter to find the named resource pool
           filter = Com::Vmware::Vcenter::ResourcePool::FilterSpec.new(names: Set.new([name]))
