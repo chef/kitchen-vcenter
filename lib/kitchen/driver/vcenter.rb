@@ -28,6 +28,7 @@ require "com/vmware/vcenter"
 require "com/vmware/vcenter/vm"
 require "support/clone_vm"
 require "securerandom"
+require "uri"
 
 # The main kitchen module
 module Kitchen
@@ -50,15 +51,28 @@ module Kitchen
       default_config :vm_name, nil
       default_config :resource_pool, nil
       default_config :clone_type, :full
+      default_config :cluster, nil
+      default_config :lookup_service_host, nil
 
       # The main create method
       #
       # @param [Object] state is the state of the vm
       def create(state)
+        # Configure the hash for use when connecting for cloning a machine
+        @connection_options = {
+          user: config[:vcenter_username],
+          password: config[:vcenter_password],
+          insecure: config[:vcenter_disable_ssl_verify] ? true : false,
+          host: config[:vcenter_host],
+          rev: config[:clone_type] == "instant" ? "6.7" : nil,
+        }
+
         # If the vm_name has not been set then set it now based on the suite, platform and a random number
         if config[:vm_name].nil?
           config[:vm_name] = format("%s-%s-%s", instance.suite.name, instance.platform.name, SecureRandom.hex(4))
         end
+
+        raise format("Cannot specify both cluster and resource_pool") if !config[:cluster].nil? && !config[:resource_pool].nil?
 
         connect
 
@@ -66,8 +80,16 @@ module Kitchen
         # Find the identifier for the targethost to pass to rbvmomi
         config[:targethost] = get_host(config[:targethost])
 
-        # Find the resource pool
-        config[:resource_pool] = get_resource_pool(config[:resource_pool])
+        # Use the root resource pool of a specified cluster, if any
+        # @todo This does not allow to specify cluster AND pool yet
+        unless config[:cluster].nil?
+          cluster = get_cluster(config[:cluster])
+          # @todo Check for active hosts, to avoid "A specified parameter was not correct: spec.pool"
+          config[:resource_pool] = cluster.resource_pool
+        else
+          # Find the first resource pool on any cluster
+          config[:resource_pool] = get_resource_pool(config[:resource_pool])
+        end
 
         # Check that the datacenter exists
         datacenter_exists?(config[:datacenter])
@@ -187,6 +209,21 @@ module Kitchen
         vm_obj.list(filter)[0]
       end
 
+      # Gets the info of the cluster
+      #
+      # @param [name] name is the name of the Cluster
+      def get_cluster(name)
+        cl_obj = Com::Vmware::Vcenter::Cluster.new(vapi_config)
+
+        # @todo: Use Cluster::FilterSpec to only get the cluster which was asked
+        # filter = Com::Vmware::Vcenter::Cluster::FilterSpec.new(clusters: Set.new(['...']))
+        clusters = cl_obj.list.select { |cluster| cluster.name == name }
+        raise format("Unable to find Cluster: %s", name) if clusters.empty?
+
+        cluster_id = clusters[0].cluster
+        cl_obj.get(cluster_id)
+      end
+
       # Gets the name of the resource pool
       #
       # @todo Will not yet work with nested pools ("Pool1/Subpool1")
@@ -204,7 +241,7 @@ module Kitchen
 
           # Revert to default pool, if no user-defined pool found (> 1.2.1 behaviour)
           # (This one might not be found under some circumstances by the statement above)
-          resource_pool = get_resource_pool("Resources") if resource_pool.empty?
+          return get_resource_pool("Resources") if resource_pool.empty?
         else
           # create a filter to find the named resource pool
           filter = Com::Vmware::Vcenter::ResourcePool::FilterSpec.new(names: Set.new([name]))
@@ -217,13 +254,48 @@ module Kitchen
         resource_pool[0].resource_pool
       end
 
+      # Get location of lookup service
+      def lookup_service_host
+        # Allow manual overrides
+        return config[:lookup_service_host] unless config[:lookup_service_host].nil?
+
+        # Retrieve SSO service via RbVmomi, which is always co-located with the Lookup Service.
+        vim = RbVmomi::VIM.connect @connection_options
+        vim_settings = vim.serviceContent.setting.setting
+        sso_url = vim_settings.select { |o| o.key == "config.vpxd.sso.sts.uri" }&.first&.value
+
+        # Configuration fallback, if no SSO URL found for some reason
+        ls_host = sso_url.nil? ? config[:vcenter_host] : URI.parse(sso_url).host
+        debug("Using Lookup Service at: " + ls_host)
+
+        ls_host
+      end
+
+      # Get vCenter FQDN
+      def vcenter_host
+        # Retrieve SSO service via RbVmomi, which is always co-located with the Lookup Service.
+        vim = RbVmomi::VIM.connect @connection_options
+        vim_settings = vim.serviceContent.setting.setting
+
+        vim_settings.select { |o| o.key == "VirtualCenter.FQDN" }.first.value
+      end
+
       # The main connect method
       #
       def connect
         # Configure the connection to vCenter
-        lookup_service_helper = LookupServiceHelper.new(config[:vcenter_host])
+        lookup_service_helper = LookupServiceHelper.new(lookup_service_host)
         vapi_urls = lookup_service_helper.find_vapi_urls
-        vapi_url = vapi_urls.values[0]
+        debug("Found vAPI endpoints: [" + vapi_urls.to_s + "]")
+
+        vim_urls = lookup_service_helper.find_vim_urls
+        debug("Found VIM endpoints: [" + vim_urls.to_s + "]")
+
+        node_id = vim_urls.select { |id, url| url.include? vcenter_host }.keys.first
+        debug("NodeID of vCenter " + config[:vcenter_host] + " is " + node_id.to_s)
+
+        vapi_url = lookup_service_helper.find_vapi_url(node_id)
+        debug("vAPI Endpoint for vCenter is " + vapi_url)
 
         # Create the VAPI config object
         ssl_options = {}
@@ -244,15 +316,6 @@ module Kitchen
         vapi_config.set_security_context(
           VAPI::Security.create_session_security_context(session_id)
         )
-
-        # Configure the hash for use when connecting for cloning a machine
-        @connection_options = {
-          user: config[:vcenter_username],
-          password: config[:vcenter_password],
-          insecure: config[:vcenter_disable_ssl_verify] ? true : false,
-          host: config[:vcenter_host],
-          rev: config[:clone_type] == "instant" ? "6.7" : nil,
-        }
       end
     end
   end

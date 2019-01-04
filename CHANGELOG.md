@@ -1,26 +1,33 @@
 # Change Log
 
-<!-- latest_release 1.3.3 -->
-## [v1.3.3](https://github.com/chef/kitchen-vcenter/tree/v1.3.3) (2018-11-23)
+<!-- latest_release 1.4.1 -->
+## [v1.4.1](https://github.com/chef/kitchen-vcenter/tree/v1.4.1) (2019-01-04)
 
 #### Merged Pull Requests
-- Feature/check parameters [#40](https://github.com/chef/kitchen-vcenter/pull/40) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Add support for provisioning on a specific cluster [#42](https://github.com/chef/kitchen-vcenter/pull/42) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
-<!-- release_rollup since=1.3.1 -->
+<!-- release_rollup since=1.3.4 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
-- Feature/check parameters [#40](https://github.com/chef/kitchen-vcenter/pull/40) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.3.3 -->
-- README edits [#38](https://github.com/chef/kitchen-vcenter/pull/38) ([mjingle](https://github.com/mjingle)) <!-- 1.3.2 -->
+- Add support for provisioning on a specific cluster [#42](https://github.com/chef/kitchen-vcenter/pull/42) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.1 -->
+- Require Ruby 2.3+ and slim the files we ship in the gem [#45](https://github.com/chef/kitchen-vcenter/pull/45) ([tas50](https://github.com/tas50)) <!-- 1.4.0 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [v1.3.4](https://github.com/chef/kitchen-vcenter/tree/v1.3.4) (2019-01-04)
+
+#### Merged Pull Requests
+- README edits [#38](https://github.com/chef/kitchen-vcenter/pull/38) ([mjingle](https://github.com/mjingle))
+- Feature/check parameters [#40](https://github.com/chef/kitchen-vcenter/pull/40) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Fix for Issues #26 and #30 [#44](https://github.com/chef/kitchen-vcenter/pull/44) ([tecracer-theinen](https://github.com/tecracer-theinen))
+<!-- latest_stable_release -->
+
 ## [v1.3.1](https://github.com/chef/kitchen-vcenter/tree/v1.3.1) (2018-11-19)
 
 #### Merged Pull Requests
 - Fixed behaviour when not having any resource pools (Issue #28) [#31](https://github.com/chef/kitchen-vcenter/pull/31) ([tecracer-theinen](https://github.com/tecracer-theinen))
 - Implement support for linked clones (feature #18) [#32](https://github.com/chef/kitchen-vcenter/pull/32) ([tecracer-theinen](https://github.com/tecracer-theinen))
 - Chefstyle fixes [#37](https://github.com/chef/kitchen-vcenter/pull/37) ([tas50](https://github.com/tas50))
-<!-- latest_stable_release -->
 
 ## [1.2.1](https://github.com/chef/kitchen-vcenter/tree/1.2.1) (2017-09-14)
 [Full Changelog](https://github.com/chef/kitchen-vcenter/compare/v1.2.0...1.2.1)
