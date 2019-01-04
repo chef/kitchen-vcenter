@@ -1,6 +1,7 @@
 language: ruby
 cache: bundler
 sudo: false
+dist: xenial
 
 rvm:
   - 2.3.8
