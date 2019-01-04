@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 1.4.0 -->
+## [v1.4.0](https://github.com/chef/kitchen-vcenter/tree/v1.4.0) (2019-01-04)
+
+#### Merged Pull Requests
+- Require Ruby 2.3+ and slim the files we ship in the gem [#45](https://github.com/chef/kitchen-vcenter/pull/45) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=1.3.4 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Require Ruby 2.3+ and slim the files we ship in the gem [#45](https://github.com/chef/kitchen-vcenter/pull/45) ([tas50](https://github.com/tas50)) <!-- 1.4.0 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [v1.3.4](https://github.com/chef/kitchen-vcenter/tree/v1.3.4) (2019-01-04)
