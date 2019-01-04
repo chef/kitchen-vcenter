@@ -30,6 +30,26 @@ class Support
       # Set the resource pool
       relocate_spec.pool = options[:resource_pool]
 
+      # Change network, if wanted
+      unless options[:network_name].nil?
+        all_network_devices = src_vm.config.hardware.device.select do |device|
+          device.is_a?(RbVmomi::VIM::VirtualEthernetCard)
+        end
+
+        # Only support for first NIC so far
+        network_device = all_network_devices.first
+        network_device.backing = RbVmomi::VIM.VirtualEthernetCardNetworkBackingInfo(
+          deviceName: options[:network_name]
+        )
+
+        relocate_spec.deviceChange = [
+          RbVmomi::VIM.VirtualDeviceConfigSpec(
+            operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
+            device: network_device
+          )
+        ]
+      end
+
       # Set the folder to use
       dest_folder = options[:folder].nil? ? src_vm.parent : options[:folder][:id]
 
