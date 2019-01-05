@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 1.4.3 -->
+## [v1.4.3](https://github.com/chef/kitchen-vcenter/tree/v1.4.3) (2019-01-05)
+
+#### Merged Pull Requests
+- Add ability to move the created VM onto another network via using the &quot;network_name&quot; parameter [#47](https://github.com/chef/kitchen-vcenter/pull/47) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=1.4.2 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Add ability to move the created VM onto another network via using the &quot;network_name&quot; parameter [#47](https://github.com/chef/kitchen-vcenter/pull/47) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.3 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [v1.4.2](https://github.com/chef/kitchen-vcenter/tree/v1.4.2) (2019-01-04)
