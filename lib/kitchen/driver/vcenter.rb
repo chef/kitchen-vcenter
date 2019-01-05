@@ -53,6 +53,7 @@ module Kitchen
       default_config :clone_type, :full
       default_config :cluster, nil
       default_config :lookup_service_host, nil
+      default_config :network_name, nil
 
       # The main create method
       #
@@ -94,6 +95,9 @@ module Kitchen
         # Check that the datacenter exists
         datacenter_exists?(config[:datacenter])
 
+        # Check if network exists, if to be changed
+        network_exists?(config[:network_name]) unless config[:network_name].nil?
+
         # Same thing needs to happen with the folder name if it has been set
         unless config[:folder].nil?
           config[:folder] = {
@@ -116,6 +120,7 @@ module Kitchen
           folder: config[:folder],
           resource_pool: config[:resource_pool],
           clone_type: config[:clone_type],
+          network_name: config[:network_name],
         }
 
         # Create an object from which the clone operation can be called
@@ -165,6 +170,17 @@ module Kitchen
         dc = dc_obj.list(filter)
 
         raise format("Unable to find data center: %s", name) if dc.empty?
+      end
+
+      # Checks if a network exists or not
+      #
+      # @param [name] name is the name of the Network
+      def network_exists?(name)
+        net_obj = Com::Vmware::Vcenter::Network.new(vapi_config)
+        filter = Com::Vmware::Vcenter::Network::FilterSpec.new(names: Set.new([name]))
+        net = net_obj.list(filter)
+
+        raise format("Unable to find target network: %s", name) if net.empty?
       end
 
       # Validates the host name of the server you can connect to
