@@ -54,7 +54,7 @@ class Support
       end
 
       # Set the folder to use
-      dest_folder = options[:folder].nil? ? src_vm.parent : options[:folder][:id]
+      dest_folder = options[:folder].nil? ? dc.vmFolder : options[:folder][:id]
 
       puts "Cloning '#{options[:template]}' to create the VM..."
       if options[:clone_type] == :instant
