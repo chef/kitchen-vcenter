@@ -14,8 +14,11 @@ class Support
     def clone
       # set the datacenter name
       dc = vim.serviceInstance.find_datacenter(options[:datacenter])
-      src_vm = dc.find_vm(options[:template])
 
+      # reference template using full inventory path
+      root_folder = @vim.serviceInstance.content.rootFolder
+      inventory_path = format('/%s/vm/%s', options[:datacenter], options[:template])
+      src_vm = root_folder.findByInventoryPath(inventory_path)
       raise format("Unable to find template: %s", options[:template]) if src_vm.nil?
 
       # Specify where the machine is going to be created
