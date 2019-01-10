@@ -59,22 +59,7 @@ module Kitchen
       #
       # @param [Object] state is the state of the vm
       def create(state)
-        # Configure the hash for use when connecting for cloning a machine
-        @connection_options = {
-          user: config[:vcenter_username],
-          password: config[:vcenter_password],
-          insecure: config[:vcenter_disable_ssl_verify] ? true : false,
-          host: config[:vcenter_host],
-          rev: config[:clone_type] == "instant" ? "6.7" : nil,
-        }
-
-        # If the vm_name has not been set then set it now based on the suite, platform and a random number
-        if config[:vm_name].nil?
-          config[:vm_name] = format("%s-%s-%s", instance.suite.name, instance.platform.name, SecureRandom.hex(4))
-        end
-
-        raise format("Cannot specify both cluster and resource_pool") if !config[:cluster].nil? && !config[:resource_pool].nil?
-
+        save_and_validate_parameters
         connect
 
         # Using the clone class, create a machine for TK
@@ -135,6 +120,7 @@ module Kitchen
       def destroy(state)
         return if state[:vm_name].nil?
 
+        save_and_validate_parameters
         connect
         vm = get_vm(state[:vm_name])
 
@@ -151,6 +137,26 @@ module Kitchen
       end
 
       private
+
+      # Helper method for storing and validating configuration parameters
+      #
+      def save_and_validate_parameters
+        # Configure the hash for use when connecting for cloning a machine
+        @connection_options = {
+          user: config[:vcenter_username],
+          password: config[:vcenter_password],
+          insecure: config[:vcenter_disable_ssl_verify] ? true : false,
+          host: config[:vcenter_host],
+          rev: config[:clone_type] == "instant" ? "6.7" : nil,
+        }
+
+        # If the vm_name has not been set then set it now based on the suite, platform and a random number
+        if config[:vm_name].nil?
+          config[:vm_name] = format("%s-%s-%s", instance.suite.name, instance.platform.name, SecureRandom.hex(4))
+        end
+
+        raise format("Cannot specify both cluster and resource_pool") if !config[:cluster].nil? && !config[:resource_pool].nil?
+      end
 
       # A helper method to validate the state
       #
