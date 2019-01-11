@@ -24,6 +24,7 @@ require "base"
 require "lookup_service_helper"
 require "vapi"
 require "com/vmware/cis"
+require "com/vmware/cis/tagging"
 require "com/vmware/vcenter"
 require "com/vmware/vcenter/vm"
 require "support/clone_vm"
@@ -54,6 +55,7 @@ module Kitchen
       default_config :cluster, nil
       default_config :lookup_service_host, nil
       default_config :network_name, nil
+      default_config :tags, nil
 
       # The main create method
       #
@@ -112,6 +114,28 @@ module Kitchen
         clone_obj = Support::CloneVm.new(connection_options, options)
         state[:hostname] = clone_obj.clone
         state[:vm_name] = config[:vm_name]
+
+        unless config[:tags].nil? || config[:tags].empty?
+          valid_tags = {}
+          vm_tags = Com::Vmware::Cis::Tagging::Tag.new(vapi_config)
+          vm_tags.list.each do |uid|
+            tag = vm_tags.get(uid)
+            valid_tags[tag.name] = tag.id
+          end
+
+          # Error out on undefined tags
+          invalid = config[:tags] - valid_tags.keys
+          raise format("Specified tag(s) %s not valid", invalid.join(",")) unless invalid.empty?
+
+          tag_service = Com::Vmware::Cis::Tagging::TagAssociation.new(vapi_config)
+
+          # calls needs a DynamicID object which we construct from type and mobID
+          mobid = get_vm(config[:vm_name]).vm
+          dynamic_id = Com::Vmware::Vapi::Std::DynamicID.new(type: "VirtualMachine", id: mobid)
+
+          tag_ids = config[:tags].map { |name| valid_tags[name] }
+          tag_service.attach_multiple_tags_to_object(dynamic_id, tag_ids)
+        end
       end
 
       # The main destroy method

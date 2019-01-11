@@ -129,6 +129,7 @@ The following optional parameters should be used in the `driver_config` for the 
  - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
  - `lookup_service_host` - Specify hostname of Lookup Service for setups with external PSC. Default: autodetect
  - `network_name` - Network to switch first interface to, needs a VM Network name. Default: do not change
+ - `tags` - Array of pre-defined vCenter tag names to assign (VMware tags are not key/value pairs). Default: none
 
 Only one of the following optional parameters can be given:
  - `resource_pool` - Name of the resource pool to use when creating the machine. Default: first pool
