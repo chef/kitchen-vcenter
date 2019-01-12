@@ -20,5 +20,5 @@
 # The main kitchen-vcenter module
 module KitchenVcenter
   # The version of this version of test-kitchen we assume enterprises want.
-  VERSION = "1.4.4"
+  VERSION = "1.4.5"
 end
