@@ -90,7 +90,7 @@ platforms:
   - name: windows2012R2
     driver_config:
       targethost: 10.0.0.42
-      template: windows2012R2-template
+      template: folder/windows2012R2-template
       datacenter: "Datacenter"
     transport:
       username: "Administrator"
