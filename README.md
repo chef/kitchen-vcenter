@@ -23,12 +23,13 @@ Please refer to the [CHANGELOG](CHANGELOG.md) for version history and known issu
 
 ## Installation
 
-This driver has a dependency. It requires the [vSphere Automation SDK](https://github.com/vmware/vsphere-automation-sdk-ruby) be installed. The steps to do that are as follows, for the time being it's not published to Rubygems. If you are interested, please comment [here](https://github.com/vmware/vsphere-automation-sdk-ruby/issues/10).
+This driver has a dependency. It requires the [vSphere Automation SDK](https://github.com/vmware/vsphere-automation-sdk-ruby) be installed. The steps to do that are as follows, the version published to Rubygems is not yet supported. For the time being you need to build the gem to a previous commit.
 
 - `$ git clone` [https://github.com/vmware/vsphere-automation-sdk-ruby.git](https://github.com/vmware/vsphere-automation-sdk-ruby.git)
 - `cd vsphere-automation-sdk-ruby`
-- `gem build vsphere-automation-sdk-ruby.gemspec`
-- `chef gem install vsphere-automation-sdk-<version>.gem`
+- `git checkout 2ffd6f9e2bcde899a6f5f863d5de97e38135fcd2`
+- `chef gem build vsphere-automation-sdk-ruby.gemspec`
+- `chef gem install vsphere-automation-sdk-6.6.1.gem`
 
 Using [ChefDK](https://downloads.chef.io/chef-dk/), simply install the Gem:
 
