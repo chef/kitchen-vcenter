@@ -1,29 +1,26 @@
 # Change Log
 
-<!-- latest_release 1.5.0 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+<!-- latest_stable_release -->
 ## [v1.5.0](https://github.com/chef/kitchen-vcenter/tree/v1.5.0) (2019-01-12)
 
 #### Merged Pull Requests
+- Add ability to move the created VM onto another network via using the &quot;network_name&quot; parameter [#47](https://github.com/chef/kitchen-vcenter/pull/47) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Fix destroy action [#50](https://github.com/chef/kitchen-vcenter/pull/50) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Add feature to tag kitchen instances [#52](https://github.com/chef/kitchen-vcenter/pull/52) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Allow template names to include a VM folder path [#48](https://github.com/chef/kitchen-vcenter/pull/48) ([tecracer-theinen](https://github.com/tecracer-theinen))
 - Update the author of the gem to be Chef Software [#53](https://github.com/chef/kitchen-vcenter/pull/53) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
-<!-- release_rollup since=1.4.2 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Update the author of the gem to be Chef Software [#53](https://github.com/chef/kitchen-vcenter/pull/53) ([tas50](https://github.com/tas50)) <!-- 1.5.0 -->
-- Allow template names to include a VM folder path [#48](https://github.com/chef/kitchen-vcenter/pull/48) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.6 -->
-- Add feature to tag kitchen instances [#52](https://github.com/chef/kitchen-vcenter/pull/52) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.5 -->
-- Fix destroy action [#50](https://github.com/chef/kitchen-vcenter/pull/50) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.4 -->
-- Add ability to move the created VM onto another network via using the &quot;network_name&quot; parameter [#47](https://github.com/chef/kitchen-vcenter/pull/47) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.3 -->
-<!-- release_rollup -->
 <!-- latest_stable_release -->
+
 ## [v1.4.2](https://github.com/chef/kitchen-vcenter/tree/v1.4.2) (2019-01-04)
 
 #### Merged Pull Requests
 - Require Ruby 2.3+ and slim the files we ship in the gem [#45](https://github.com/chef/kitchen-vcenter/pull/45) ([tas50](https://github.com/tas50))
 - Add support for provisioning on a specific cluster [#42](https://github.com/chef/kitchen-vcenter/pull/42) ([tecracer-theinen](https://github.com/tecracer-theinen))
 - Add support for instant clones and documentation [#43](https://github.com/chef/kitchen-vcenter/pull/43) - Thank you [Siemens Gamesa](https://www.siemensgamesa.com) for sponsoring this contribution.
-<!-- latest_stable_release -->
 
 ## [v1.3.4](https://github.com/chef/kitchen-vcenter/tree/v1.3.4) (2019-01-04)
 
