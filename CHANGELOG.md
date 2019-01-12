@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 1.4.5 -->
-## [v1.4.5](https://github.com/chef/kitchen-vcenter/tree/v1.4.5) (2019-01-12)
+<!-- latest_release 1.4.6 -->
+## [v1.4.6](https://github.com/chef/kitchen-vcenter/tree/v1.4.6) (2019-01-12)
 
 #### Merged Pull Requests
-- Add feature to tag kitchen instances [#52](https://github.com/chef/kitchen-vcenter/pull/52) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Allow template names to include a VM folder path [#48](https://github.com/chef/kitchen-vcenter/pull/48) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
 <!-- release_rollup since=1.4.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Allow template names to include a VM folder path [#48](https://github.com/chef/kitchen-vcenter/pull/48) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.6 -->
 - Add feature to tag kitchen instances [#52](https://github.com/chef/kitchen-vcenter/pull/52) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.5 -->
 - Fix destroy action [#50](https://github.com/chef/kitchen-vcenter/pull/50) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.4 -->
 - Add ability to move the created VM onto another network via using the &quot;network_name&quot; parameter [#47](https://github.com/chef/kitchen-vcenter/pull/47) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.3 -->
