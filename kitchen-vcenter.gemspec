@@ -6,8 +6,8 @@ require "kitchen-vcenter/version"
 Gem::Specification.new do |spec|
   spec.name          = "kitchen-vcenter"
   spec.version       = KitchenVcenter::VERSION
-  spec.authors       = ["Russell Seymour"]
-  spec.email         = ["russell@chef.io"]
+  spec.authors       = ["Chef Software"]
+  spec.email         = ["oss@chef.io"]
   spec.summary       = "Test Kitchen driver for VMare vCenter"
   spec.description   = "Test Kitchen driver for VMware vCenter using SDK"
   spec.homepage      = "https://github.com/chef/kitchen-vcenter"
