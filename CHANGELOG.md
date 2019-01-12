@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 1.4.6 -->
-## [v1.4.6](https://github.com/chef/kitchen-vcenter/tree/v1.4.6) (2019-01-12)
+<!-- latest_release 1.5.0 -->
+## [v1.5.0](https://github.com/chef/kitchen-vcenter/tree/v1.5.0) (2019-01-12)
 
 #### Merged Pull Requests
-- Allow template names to include a VM folder path [#48](https://github.com/chef/kitchen-vcenter/pull/48) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Update the author of the gem to be Chef Software [#53](https://github.com/chef/kitchen-vcenter/pull/53) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 <!-- release_rollup since=1.4.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update the author of the gem to be Chef Software [#53](https://github.com/chef/kitchen-vcenter/pull/53) ([tas50](https://github.com/tas50)) <!-- 1.5.0 -->
 - Allow template names to include a VM folder path [#48](https://github.com/chef/kitchen-vcenter/pull/48) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.6 -->
 - Add feature to tag kitchen instances [#52](https://github.com/chef/kitchen-vcenter/pull/52) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.5 -->
 - Fix destroy action [#50](https://github.com/chef/kitchen-vcenter/pull/50) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.4.4 -->
