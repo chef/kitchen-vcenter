@@ -23,7 +23,7 @@ Please refer to the [CHANGELOG](CHANGELOG.md) for version history and known issu
 
 ## Installation
 
-This driver has a dependency. It requires the [vSphere Automation SDK](https://github.com/vmware/vsphere-automation-sdk-ruby) be installed. The steps to do that are as follows, the version published to Rubygems is not yet supported. For the time being you need to build the gem to a previous commit.
+This driver depends on the [vSphere Automation SDK](https://github.com/vmware/vsphere-automation-sdk-ruby) gem. We do not yet support version published on RubyGems, and you will need to build an earlier version of the gem. Install the vSphere Automation SDK gem with the following steps:
 
 - `$ git clone` [https://github.com/vmware/vsphere-automation-sdk-ruby.git](https://github.com/vmware/vsphere-automation-sdk-ruby.git)
 - `cd vsphere-automation-sdk-ruby`
