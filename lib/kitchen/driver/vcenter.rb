@@ -56,6 +56,8 @@ module Kitchen
       default_config :lookup_service_host, nil
       default_config :network_name, nil
       default_config :tags, nil
+      default_config :vm_wait_timeout, 90
+      default_config :vm_wait_interval, 2.0
 
       # The main create method
       #
@@ -108,6 +110,8 @@ module Kitchen
           resource_pool: config[:resource_pool],
           clone_type: config[:clone_type],
           network_name: config[:network_name],
+          wait_timeout: config[:vm_wait_timeout],
+          wait_interval: config[:vm_wait_interval],
         }
 
         # Create an object from which the clone operation can be called
