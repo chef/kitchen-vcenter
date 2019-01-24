@@ -34,7 +34,7 @@ class Support
       end
 
       raise "Timeout waiting for IP address or no VMware Tools installed on guest" if ip.nil?
-      raise format("Error getting accessible IP address, got %s. Check DHCP server", ip) if ip =~ /^169\.254\./
+      raise format("Error getting accessible IP address, got %s. Check DHCP server and scope exhaustion", ip) if ip =~ /^169\.254\./
 
       ip
     end
