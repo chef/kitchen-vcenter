@@ -128,9 +128,9 @@ module Kitchen
           request_body = {
             object_id: {
               id: cloned_vm.vm,
-              type: "VirtualMachine"
+              type: "VirtualMachine",
             },
-            tag_ids: tag_ids
+            tag_ids: tag_ids,
           }
           tag_service.attach_multiple_tags_to_object(request_body)
         end
