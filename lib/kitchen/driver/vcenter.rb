@@ -18,15 +18,8 @@
 #
 
 require "kitchen"
-require "rbvmomi"
-require "sso"
-require "base"
-require "lookup_service_helper"
-require "vapi"
-require "com/vmware/cis"
-require "com/vmware/cis/tagging"
-require "com/vmware/vcenter"
-require "com/vmware/vcenter/vm"
+require "vsphere-automation-cis"
+require "vsphere-automation-vcenter"
 require "support/clone_vm"
 require "securerandom"
 require "uri"
@@ -37,7 +30,7 @@ module Kitchen
   module Driver
     # Extends the Base class for vCenter
     class Vcenter < Kitchen::Driver::Base
-      attr_accessor :connection_options, :ipaddress, :vapi_config, :session_svc, :session_id
+      attr_accessor :connection_options, :ipaddress, :api_client
 
       required_config :vcenter_username
       required_config :vcenter_password
@@ -53,7 +46,6 @@ module Kitchen
       default_config :resource_pool, nil
       default_config :clone_type, :full
       default_config :cluster, nil
-      default_config :lookup_service_host, nil
       default_config :network_name, nil
       default_config :tags, nil
 
@@ -72,7 +64,6 @@ module Kitchen
         # @todo This does not allow to specify cluster AND pool yet
         unless config[:cluster].nil?
           cluster = get_cluster(config[:cluster])
-          # @todo Check for active hosts, to avoid "A specified parameter was not correct: spec.pool"
           config[:resource_pool] = cluster.resource_pool
         else
           # Find the first resource pool on any cluster
@@ -111,30 +102,38 @@ module Kitchen
         }
 
         # Create an object from which the clone operation can be called
-        clone_obj = Support::CloneVm.new(connection_options, options)
-        state[:hostname] = clone_obj.clone
-        state[:vm_name] = config[:vm_name]
+        new_vm = Support::CloneVm.new(connection_options, options)
+        new_vm.clone
+
+        state[:hostname] = new_vm.ip
+        state[:vm_name] = new_vm.name
 
         unless config[:tags].nil? || config[:tags].empty?
+          tag_api = VSphereAutomation::CIS::TaggingTagApi.new(api_client)
+          vm_tags = tag_api.list.value
+          raise format("No configured tags found on VCenter, but %s specified", config[:tags].to_s) if vm_tags.empty?
+
           valid_tags = {}
-          vm_tags = Com::Vmware::Cis::Tagging::Tag.new(vapi_config)
-          vm_tags.list.each do |uid|
-            tag = vm_tags.get(uid)
-            valid_tags[tag.name] = tag.id
+          vm_tags.each do |uid|
+            tag = tag_api.get(uid)
+
+            valid_tags[tag.value.name] = tag.value.id if tag.is_a? VSphereAutomation::CIS::CisTaggingTagResult
           end
 
           # Error out on undefined tags
           invalid = config[:tags] - valid_tags.keys
           raise format("Specified tag(s) %s not valid", invalid.join(",")) unless invalid.empty?
-
-          tag_service = Com::Vmware::Cis::Tagging::TagAssociation.new(vapi_config)
-
-          # calls needs a DynamicID object which we construct from type and mobID
-          mobid = get_vm(config[:vm_name]).vm
-          dynamic_id = Com::Vmware::Vapi::Std::DynamicID.new(type: "VirtualMachine", id: mobid)
-
+          tag_service = VSphereAutomation::CIS::TaggingTagAssociationApi.new(api_client)
           tag_ids = config[:tags].map { |name| valid_tags[name] }
-          tag_service.attach_multiple_tags_to_object(dynamic_id, tag_ids)
+
+          request_body = {
+            object_id: {
+              id: get_vm(config[:vm_name]).vm,
+              type: "VirtualMachine",
+            },
+            tag_ids: tag_ids,
+          }
+          tag_service.attach_multiple_tags_to_object(request_body)
         end
       end
 
@@ -146,18 +145,20 @@ module Kitchen
 
         save_and_validate_parameters
         connect
+
         vm = get_vm(state[:vm_name])
+        unless vm.nil?
+          vm_api = VSphereAutomation::VCenter::VMApi.new(api_client)
 
-        vm_obj = Com::Vmware::Vcenter::VM.new(vapi_config)
+          # shut the machine down if it is running
+          if vm.power_state == "POWERED_ON"
+            power = VSphereAutomation::VCenter::VmPowerApi.new(api_client)
+            power.stop(vm.vm)
+          end
 
-        # shut the machine down if it is running
-        if vm.power_state.value == "POWERED_ON"
-          power = Com::Vmware::Vcenter::Vm::Power.new(vapi_config)
-          power.stop(vm.vm)
+          # delete the vm
+          vm_api.delete(vm.vm)
         end
-
-        # delete the vm
-        vm_obj.delete(vm.vm)
       end
 
       private
@@ -195,22 +196,20 @@ module Kitchen
       #
       # @param [name] name is the name of the datacenter
       def datacenter_exists?(name)
-        filter = Com::Vmware::Vcenter::Datacenter::FilterSpec.new(names: Set.new([name]))
-        dc_obj = Com::Vmware::Vcenter::Datacenter.new(vapi_config)
-        dc = dc_obj.list(filter)
+        dc_api = VSphereAutomation::VCenter::DatacenterApi.new(api_client)
+        dcs = dc_api.list({ filter_names: name }).value
 
-        raise format("Unable to find data center: %s", name) if dc.empty?
+        raise format("Unable to find data center: %s", name) if dcs.empty?
       end
 
       # Checks if a network exists or not
       #
       # @param [name] name is the name of the Network
       def network_exists?(name)
-        net_obj = Com::Vmware::Vcenter::Network.new(vapi_config)
-        filter = Com::Vmware::Vcenter::Network::FilterSpec.new(names: Set.new([name]))
-        net = net_obj.list(filter)
+        net_api = VSphereAutomation::VCenter::NetworkApi.new(api_client)
+        nets = net_api.list({ filter_names: name }).value
 
-        raise format("Unable to find target network: %s", name) if net.empty?
+        raise format("Unable to find target network: %s", name) if nets.empty?
       end
 
       # Validates the host name of the server you can connect to
@@ -218,56 +217,58 @@ module Kitchen
       # @param [name] name is the name of the host
       def get_host(name)
         # create a host object to work with
-        host_obj = Com::Vmware::Vcenter::Host.new(vapi_config)
+        host_api = VSphereAutomation::VCenter::HostApi.new(api_client)
 
         if name.nil?
-          host = host_obj.list
+          hosts = host_api.list.value
         else
-          filter = Com::Vmware::Vcenter::Host::FilterSpec.new(names: Set.new([name]))
-          host = host_obj.list(filter)
+          hosts = host_api.list({ filter_names: name }).value
         end
 
-        raise format("Unable to find target host: %s", name) if host.empty?
+        raise format("Unable to find target host: %s", name) if hosts.empty?
 
-        host[0]
+        hosts.first
       end
 
       # Gets the folder you want to create the VM
       #
       # @param [name] name is the name of the folder
       def get_folder(name)
-        # Create a filter to ensure that only the named folder is returned
-        filter = Com::Vmware::Vcenter::Folder::FilterSpec.new(names: Set.new([name]))
-        folder_obj = Com::Vmware::Vcenter::Folder.new(vapi_config)
-        folder = folder_obj.list(filter)
+        folder_api = VSphereAutomation::VCenter::FolderApi.new(api_client)
+        folders = folder_api.list({ filter_names: name }).value
 
-        raise format("Unable to find folder: %s", name) if folder.empty?
+        raise format("Unable to find folder: %s", name) if folders.empty?
 
-        folder[0].folder
+        folders.first.folder
       end
 
       # Gets the name of the VM you are creating
       #
       # @param [name] name is the name of the VM
       def get_vm(name)
-        filter = Com::Vmware::Vcenter::VM::FilterSpec.new(names: Set.new([name]))
-        vm_obj = Com::Vmware::Vcenter::VM.new(vapi_config)
-        vm_obj.list(filter)[0]
+        vm_api = VSphereAutomation::VCenter::VMApi.new(api_client)
+        vms = vm_api.list({ filter_names: name }).value
+
+        vms.first
       end
 
       # Gets the info of the cluster
       #
       # @param [name] name is the name of the Cluster
       def get_cluster(name)
-        cl_obj = Com::Vmware::Vcenter::Cluster.new(vapi_config)
+        cluster_api = VSphereAutomation::VCenter::ClusterApi.new(api_client)
+        clusters = cluster_api.list({ filter_names: name }).value
 
-        # @todo: Use Cluster::FilterSpec to only get the cluster which was asked
-        # filter = Com::Vmware::Vcenter::Cluster::FilterSpec.new(clusters: Set.new(['...']))
-        clusters = cl_obj.list.select { |cluster| cluster.name == name }
         raise format("Unable to find Cluster: %s", name) if clusters.empty?
 
-        cluster_id = clusters[0].cluster
-        cl_obj.get(cluster_id)
+        cluster_id = clusters.first.cluster
+
+        host_api = VSphereAutomation::VCenter::HostApi.new(api_client)
+        hosts = host_api.list({ filter_clusters: cluster_id, connection_states: "CONNECTED" }).value
+
+        raise format("Unable to find active host in cluster %s", name) if hosts.empty?
+
+        cluster_api.get(cluster_id).value
       end
 
       # Gets the name of the resource pool
@@ -276,92 +277,47 @@ module Kitchen
       # @param [name] name is the name of the ResourcePool
       def get_resource_pool(name)
         # Create a resource pool object
-        rp_obj = Com::Vmware::Vcenter::ResourcePool.new(vapi_config)
+        rp_api = VSphereAutomation::VCenter::ResourcePoolApi.new(api_client)
 
         # If no name has been set, use the first resource pool that can be found,
         # otherwise try to find by given name
         if name.nil?
           # Remove default pool for first pass (<= 1.2.1 behaviour to pick first user-defined pool found)
-          resource_pool = rp_obj.list.delete_if { |pool| pool.name == "Resources" }
-          debug("Search of all resource pools found: " + resource_pool.map { |pool| pool.name }.to_s)
+          resource_pools = rp_api.list.value.delete_if { |pool| pool.name == "Resources" }
+          debug("Search of all resource pools found: " + resource_pools.map { |pool| pool.name }.to_s)
 
           # Revert to default pool, if no user-defined pool found (> 1.2.1 behaviour)
           # (This one might not be found under some circumstances by the statement above)
-          return get_resource_pool("Resources") if resource_pool.empty?
+          return get_resource_pool("Resources") if resource_pools.empty?
         else
-          # create a filter to find the named resource pool
-          filter = Com::Vmware::Vcenter::ResourcePool::FilterSpec.new(names: Set.new([name]))
-          resource_pool = rp_obj.list(filter)
-          debug("Search for resource pools found: " + resource_pool.map { |pool| pool.name }.to_s)
+          resource_pools = rp_api.list({ filter_names: name }).value
+          debug("Search for resource pools found: " + resource_pools.map { |pool| pool.name }.to_s)
         end
 
-        raise format("Unable to find Resource Pool: %s", name) if resource_pool.empty?
+        raise format("Unable to find Resource Pool: %s", name) if resource_pools.empty?
 
-        resource_pool[0].resource_pool
-      end
-
-      # Get location of lookup service
-      def lookup_service_host
-        # Allow manual overrides
-        return config[:lookup_service_host] unless config[:lookup_service_host].nil?
-
-        # Retrieve SSO service via RbVmomi, which is always co-located with the Lookup Service.
-        vim = RbVmomi::VIM.connect @connection_options
-        vim_settings = vim.serviceContent.setting.setting
-        sso_url = vim_settings.select { |o| o.key == "config.vpxd.sso.sts.uri" }&.first&.value
-
-        # Configuration fallback, if no SSO URL found for some reason
-        ls_host = sso_url.nil? ? config[:vcenter_host] : URI.parse(sso_url).host
-        debug("Using Lookup Service at: " + ls_host)
-
-        ls_host
-      end
-
-      # Get vCenter FQDN
-      def vcenter_host
-        # Retrieve SSO service via RbVmomi, which is always co-located with the Lookup Service.
-        vim = RbVmomi::VIM.connect @connection_options
-        vim_settings = vim.serviceContent.setting.setting
-
-        vim_settings.select { |o| o.key == "VirtualCenter.FQDN" }.first.value
+        resource_pools.first.resource_pool
       end
 
       # The main connect method
       #
       def connect
-        # Configure the connection to vCenter
-        lookup_service_helper = LookupServiceHelper.new(lookup_service_host)
-        vapi_urls = lookup_service_helper.find_vapi_urls
-        debug("Found vAPI endpoints: [" + vapi_urls.to_s + "]")
+        configuration = VSphereAutomation::Configuration.new.tap do |c|
+          c.host = config[:vcenter_host]
+          c.username = config[:vcenter_username]
+          c.password = config[:vcenter_password]
+          c.scheme = "https"
+          c.verify_ssl = config[:vcenter_disable_ssl_verify] ? false : true
+          c.verify_ssl_host = config[:vcenter_disable_ssl_verify] ? false : true
+        end
 
-        vim_urls = lookup_service_helper.find_vim_urls
-        debug("Found VIM endpoints: [" + vim_urls.to_s + "]")
+        @api_client = VSphereAutomation::ApiClient.new(configuration)
+        api_client.default_headers["Authorization"] = configuration.basic_auth_token
 
-        node_id = vim_urls.select { |id, url| url.include? vcenter_host }.keys.first
-        debug("NodeID of vCenter " + config[:vcenter_host] + " is " + node_id.to_s)
+        session_api = VSphereAutomation::CIS::SessionApi.new(api_client)
+        session_id = session_api.create("").value
 
-        vapi_url = lookup_service_helper.find_vapi_url(node_id)
-        debug("vAPI Endpoint for vCenter is " + vapi_url)
-
-        # Create the VAPI config object
-        ssl_options = {}
-        ssl_options[:verify] = config[:vcenter_disable_ssl_verify] ? :none : :peer
-        @vapi_config = VAPI::Bindings::VapiConfig.new(vapi_url, ssl_options)
-
-        # get the SSO url
-        sso_url = lookup_service_helper.find_sso_url
-        sso = SSO::Connection.new(sso_url).login(config[:vcenter_username], config[:vcenter_password])
-        token = sso.request_bearer_token
-        vapi_config.set_security_context(
-          VAPI::Security.create_saml_bearer_security_context(token.to_s)
-        )
-
-        # Login and get the session information
-        @session_svc = Com::Vmware::Cis::Session.new(vapi_config)
-        @session_id = session_svc.create
-        vapi_config.set_security_context(
-          VAPI::Security.create_session_security_context(session_id)
-        )
+        api_client.default_headers["vmware-api-session-id"] = session_id
       end
     end
   end

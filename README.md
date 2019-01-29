@@ -20,15 +20,11 @@ Please refer to the [CHANGELOG](CHANGELOG.md) for version history and known issu
 
 - Chef 13.0 higher
 - Ruby 2.3.3 or higher
+- VMware vCenter/vSphere 5.5 or higher
+- VMs or templates to clone, with open-vm-tools installed
+- DHCP server to assign IPs to kitchen instances
 
 ## Installation
-
-This driver has a dependency. It requires the [vSphere Automation SDK](https://github.com/vmware/vsphere-automation-sdk-ruby) be installed. The steps to do that are as follows, for the time being it's not published to Rubygems. If you are interested, please comment [here](https://github.com/vmware/vsphere-automation-sdk-ruby/issues/10).
-
-- `$ git clone` [https://github.com/vmware/vsphere-automation-sdk-ruby.git](https://github.com/vmware/vsphere-automation-sdk-ruby.git)
-- `cd vsphere-automation-sdk-ruby`
-- `gem build vsphere-automation-sdk-ruby.gemspec`
-- `chef gem install vsphere-automation-sdk-<version>.gem`
 
 Using [ChefDK](https://downloads.chef.io/chef-dk/), simply install the Gem:
 
@@ -70,7 +66,7 @@ verifier:
 
 platforms:
   - name: ubuntu-1604
-    driver_config:
+    driver:
       targethost: 10.0.0.42
       template: ubuntu16-template
       datacenter: "Datacenter"
@@ -79,7 +75,7 @@ platforms:
       password: admini
 
   - name: centos-7
-    driver_config:
+    driver:
       targethost: 10.0.0.42
       template: centos7-template
       datacenter: "Datacenter"
@@ -88,8 +84,9 @@ platforms:
       password: admini
 
   - name: windows2012R2
-    driver_config:
+    driver:
       targethost: 10.0.0.42
+      network: "Internal"
       template: folder/windows2012R2-template
       datacenter: "Datacenter"
     transport:
@@ -127,7 +124,6 @@ The following optional parameters should be used in the `driver_config` for the 
  - `poweron` - Power on the new virtual machine. Default: true
  - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
  - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
- - `lookup_service_host` - Specify hostname of Lookup Service for setups with external PSC. Default: autodetect
  - `network_name` - Network to switch first interface to, needs a VM Network name. Default: do not change
  - `tags` - Array of pre-defined vCenter tag names to assign (VMware tags are not key/value pairs). Default: none
 

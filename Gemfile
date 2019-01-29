@@ -4,7 +4,6 @@ gemspec
 
 group :development do
   gem "chefstyle", git: "https://github.com/chef/chefstyle.git", branch: "master"
-  gem "vsphere-automation-sdk", git: "https://github.com/vmware/vsphere-automation-sdk-ruby.git", branch: "master"
 end
 
 group :docs do
