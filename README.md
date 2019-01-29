@@ -66,7 +66,7 @@ verifier:
 
 platforms:
   - name: ubuntu-1604
-    driver_config:
+    driver:
       targethost: 10.0.0.42
       template: ubuntu16-template
       datacenter: "Datacenter"
@@ -75,7 +75,7 @@ platforms:
       password: admini
 
   - name: centos-7
-    driver_config:
+    driver:
       targethost: 10.0.0.42
       template: centos7-template
       datacenter: "Datacenter"
@@ -84,8 +84,9 @@ platforms:
       password: admini
 
   - name: windows2012R2
-    driver_config:
+    driver:
       targethost: 10.0.0.42
+      network: "Internal"
       template: folder/windows2012R2-template
       datacenter: "Datacenter"
     transport:

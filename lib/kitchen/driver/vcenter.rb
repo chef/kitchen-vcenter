@@ -64,7 +64,6 @@ module Kitchen
         # @todo This does not allow to specify cluster AND pool yet
         unless config[:cluster].nil?
           cluster = get_cluster(config[:cluster])
-          # @todo Check for active hosts, to avoid "A specified parameter was not correct: spec.pool"
           config[:resource_pool] = cluster.resource_pool
         else
           # Find the first resource pool on any cluster
@@ -103,9 +102,11 @@ module Kitchen
         }
 
         # Create an object from which the clone operation can be called
-        cloned_vm = Support::CloneVm.new(connection_options, options)
-        state[:hostname] = cloned_vm.clone
-        state[:vm_name] = config[:vm_name]
+        new_vm = Support::CloneVm.new(connection_options, options)
+        new_vm.clone
+
+        state[:hostname] = new_vm.ip
+        state[:vm_name] = new_vm.name
 
         unless config[:tags].nil? || config[:tags].empty?
           tag_api = VSphereAutomation::CIS::TaggingTagApi.new(api_client)
@@ -127,7 +128,7 @@ module Kitchen
 
           request_body = {
             object_id: {
-              id: cloned_vm.vm,
+              id: get_vm(config[:vm_name]).vm,
               type: "VirtualMachine",
             },
             tag_ids: tag_ids,
@@ -261,6 +262,12 @@ module Kitchen
         raise format("Unable to find Cluster: %s", name) if clusters.empty?
 
         cluster_id = clusters.first.cluster
+
+        host_api = VSphereAutomation::VCenter::HostApi.new(api_client)
+        hosts = host_api.list({ filter_clusters: cluster_id, connection_states: "CONNECTED" }).value
+
+        raise format("Unable to find active host in cluster %s", name) if hosts.empty?
+
         cluster_api.get(cluster_id).value
       end
 
