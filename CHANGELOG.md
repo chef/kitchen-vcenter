@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 1.5.1 -->
+## [v1.5.1](https://github.com/chef/kitchen-vcenter/tree/v1.5.1) (2019-01-29)
+
+#### Merged Pull Requests
+- Migration to new openapi based SDK [#55](https://github.com/chef/kitchen-vcenter/pull/55) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=1.5.0 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Migration to new openapi based SDK [#55](https://github.com/chef/kitchen-vcenter/pull/55) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.5.1 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [v1.5.0](https://github.com/chef/kitchen-vcenter/tree/v1.5.0) (2019-01-12)
