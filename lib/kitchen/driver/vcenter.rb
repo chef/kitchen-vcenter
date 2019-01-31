@@ -118,7 +118,9 @@ module Kitchen
           if config[:vm_rollback] == true
             error format("Rolling back VM %s after critical error", config[:vm_name])
 
+            # Inject name of failed VM and reset the auto-discovered resource pool to clear validation in line #200
             state[:vm_name] = config[:vm_name]
+            config[:resource_pool] = nil
             destroy(state)
           end
 
