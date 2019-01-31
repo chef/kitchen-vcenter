@@ -2,7 +2,7 @@ require "rbvmomi"
 
 class Support
   class CloneVm
-    attr_reader :vim, :options, :vm, :name, :path
+    attr_reader :vim, :options, :vm, :name, :path, :ip
 
     def initialize(conn_opts, options)
       @options = options
@@ -10,6 +10,32 @@ class Support
 
       # Connect to vSphere
       @vim ||= RbVmomi::VIM.connect conn_opts
+    end
+
+    def get_ip(vm)
+      @ip = nil
+
+      unless vm.guest.net.empty? || !vm.guest.ipAddress
+        @ip = vm.guest.net[0].ipConfig.ipAddress.detect do |addr|
+          addr.origin != "linklayer"
+        end.ipAddress
+      end
+
+      ip
+    end
+
+    def wait_for_ip(vm, timeout = 30.0, interval = 2.0)
+      start = Time.new
+
+      ip = nil
+      loop do
+        ip = get_ip(vm)
+        break if ip || (Time.new - start) >= timeout
+        sleep interval
+      end
+
+      raise "Timeout waiting for IP address or no VMware Tools installed on guest" if ip.nil?
+      raise format("Error getting accessible IP address, got %s. Check DHCP server and scope exhaustion", ip) if ip =~ /^169\.254\./
     end
 
     def clone
@@ -104,15 +130,11 @@ class Support
       if vm.nil?
         puts format("Unable to find machine: %s", path)
       else
-        puts "Waiting for network interfaces to become available..."
-        sleep 2 while vm.guest.net.empty? || !vm.guest.ipAddress
-      end
-    end
+        puts format("Waiting for VMware tools/network interfaces to become available (timeout: %d seconds)...", options[:wait_timeout])
 
-    def ip
-      vm.guest.net[0].ipConfig.ipAddress.detect do |addr|
-        addr.origin != "linklayer"
-      end.ipAddress
+        wait_for_ip(new_vm, options[:wait_timeout], options[:wait_interval])
+        puts format("Created machine %s with IP %s", name, ip)
+      end
     end
   end
 end

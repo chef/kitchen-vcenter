@@ -48,6 +48,9 @@ module Kitchen
       default_config :cluster, nil
       default_config :network_name, nil
       default_config :tags, nil
+      default_config :vm_wait_timeout, 90
+      default_config :vm_wait_interval, 2.0
+      default_config :vm_rollback, false
 
       # The main create method
       #
@@ -99,14 +102,28 @@ module Kitchen
           resource_pool: config[:resource_pool],
           clone_type: config[:clone_type],
           network_name: config[:network_name],
+          wait_timeout: config[:vm_wait_timeout],
+          wait_interval: config[:vm_wait_interval],
         }
 
-        # Create an object from which the clone operation can be called
-        new_vm = Support::CloneVm.new(connection_options, options)
-        new_vm.clone
+        begin
+          # Create an object from which the clone operation can be called
+          new_vm = Support::CloneVm.new(connection_options, options)
+          new_vm.clone
 
-        state[:hostname] = new_vm.ip
-        state[:vm_name] = new_vm.name
+          state[:hostname] = new_vm.ip
+          state[:vm_name] = new_vm.name
+
+        rescue # Kitchen::ActionFailed => e
+          if config[:vm_rollback] == true
+            error format("Rolling back VM %s after critical error", config[:vm_name])
+
+            state[:vm_name] = config[:vm_name]
+            destroy(state)
+          end
+
+          raise
+        end
 
         unless config[:tags].nil? || config[:tags].empty?
           tag_api = VSphereAutomation::CIS::TaggingTagApi.new(api_client)
