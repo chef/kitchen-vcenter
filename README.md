@@ -118,7 +118,7 @@ The following parameters should be set in the main `driver_config` section as th
  - `vcenter_disable_ssl_verify` - Whether or not to disable SSL verification checks. Good when using self signed certificates. Default: false
  - `vm_wait_timeout` - Number of seconds to wait for VM connectivity. Default: 90
  - `vm_wait_interval` - Check interval between tries on VM connectivity. Default: 2.0
- - `vm_rollback` - Whether to roll back (destroy) VMs which failed VM connectivity checking. Default: false
+ - `vm_rollback` - Automatic roll back (destroy) of VMs failing the connectivity check. Default: false
 
 The following optional parameters should be used in the `driver_config` for the platform.
 

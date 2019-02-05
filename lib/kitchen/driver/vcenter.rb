@@ -118,9 +118,9 @@ module Kitchen
           if config[:vm_rollback] == true
             error format("Rolling back VM %s after critical error", config[:vm_name])
 
-            # Inject name of failed VM and reset the auto-discovered resource pool to clear validation in line #200
+            # Inject name of failed VM for destroy to work
             state[:vm_name] = config[:vm_name]
-            config[:resource_pool] = nil
+
             destroy(state)
           end
 
@@ -161,6 +161,10 @@ module Kitchen
       # @param [Object] state is the state of the vm
       def destroy(state)
         return if state[:vm_name].nil?
+
+        # Reset resource pool, as it's not needed for the destroy action but might be a remnant of earlier calls to "connect"
+        # Temporary fix until setting cluster + resource_pool at the same time is implemented (lines #64/#187)
+        config[:resource_pool] = nil
 
         save_and_validate_parameters
         connect
