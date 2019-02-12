@@ -1,24 +1,21 @@
 # Change Log
 
-<!-- latest_release 2.0.1 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+
+<!-- latest_stable_release -->
 ## [v2.0.1](https://github.com/chef/kitchen-vcenter/tree/v2.0.1) (2019-02-12)
 
 #### Merged Pull Requests
 - Add support for network_name to accept vSphere Distributed Switches [#60](https://github.com/chef/kitchen-vcenter/pull/60) ([tecracer-theinen](https://github.com/tecracer-theinen))
-<!-- latest_release -->
-<!-- release_rollup since=1.5.0 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Add support for network_name to accept vSphere Distributed Switches [#60](https://github.com/chef/kitchen-vcenter/pull/60) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.0.1 -->
-<!-- release_rollup -->
-
 <!-- latest_stable_release -->
+
 ## [v2.0.0](https://github.com/chef/kitchen-vcenter/tree/v2.0.0) (2019-01-30)
 
 - Bump the major version since we&#39;re using the rubygems published API now [#56](https://github.com/chef/kitchen-vcenter/pull/56) ([tas50](https://github.com/tas50)) <!-- 2.0.0 -->
 - Migration to new openapi based SDK [#55](https://github.com/chef/kitchen-vcenter/pull/55) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 1.5.1 -->
-<!-- latest_stable_release -->
 
 ## [v1.5.0](https://github.com/chef/kitchen-vcenter/tree/v1.5.0) (2019-01-12)
 
