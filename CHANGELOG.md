@@ -1,24 +1,21 @@
 # Change Log
 
-<!-- latest_release 2.0.2 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+
+<!-- latest_stable_release -->
 ## [v2.0.2](https://github.com/chef/kitchen-vcenter/tree/v2.0.2) (2019-02-12)
 
 #### Merged Pull Requests
 - Implementation of configurable timeouts and automatic rollback (v2) [#58](https://github.com/chef/kitchen-vcenter/pull/58) ([tecracer-theinen](https://github.com/tecracer-theinen))
-<!-- latest_release -->
-<!-- release_rollup since=2.0.1 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Implementation of configurable timeouts and automatic rollback (v2) [#58](https://github.com/chef/kitchen-vcenter/pull/58) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.0.2 -->
-<!-- release_rollup -->
-
 <!-- latest_stable_release -->
+
 ## [v2.0.1](https://github.com/chef/kitchen-vcenter/tree/v2.0.1) (2019-02-12)
 
 #### Merged Pull Requests
 - Add support for network_name to accept vSphere Distributed Switches [#60](https://github.com/chef/kitchen-vcenter/pull/60) ([tecracer-theinen](https://github.com/tecracer-theinen))
-<!-- latest_stable_release -->
 
 ## [v2.0.0](https://github.com/chef/kitchen-vcenter/tree/v2.0.0) (2019-01-30)
 
