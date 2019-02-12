@@ -1,8 +1,9 @@
+require "kitchen"
 require "rbvmomi"
 
 class Support
   class CloneVm
-    attr_reader :vim, :options, :vm, :name, :path
+    attr_reader :vim, :options, :vm, :name, :path, :ip
 
     def initialize(conn_opts, options)
       @options = options
@@ -10,6 +11,32 @@ class Support
 
       # Connect to vSphere
       @vim ||= RbVmomi::VIM.connect conn_opts
+    end
+
+    def get_ip(vm)
+      @ip = nil
+
+      unless vm.guest.net.empty? || !vm.guest.ipAddress
+        @ip = vm.guest.net[0].ipConfig.ipAddress.detect do |addr|
+          addr.origin != "linklayer"
+        end.ipAddress
+      end
+
+      ip
+    end
+
+    def wait_for_ip(vm, timeout = 30.0, interval = 2.0)
+      start = Time.new
+
+      ip = nil
+      loop do
+        ip = get_ip(vm)
+        break if ip || (Time.new - start) >= timeout
+        sleep interval
+      end
+
+      raise "Timeout waiting for IP address or no VMware Tools installed on guest" if ip.nil?
+      raise format("Error getting accessible IP address, got %s. Check DHCP server and scope exhaustion", ip) if ip =~ /^169\.254\./
     end
 
     def clone
@@ -82,18 +109,20 @@ class Support
       # Set the folder to use
       dest_folder = options[:folder].nil? ? dc.vmFolder : options[:folder][:id]
 
-      puts "Cloning '#{options[:template]}' to create the VM..."
+      Kitchen.logger.info format("Cloning '%s' to create the VM...", options[:template])
       if options[:clone_type] == :instant
         vcenter_data = vim.serviceInstance.content.about
         raise "Instant clones only supported with vCenter 6.7 or higher" unless vcenter_data.version.to_f >= 6.7
-        puts "- Detected #{vcenter_data.fullName}"
+        Kitchen.logger.debug format("Detected %s", vcenter_data.fullName)
 
         resources = dc.hostFolder.children
-        hosts = resources.select { |resource| resource.class.to_s == "ComputeResource" }.map { |c| c.host }.flatten
+        hosts = resources.select { |resource| resource.class.to_s =~ /ComputeResource$/ }.map { |c| c.host }.flatten
         targethost = hosts.select { |host| host.summary.config.name == options[:targethost].name }.first
+        raise "No matching ComputeResource found in host folder" if targethost.nil?
+
         esx_data = targethost.summary.config.product
         raise "Instant clones only supported with ESX 6.7 or higher" unless esx_data.version.to_f >= 6.7
-        puts "- Detected #{esx_data.fullName}"
+        Kitchen.logger.debug format("Detected %s", esx_data.fullName)
 
         # Other tools check for VMWare Tools status, but that will be toolsNotRunning on frozen VMs
         raise "Need a running VM for instant clones" unless src_vm.runtime.powerState == "poweredOn"
@@ -127,17 +156,13 @@ class Support
       @vm = dc.find_vm(path)
 
       if vm.nil?
-        puts format("Unable to find machine: %s", path)
+        raise format("Unable to find machine: %s", path)
       else
-        puts "Waiting for network interfaces to become available..."
-        sleep 2 while vm.guest.net.empty? || !vm.guest.ipAddress
-      end
-    end
+        Kitchen.logger.info format("Waiting for VMware tools/network interfaces to become available (timeout: %d seconds)...", options[:wait_timeout])
 
-    def ip
-      vm.guest.net[0].ipConfig.ipAddress.detect do |addr|
-        addr.origin != "linklayer"
-      end.ipAddress
+        wait_for_ip(vm, options[:wait_timeout], options[:wait_interval])
+        Kitchen.logger.info format("Created machine %s with IP %s", name, ip)
+      end
     end
   end
 end
