@@ -42,9 +42,34 @@ class Support
 
         # Only support for first NIC so far
         network_device = all_network_devices.first
-        network_device.backing = RbVmomi::VIM.VirtualEthernetCardNetworkBackingInfo(
-          deviceName: options[:network_name]
-        )
+
+        networks = dc.network.select { |n| n.name == options[:network_name] }
+        raise format("Could not find network named %s", option[:network_name]) if networks.empty?
+
+        Kitchen.logger.warn format("Found %d networks named %s, picking first one", networks.count, options[:network_name]) if networks.count > 1
+        network_obj = networks.first
+
+        if network_obj.is_a? RbVmomi::VIM::DistributedVirtualPortgroup
+          Kitchen.logger.info format("Assigning network %s...", network_obj.pretty_path)
+
+          vds_obj = network_obj.config.distributedVirtualSwitch
+          Kitchen.logger.info format("Using vDS '%s' for network connectivity...", vds_obj.name)
+
+          network_device.backing = RbVmomi::VIM.VirtualEthernetCardDistributedVirtualPortBackingInfo(
+            port: RbVmomi::VIM.DistributedVirtualSwitchPortConnection(
+              portgroupKey: network_obj.key,
+              switchUuid: vds_obj.uuid
+            )
+          )
+        elsif network_obj.is_a? RbVmomi::VIM::Network
+          Kitchen.logger.info format("Assigning network %s...", options[:network_name])
+
+          network_device.backing = RbVmomi::VIM.VirtualEthernetCardNetworkBackingInfo(
+            deviceName: options[:network_name]
+          )
+        else
+          raise format("Unknown network type %s for network name %s", network_obj.class.to_s, options[:network_name])
+        end
 
         relocate_spec.deviceChange = [
           RbVmomi::VIM.VirtualDeviceConfigSpec(
