@@ -1,8 +1,16 @@
 # Change Log
 
-<!-- latest_release unreleased -->
+<!-- latest_release 2.0.1 -->
+## [v2.0.1](https://github.com/chef/kitchen-vcenter/tree/v2.0.1) (2019-02-12)
+
+#### Merged Pull Requests
+- Add support for network_name to accept vSphere Distributed Switches [#60](https://github.com/chef/kitchen-vcenter/pull/60) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
 <!-- release_rollup since=1.5.0 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Add support for network_name to accept vSphere Distributed Switches [#60](https://github.com/chef/kitchen-vcenter/pull/60) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.0.1 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
