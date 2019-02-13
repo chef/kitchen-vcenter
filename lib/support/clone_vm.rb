@@ -143,7 +143,7 @@ class Support
         task = src_vm.InstantClone_Task(spec: clone_spec)
       else
         clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(location: relocate_spec,
-                                                          powerOn: options[:poweron],
+                                                          powerOn: options[:poweron] && options[:customize].nil?,
                                                           template: false)
 
         task = src_vm.CloneVM_Task(spec: clone_spec, folder: dest_folder, name: name)
@@ -155,14 +155,27 @@ class Support
       @path = options[:folder].nil? ? name : format("%s/%s", options[:folder][:name], name)
       @vm = dc.find_vm(path)
 
-      if vm.nil?
-        raise format("Unable to find machine: %s", path)
-      else
-        Kitchen.logger.info format("Waiting for VMware tools/network interfaces to become available (timeout: %d seconds)...", options[:wait_timeout])
+      raise format("Unable to find machine: %s", path) if vm.nil?
 
-        wait_for_ip(vm, options[:wait_timeout], options[:wait_interval])
-        Kitchen.logger.info format("Created machine %s with IP %s", name, ip)
+      # Pass contents of the customization option/Hash through to allow full customization
+      # https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.smssdk.doc%2Fvim.vm.ConfigSpec.html
+      unless options[:customize].nil?
+        Kitchen.logger.info "Waiting for reconfiguration to finish"
+
+        config_spec = RbVmomi::VIM.VirtualMachineConfigSpec(options[:customize])
+        task = vm.ReconfigVM_Task(spec: config_spec)
+        task.wait_for_completion
       end
+
+      if options[:poweron] && !options[:customize].nil?
+        task = vm.PowerOnVM_Task
+        task.wait_for_completion
+      end
+
+      Kitchen.logger.info format("Waiting for VMware tools/network interfaces to become available (timeout: %d seconds)...", options[:wait_timeout])
+
+      wait_for_ip(vm, options[:wait_timeout], options[:wait_interval])
+      Kitchen.logger.info format("Created machine %s with IP %s", name, ip)
     end
   end
 end
