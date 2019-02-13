@@ -51,6 +51,8 @@ driver:
   vcenter_password: <%= ENV['VCENTER_PASSWORD'] %>
   vcenter_host:  <%= ENV['VCENTER_HOST'] %>
   vcenter_disable_ssl_verify: true
+  customize:
+    annotation: "Kitchen VM by <%= ENV['USER'] %> on <%= Time.now.to_s %>"
 
 provisioner:
   name: chef_zero
@@ -89,6 +91,9 @@ platforms:
       network: "Internal"
       template: folder/windows2012R2-template
       datacenter: "Datacenter"
+      customize:
+        numCPUs: 4
+        memoryMB: 1024
     transport:
       username: "Administrator"
       password: "p@ssW0rd!"
@@ -129,6 +134,7 @@ The following optional parameters should be used in the `driver_config` for the 
  - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
  - `network_name` - Network to switch first interface to, needs a VM Network name. Default: do not change
  - `tags` - Array of pre-defined vCenter tag names to assign (VMware tags are not key/value pairs). Default: none
+ - `customize` - Dictionary of `xsd:*`-type customizations like annotation, memoryMB or numCPUs (see [VirtualMachineConfigSpec](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.smssdk.doc%2Fvim.vm.ConfigSpec.html)). Default: none
 
 Only one of the following optional parameters can be given:
  - `resource_pool` - Name of the resource pool to use when creating the machine. Default: first pool

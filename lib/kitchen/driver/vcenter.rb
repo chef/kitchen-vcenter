@@ -51,6 +51,7 @@ module Kitchen
       default_config :vm_wait_timeout, 90
       default_config :vm_wait_interval, 2.0
       default_config :vm_rollback, false
+      default_config :customize, nil
 
       # The main create method
       #
@@ -104,6 +105,7 @@ module Kitchen
           network_name: config[:network_name],
           wait_timeout: config[:vm_wait_timeout],
           wait_interval: config[:vm_wait_interval],
+          customize: config[:customize],
         }
 
         begin
