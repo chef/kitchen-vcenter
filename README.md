@@ -127,6 +127,8 @@ The following parameters should be set in the main `driver_config` section as th
 
 The following optional parameters should be used in the `driver_config` for the platform.
 
+ - `resource_pool` - Name of the resource pool to use when creating the machine. Default: first pool
+ - `cluster` - Cluster on which the new virtual machine should be created. Default: cluster of the `targethost` machine.
  - `targethost` - Host on which the new virtual machine should be created. If not specified then the first host in the cluster is used.
  - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist.
  - `poweron` - Power on the new virtual machine. Default: true
@@ -135,10 +137,6 @@ The following optional parameters should be used in the `driver_config` for the 
  - `network_name` - Network to switch first interface to, needs a VM Network name. Default: do not change
  - `tags` - Array of pre-defined vCenter tag names to assign (VMware tags are not key/value pairs). Default: none
  - `customize` - Dictionary of `xsd:*`-type customizations like annotation, memoryMB or numCPUs (see [VirtualMachineConfigSpec](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.smssdk.doc%2Fvim.vm.ConfigSpec.html)). Default: none
-
-Only one of the following optional parameters can be given:
- - `resource_pool` - Name of the resource pool to use when creating the machine. Default: first pool
- - `cluster` - Cluster on which the new virtual machine should be created. Default: cluster of the `targethost` machine.
 
 ## Clone types
 
