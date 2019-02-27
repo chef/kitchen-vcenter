@@ -65,13 +65,28 @@ module Kitchen
         config[:targethost] = get_host(config[:targethost])
 
         # Use the root resource pool of a specified cluster, if any
-        # @todo This does not allow to specify cluster AND pool yet
-        unless config[:cluster].nil?
-          cluster = get_cluster(config[:cluster])
-          config[:resource_pool] = cluster.resource_pool
-        else
+        if config[:cluster].nil?
           # Find the first resource pool on any cluster
           config[:resource_pool] = get_resource_pool(config[:resource_pool])
+        else
+          cluster = get_cluster(config[:cluster])
+          root_pool = cluster.resource_pool
+
+          if config[:resource_pool].nil?
+            config[:resource_pool] = root_pool
+          else
+            rp_api = VSphereAutomation::VCenter::ResourcePoolApi.new(api_client)
+
+            found_pool = nil
+            pools = rp_api.get(root_pool).value.resource_pools
+            pools.each do |pool|
+              name = rp_api.get(pool).value.name
+              found_pool = pool if name == config[:resource_pool]
+            end
+
+            raise format("Pool %s not found on cluster %s", config[:resource_pool], config[:cluster]) if found_pool.nil?
+            config[:resource_pool] = found_pool
+          end
         end
 
         # Check that the datacenter exists
@@ -205,7 +220,10 @@ module Kitchen
           config[:vm_name] = format("%s-%s-%s", instance.suite.name, instance.platform.name, SecureRandom.hex(4))
         end
 
-        raise format("Cannot specify both cluster and resource_pool") if !config[:cluster].nil? && !config[:resource_pool].nil?
+        # See details in function get_resource_pool for more details
+        # if config[:cluster].nil? && config[:resource_pool].nil?
+        #   warn("It is recommended to specify cluster and/or resource_pool to avoid unpredictable machine placement on large deployments")
+        # end
       end
 
       # A helper method to validate the state
@@ -307,6 +325,14 @@ module Kitchen
         # If no name has been set, use the first resource pool that can be found,
         # otherwise try to find by given name
         if name.nil?
+          # Unpredictable results can occur, if neither cluster nor resource_pool are specified,
+          # as this relies on the order in which VMware saves the objects. This does not have large
+          # impact on small environments, but on large deployments with lots of clusters and pools,
+          # provisioned machines are likely to "jump around" available hosts.
+          #
+          # This behaviour is carried on from versions 1.2.1 and lower, but likely to be removed in
+          # a new major version due to these insufficiencies and the confusing code for it
+
           # Remove default pool for first pass (<= 1.2.1 behaviour to pick first user-defined pool found)
           resource_pools = rp_api.list.value.delete_if { |pool| pool.name == "Resources" }
           debug("Search of all resource pools found: " + resource_pools.map { |pool| pool.name }.to_s)
