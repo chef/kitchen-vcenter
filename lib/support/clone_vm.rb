@@ -167,7 +167,7 @@ class Support
         task.wait_for_completion
       end
 
-      if options[:poweron] && !options[:customize].nil?
+      if options[:poweron] && !options[:customize].nil? && options[:clone_type] != :instant
         task = vm.PowerOnVM_Task
         task.wait_for_completion
       end
