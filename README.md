@@ -71,6 +71,7 @@ platforms:
     driver:
       targethost: 10.0.0.42
       template: ubuntu16-template
+      interface: "VM Network"
       datacenter: "Datacenter"
     transport:
       username: "admini"
@@ -88,7 +89,7 @@ platforms:
   - name: windows2012R2
     driver:
       targethost: 10.0.0.42
-      network: "Internal"
+      network_name: "Internal"
       template: folder/windows2012R2-template
       datacenter: "Datacenter"
       customize:
@@ -134,9 +135,10 @@ The following optional parameters should be used in the `driver_config` for the 
  - `poweron` - Power on the new virtual machine. Default: true
  - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
  - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
- - `network_name` - Network to switch first interface to, needs a VM Network name. Default: do not change
+ - `network_name` - Network to reconfigure the first interface to, needs a VM Network name. Default: do not change
  - `tags` - Array of pre-defined vCenter tag names to assign (VMware tags are not key/value pairs). Default: none
  - `customize` - Dictionary of `xsd:*`-type customizations like annotation, memoryMB or numCPUs (see [VirtualMachineConfigSpec](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.smssdk.doc%2Fvim.vm.ConfigSpec.html)). Default: none
+ - `interface`- VM Network name to use for kitchen connections. Default: not set = first interface with usable IP
 
 ## Clone types
 
