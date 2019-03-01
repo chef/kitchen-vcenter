@@ -27,11 +27,11 @@ class Support
 
         vm_ip = nil
         nics.each do |net|
-          vm_ip = net.ipConfig.ipAddress.detect { |addr| addr.origin != 'linklayer' }
+          vm_ip = net.ipConfig.ipAddress.detect { |addr| addr.origin != "linklayer" }
           break unless vm_ip.nil?
         end
 
-        extended_msg = options[:interface] ? 'Network ' + options[:interface] : ''
+        extended_msg = options[:interface] ? "Network #{options[:interface]}" : ""
         raise format("No valid IP found on VM %s", extended_msg) if vm_ip.nil?
 
         @ip = vm_ip.ipAddress
