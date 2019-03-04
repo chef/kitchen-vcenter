@@ -16,10 +16,25 @@ class Support
     def get_ip(vm)
       @ip = nil
 
+      # Don't simply use vm.guest.ipAddress to allow specifying a different interface
       unless vm.guest.net.empty? || !vm.guest.ipAddress
-        @ip = vm.guest.net[0].ipConfig.ipAddress.detect do |addr|
-          addr.origin != "linklayer"
-        end.ipAddress
+        nics = vm.guest.net
+        if options[:interface]
+          nics.select! { |nic| nic.network == options[:interface] }
+
+          raise format("No interfaces found on VM which are attached to network '%s'", options[:interface]) if nics.empty?
+        end
+
+        vm_ip = nil
+        nics.each do |net|
+          vm_ip = net.ipConfig.ipAddress.detect { |addr| addr.origin != "linklayer" }
+          break unless vm_ip.nil?
+        end
+
+        extended_msg = options[:interface] ? "Network #{options[:interface]}" : ""
+        raise format("No valid IP found on VM %s", extended_msg) if vm_ip.nil?
+
+        @ip = vm_ip.ipAddress
       end
 
       ip
