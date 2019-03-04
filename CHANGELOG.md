@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.2.0 -->
-## [v2.2.0](https://github.com/chef/kitchen-vcenter/tree/v2.2.0) (2019-03-04)
+<!-- latest_release 2.2.1 -->
+## [v2.2.1](https://github.com/chef/kitchen-vcenter/tree/v2.2.1) (2019-03-04)
 
 #### Merged Pull Requests
-- Network Interface Selection Support [#63](https://github.com/chef/kitchen-vcenter/pull/63) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Fix instant clones, which failed after implementing VM reconfiguration [#64](https://github.com/chef/kitchen-vcenter/pull/64) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
 <!-- release_rollup since=2.1.0 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Fix instant clones, which failed after implementing VM reconfiguration [#64](https://github.com/chef/kitchen-vcenter/pull/64) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.2.1 -->
 - Network Interface Selection Support [#63](https://github.com/chef/kitchen-vcenter/pull/63) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.2.0 -->
 <!-- release_rollup -->
 
