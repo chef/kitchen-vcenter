@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.2.2 -->
+## [v2.2.2](https://github.com/chef/kitchen-vcenter/tree/v2.2.2) (2019-03-20)
+
+#### Merged Pull Requests
+- Loosen the Test Kitchen dep to allow 2.X [#65](https://github.com/chef/kitchen-vcenter/pull/65) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.2.1 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Loosen the Test Kitchen dep to allow 2.X [#65](https://github.com/chef/kitchen-vcenter/pull/65) ([tas50](https://github.com/tas50)) <!-- 2.2.2 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
