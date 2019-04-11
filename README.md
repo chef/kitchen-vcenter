@@ -107,26 +107,26 @@ suites:
 
 ### Required parameters:
 
-The following parameters should be set in the main `driver_config` section as they are common to all platforms:
+The following parameters should be set in the main `driver` section as they are common to all platforms:
 
  - `vcenter_username` - Name to use when connecting to the vSphere environment
  - `vcenter_password` - Password associated with the specified user
  - `vcenter_host` - Host against which logins should be attempted
 
-The following parameters should be set in the `driver_config` for the individual platform:
+The following parameters should be set in the `driver` section for the individual platform:
 
  - `datacenter` - Name of the datacenter to use to deploy into
  - `template` - Template or virtual machine to use when cloning the new machine (needs to be a VM for linked clones)
 
 ### Optional Parameters
 
-The following parameters should be set in the main `driver_config` section as they are common to all platforms:
+The following parameters should be set in the main `driver` section as they are common to all platforms:
  - `vcenter_disable_ssl_verify` - Whether or not to disable SSL verification checks. Good when using self signed certificates. Default: false
  - `vm_wait_timeout` - Number of seconds to wait for VM connectivity. Default: 90
  - `vm_wait_interval` - Check interval between tries on VM connectivity. Default: 2.0
  - `vm_rollback` - Automatic roll back (destroy) of VMs failing the connectivity check. Default: false
 
-The following optional parameters should be used in the `driver_config` for the platform.
+The following optional parameters should be used in the `driver` for the platform.
 
  - `resource_pool` - Name of the resource pool to use when creating the machine. Default: first pool
  - `cluster` - Cluster on which the new virtual machine should be created. Default: cluster of the `targethost` machine.
@@ -137,8 +137,13 @@ The following optional parameters should be used in the `driver_config` for the 
  - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
  - `network_name` - Network to reconfigure the first interface to, needs a VM Network name. Default: do not change
  - `tags` - Array of pre-defined vCenter tag names to assign (VMware tags are not key/value pairs). Default: none
- - `customize` - Dictionary of `xsd:*`-type customizations like annotation, memoryMB or numCPUs (see [VirtualMachineConfigSpec](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.smssdk.doc%2Fvim.vm.ConfigSpec.html)). Default: none
+ - `customize` - Dictionary of `xsd:*`-type customizations like annotation, memoryMB or numCPUs (see
+[VirtualMachineConfigSpec](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.smssdk.doc%2Fvim.vm.ConfigSpec.html)). Default: none
  - `interface`- VM Network name to use for kitchen connections. Default: not set = first interface with usable IP
+ - `aggressive` - Use aggressive IP retrieval to speed up provisioning. Default: false
+ - `aggressive_os` - OS family of the VM . Values: "linux", "windows". Default: autodetect from VMware
+ - `aggressive_username` - Username to access the VM. Default: "vagrant"
+ - `aggressive_password` - Password to access the VM. Default: "vagrant"
 
 ## Clone types
 
@@ -175,6 +180,20 @@ New clones resume from exactly the frozen point in time and also resume CPU acti
 duplicate the source MAC address, but get a different one.
 
 Architectural description see <https://www.virtuallyghetto.com/2018/04/new-instant-clone-architecture-in-vsphere-6-7-part-1.html>
+
+## Aggressive mode
+
+This mode is used to speed up provisioning of kitchen machines as much as possible. One of the limiting factors despite actual provisioning time
+(which can be improved using the linked/instant clone modes) is waiting for the VM to return its IP address. While VMware tools are usually available and
+responding within 10-20 seconds, sending back IP/OS information to vCenter can take additional 30-40 seconds easily.
+
+Aggressive mode invokes OS specific commands for IP retrieval as soon as the VMware Tools are responding, by using the Guest Operations Manager
+feature within the tools agent. Depending on the OS, a command to determine the IP will be executed using Bash (Linux) or CMD (Windows) and the
+resulting output parsed.
+
+If retrieving the IP fails for some reason, the VMware Tools provided data is used as fallback.
+
+Aggressive mode can speed up tests and pipelines by up to 30 seconds, but may fail due to asynchronous OS interaction in some instances.
 
 ## Contributing
 
