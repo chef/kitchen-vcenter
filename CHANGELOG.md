@@ -1,8 +1,16 @@
 # Change Log
 
-<!-- latest_release -->
+<!-- latest_release 2.3.0 -->
+## [v2.3.0](https://github.com/chef/kitchen-vcenter/tree/v2.3.0) (2019-04-24)
+
+#### Merged Pull Requests
+- Implement aggressive IP polling mode [#66](https://github.com/chef/kitchen-vcenter/pull/66) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
 <!-- release_rollup -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Implement aggressive IP polling mode [#66](https://github.com/chef/kitchen-vcenter/pull/66) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.3.0 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
