@@ -53,6 +53,10 @@ module Kitchen
       default_config :vm_rollback, false
       default_config :customize, nil
       default_config :interface, nil
+      default_config :aggressive, false
+      default_config :aggressive_os, nil
+      default_config :aggressive_username, "vagrant"
+      default_config :aggressive_password, "vagrant"
 
       # The main create method
       #
@@ -123,6 +127,10 @@ module Kitchen
           wait_timeout: config[:vm_wait_timeout],
           wait_interval: config[:vm_wait_interval],
           customize: config[:customize],
+          aggressive: config[:aggressive],
+          aggressive_os: config[:aggressive_os],
+          aggressive_username: config[:aggressive_username],
+          aggressive_password: config[:aggressive_password],
         }
 
         begin
