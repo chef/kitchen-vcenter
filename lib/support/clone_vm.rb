@@ -6,7 +6,7 @@ class Support
   class CloneError < RuntimeError; end
 
   class CloneVm
-    attr_reader :vim, :options, :ssl_verify, :vm, :name, :ip
+    attr_reader :vim, :options, :ssl_verify, :vm, :name, :ip, :guest_auth, :username
 
     def initialize(conn_opts, options)
       @options = options
@@ -15,10 +15,16 @@ class Support
 
       # Connect to vSphere
       @vim ||= RbVmomi::VIM.connect conn_opts
+
+      @username = options[:vm_username]
+      password = options[:vm_password]
+      @guest_auth = RbVmomi::VIM::NamePasswordAuthentication(interactiveSession: false, username: username, password: password)
+
+      @benchmark_data = {}
     end
 
-    def aggressive_discovery?
-      options[:aggressive] == true
+    def active_discovery?
+      options[:active_discovery] == true
     end
 
     def ip_from_tools
@@ -38,9 +44,7 @@ class Support
         break unless vm_ip.nil?
       end
 
-      extended_msg = options[:interface] ? "Network #{options[:interface]}" : ""
-      raise Support::CloneError.new(format("No valid IP found on VM %s", extended_msg)) if vm_ip.nil?
-      vm_ip.ipAddress
+      vm_ip&.ipAddress
     end
 
     def wait_for_tools(timeout = 30.0, interval = 2.0)
@@ -48,7 +52,9 @@ class Support
 
       loop do
         if vm.guest.toolsRunningStatus == "guestToolsRunning"
-          Kitchen.logger.debug format("Tools detected after %d seconds", Time.new - start)
+          benchmark_checkpoint("tools_detected") if benchmark?
+
+          Kitchen.logger.debug format("Tools detected after %.1f seconds", Time.new - start)
           return
         end
         break if (Time.new - start) >= timeout
@@ -65,7 +71,7 @@ class Support
       loop do
         ip = ip_from_tools
         if ip || (Time.new - start) >= timeout
-          Kitchen.logger.debug format("IP retrieved after %d seconds", Time.new - start) if ip
+          Kitchen.logger.debug format("IP retrieved after %.1f seconds", Time.new - start) if ip
           break
         end
         sleep interval
@@ -77,8 +83,109 @@ class Support
       @ip = ip
     end
 
+    def benchmark?
+      options[:benchmark] == true
+    end
+
+    def benchmark_file
+      options[:benchmark_file]
+    end
+
+    def benchmark_start
+      Kitchen.logger.debug("Starting benchmark data collection.")
+
+      @benchmark_data = {
+        template: options[:template],
+        clonetype: options[:clone_type],
+        checkpoints: [
+          { title: "timestamp", value: Time.new.to_f },
+        ],
+      }
+    end
+
+    def benchmark_checkpoint(title)
+      timestamp = Time.new
+      checkpoints = @benchmark_data[:checkpoints]
+
+      total = timestamp - checkpoints.first.fetch(:value)
+      Kitchen.logger.debug format(
+        'Benchmark: Step "%s" at %d (%.1f since start)',
+        title, timestamp, total.to_f
+      )
+
+      @benchmark_data[:checkpoints] << {
+        title: title.to_sym,
+        value: total,
+      }
+    end
+
+    def benchmark_persist
+      # Add total time spent as well
+      checkpoints = @benchmark_data[:checkpoints]
+      checkpoints << {
+        title: :total,
+        value: Time.new - checkpoints.first.fetch(:value),
+      }
+
+      # Include CSV headers
+      unless File.exist?(benchmark_file)
+        header = "template, clonetype, active_discovery, "
+        header += checkpoints.map { |entry| entry[:title] }.join(", ") + "\n"
+        File.write(benchmark_file, header)
+      end
+
+      active_discovery = options[:active_discovery] || instant_clone?
+      data = [@benchmark_data[:template], @benchmark_data[:clonetype], active_discovery.to_s]
+      data << checkpoints.map { |entry| format("%.1f", entry[:value]) }
+
+      file = File.new(benchmark_file, "a")
+      file.puts(data.join(", ") + "\n")
+
+      Kitchen.logger.debug format("Benchmark: Appended data to file %s", benchmark_file)
+    end
+
     def detect_os
-      vm.config&.guestId =~ /^win/ ? :windows : :linux
+      vm.config&.guestId&.match(/^win/) ? :windows : :linux
+    end
+
+    def windows?
+      options[:vm_os].downcase.to_sym == :windows
+    end
+
+    def linux?
+      options[:vm_os].downcase.to_sym == :linux
+    end
+
+    def network_device(vm)
+      all_network_devices = vm.config.hardware.device.select do |device|
+        device.is_a?(RbVmomi::VIM::VirtualEthernetCard)
+      end
+
+      # Only support for first NIC so far
+      all_network_devices.first
+    end
+
+    def reconnect_network_device(vm)
+      network_device = network_device(vm)
+      network_device.connectable = RbVmomi::VIM.VirtualDeviceConnectInfo(
+        allowGuestControl: true,
+        startConnected: true,
+        connected: true
+      )
+
+      config_spec = RbVmomi::VIM.VirtualMachineConfigSpec(
+        deviceChange: [
+          RbVmomi::VIM.VirtualDeviceConfigSpec(
+            operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
+            device: network_device
+          )
+        ]
+      )
+
+      task = vm.ReconfigVM_Task(spec: config_spec)
+      task.wait_for_completion
+
+      benchmark_checkpoint("nic_reconfigured") if benchmark?
     end
 
     def standard_ip_discovery
@@ -86,45 +193,99 @@ class Support
       wait_for_ip(options[:wait_timeout], options[:wait_interval])
     end
 
-    def aggressive_ip_discovery
-      return unless aggressive_discovery? && !instant_clone?
-
-      # Take guest OS from VM/Template configuration, if not explicitly configured
-      # @see https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.apiref.doc%2Fvim.vm.GuestOsDescriptor.GuestOsIdentifier.html
-      if options[:aggressive_os].nil?
-        os = detect_os
-        Kitchen.logger.warn format('OS for aggressive mode not configured, got "%s" from VMware', os.to_s.capitalize)
-        options[:aggressive_os] = os
-      end
-
-      case options[:aggressive_os].downcase.to_sym
+    def command_separator
+      case options[:vm_os].downcase.to_sym
       when :linux
-        discovery_command = "ip addr | grep global | cut -b10- | cut -d/ -f1"
+        " && "
       when :windows
-        # discovery_command = "(Test-Connection -Computername $env:COMPUTERNAME -Count 1).IPV4Address.IPAddressToString"
-        discovery_command = "wmic nicconfig get IPAddress"
+        " & "
       end
+    end
 
-      username = options[:aggressive_username]
-      password = options[:aggressive_password]
-      guest_auth = RbVmomi::VIM::NamePasswordAuthentication(interactiveSession: false, username: username, password: password)
+    # Rescan network adapters for MAC/IP changes
+    def rescan_commands
+      Kitchen.logger.info "Refreshing network interfaces in OS"
 
-      Kitchen.logger.info "Attempting aggressive IP discovery"
+      case options[:vm_os].downcase.to_sym
+      when :linux
+        # @todo: allow override if no dhclient
+        return [
+          "/sbin/modprobe -r vmxnet3",
+          "/sbin/modprobe vmxnet3",
+          "/sbin/dhclient"
+        ]
+      when :windows
+        return [
+          "netsh interface set Interface #{options[:vm_win_network]} disable",
+          "netsh interface set Interface #{options[:vm_win_network]} enable",
+          "ipconfig /renew",
+        ]
+      end
+    end
+
+    # Available from VMware Tools 10.1.0 this pushes the IP instead of the standard 30 second poll
+    # This will be used to provide a quick fallback, if active discovery fails.
+    def trigger_tools
+      case options[:vm_os].downcase.to_sym
+      when :linux
+        [
+          "/usr/bin/vmware-toolbox-cmd info update network"
+        ]
+      when :windows
+        [
+          '"C:\Program Files\VMware\VMware Tools\VMwareToolboxCmd.exe" info update network',
+        ]
+      end
+    end
+
+    # Retrieve IP via OS commands
+    def discovery_commands
+      if options[:active_discovery_command].nil?
+        case options[:vm_os].downcase.to_sym
+        when :linux
+          "ip address show scope global | grep global | cut -b10- | cut -d/ -f1"
+        when :windows
+          ["sleep 5", "ipconfig"]
+          # "ipconfig /renew"
+          # "wmic nicconfig get IPAddress",
+          # "netsh interface ip show ipaddress #{options[:vm_win_network]}"
+        end
+      end
+    end
+
+    def active_ip_discovery(prefix_commands = [])
+      # Instant clone needs this to have synchronous reply on the new IP
+      return unless active_discovery? || instant_clone?
+
+      Kitchen.logger.info "Attempting active IP discovery"
       begin
         tools = Support::GuestOperations.new(vim, vm, guest_auth, ssl_verify)
-        stdout = tools.run_shell_capture_output(discovery_command)
+
+        commands = []
+        commands << rescan_commands if instant_clone?
+        # commands << trigger_tools # deactivated for now, as benefit is doubtful
+        commands << discovery_commands
+        script = commands.flatten.join(command_separator)
+
+        stdout = tools.run_shell_capture_output(script, :auto, 20)
 
         # Windows returns wrongly encoded UTF-8 for some reason
         stdout = stdout.bytes.map { |b| (32..126).cover?(b.ord) ? b.chr : nil }.join unless stdout.ascii_only?
-        @ip = stdout.match(/([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})/m).captures.first
+        @ip = stdout.match(/([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})/m)&.captures&.first
+
+        Kitchen.logger.debug format("Script output: %s", stdout)
+        raise Support::CloneError.new(format("Could not find IP in script output, fallback to standard discovery")) if ip.nil?
+        raise Support::CloneError.new(format("Error getting accessible IP address, got %s. Check DHCP server, scope exhaustion or timing issues", ip)) if ip =~ /^169\.254\./
       rescue RbVmomi::Fault => e
         if e.fault.class.wsdl_name == "InvalidGuestLogin"
-          message = format('Error authenticating to guest OS as "%s", check configuration of "aggressive_username"/"aggressive_password"', username)
+          message = format('Error authenticating to guest OS as "%s", check configuration of "vm_username"/"vm_password"', username)
+        else
+          message = e.message
         end
 
         raise Support::CloneError.new(message)
-      rescue ::StandardError
-        Kitchen.logger.info "Aggressive discovery failed. Trying standard discovery method."
+      rescue ::StandardError => e
+        Kitchen.logger.info format("Active discovery failed: %s", e.message)
         return false
       end
 
@@ -140,6 +301,8 @@ class Support
 
       task = vm.ReconfigVM_Task(spec: config_spec)
       task.wait_for_completion
+
+      benchmark_checkpoint("reconfigured") if benchmark?
     end
 
     def instant_clone?
@@ -155,6 +318,8 @@ class Support
     end
 
     def clone
+      benchmark_start if benchmark?
+
       # set the datacenter name
       dc = vim.serviceInstance.find_datacenter(options[:datacenter])
 
@@ -163,6 +328,16 @@ class Support
       inventory_path = format("/%s/vm/%s", options[:datacenter], options[:template])
       src_vm = root_folder.findByInventoryPath(inventory_path)
       raise Support::CloneError.new(format("Unable to find template: %s", options[:template])) if src_vm.nil?
+
+      if src_vm.config.template && !full_clone?
+        Kitchen.logger.warn "Source is a template, thus falling back to full clone. Reference a VM for linked/instant clones."
+        options[:clone_type] = :full
+      end
+
+      if src_vm.snapshot.nil? && !full_clone?
+        Kitchen.logger.warn "Source VM has no snapshot available, thus falling back to full clone. Create a snapshot for linked/instant clones."
+        options[:clone_type] = :full
+      end
 
       # Specify where the machine is going to be created
       relocate_spec = RbVmomi::VIM.VirtualMachineRelocateSpec
@@ -178,13 +353,6 @@ class Support
 
       # Change network, if wanted
       unless options[:network_name].nil?
-        all_network_devices = src_vm.config.hardware.device.select do |device|
-          device.is_a?(RbVmomi::VIM::VirtualEthernetCard)
-        end
-
-        # Only support for first NIC so far
-        network_device = all_network_devices.first
-
         networks = dc.network.select { |n| n.name == options[:network_name] }
         raise Support::CloneError.new(format("Could not find network named %s", option[:network_name])) if networks.empty?
 
@@ -197,6 +365,7 @@ class Support
           vds_obj = network_obj.config.distributedVirtualSwitch
           Kitchen.logger.info format("Using vDS '%s' for network connectivity...", vds_obj.name)
 
+          network_device = network_device(src_vm)
           network_device.backing = RbVmomi::VIM.VirtualEthernetCardDistributedVirtualPortBackingInfo(
             port: RbVmomi::VIM.DistributedVirtualSwitchPortConnection(
               portgroupKey: network_obj.key,
@@ -250,18 +419,37 @@ class Support
         # Swapping NICs not needed anymore (blog posts mention this), instant clones get a new
         # MAC at least with 6.7.0 build 9433931
 
+        # Disconnect network device, so wo don't get IP collisions on start
+        network_device = network_device(src_vm)
+        network_device.connectable = RbVmomi::VIM.VirtualDeviceConnectInfo(
+          allowGuestControl: true,
+          startConnected: true,
+          connected: false,
+          migrateConnect: "disconnect"
+        )
+        relocate_spec.deviceChange = [
+          RbVmomi::VIM.VirtualDeviceConfigSpec(
+            operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
+            device: network_device
+          )
+        ]
+
         clone_spec = RbVmomi::VIM.VirtualMachineInstantCloneSpec(location: relocate_spec,
                                                                  name: name)
 
+        benchmark_checkpoint("initialized") if benchmark?
         task = src_vm.InstantClone_Task(spec: clone_spec)
       else
         clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(location: relocate_spec,
                                                           powerOn: options[:poweron] && options[:customize].nil?,
                                                           template: false)
 
+        benchmark_checkpoint("initialized") if benchmark?
         task = src_vm.CloneVM_Task(spec: clone_spec, folder: dest_folder, name: name)
       end
       task.wait_for_completion
+
+      benchmark_checkpoint("cloned") if benchmark?
 
       # get the IP address of the machine for bootstrapping
       # machine name is based on the path, e.g. that includes the folder
@@ -269,18 +457,34 @@ class Support
       @vm = dc.find_vm(path)
       raise Support::CloneError.new(format("Unable to find machine: %s", path)) if vm.nil?
 
+      if options[:vm_os].nil?
+        os = detect_os
+        Kitchen.logger.debug format('OS for VM not configured, got "%s" from VMware', os.to_s.capitalize)
+        options[:vm_os] = os
+      end
+
+      # Reconnect network device after Instant Clone is ready
+      if instant_clone?
+        Kitchen.logger.info "Reconnecting network adapter"
+        reconnect_network_device(vm)
+      end
+
       reconfigure_guest unless options[:customize].nil?
 
+      # Start only if specified or customizations wanted; no need for instant clones as they start in running state
       if options[:poweron] && !options[:customize].nil? && !instant_clone?
         task = vm.PowerOnVM_Task
         task.wait_for_completion
       end
+      benchmark_checkpoint("powered_on") if benchmark?
 
       Kitchen.logger.info format("Waiting for VMware tools to become available (timeout: %d seconds)...", options[:wait_timeout])
       wait_for_tools(options[:wait_timeout], options[:wait_interval])
 
-      aggressive_ip_discovery || standard_ip_discovery
+      active_ip_discovery || standard_ip_discovery
+      benchmark_checkpoint("ip_detected") if benchmark?
 
+      benchmark_persist if benchmark?
       Kitchen.logger.info format("Created machine %s with IP %s", name, ip)
     end
   end

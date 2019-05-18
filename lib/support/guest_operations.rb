@@ -17,7 +17,7 @@ class Support
       return vm.guest.guestFamily == "windowsGuest" ? :windows : :linux if vm.guest.guestFamily
 
       # VMware tools are not initialized or missing, infer from Guest Id
-      vm.config&.guestId =~ /^win/ ? :windows : :linux
+      vm.config&.guestId&.match(/^win/) ? :windows : :linux
     end
 
     def linux?
@@ -50,7 +50,7 @@ class Support
         sleep interval
       end
 
-      raise format("Timeout waiting for process %d to exit after %d seconds", pid, timeout) if waitTime >= timeout
+      raise format("Timeout waiting for process %d to exit after %d seconds", pid, timeout) if (Time.new - start) >= timeout
     end
 
     def run_program(path, args = "", timeout = 60.0)
@@ -66,12 +66,17 @@ class Support
     end
 
     def run_shell_capture_output(command, shell = :auto, timeout = 60.0)
-      if linux? || shell == :linux
+      if shell == :auto
+        shell = :linux if linux?
+        shell = :cmd if windows?
+      end
+
+      if shell == :linux
         tmp_out_fname = format("/tmp/vm_utils_run_out_%s", Random.rand)
         tmp_err_fname = format("/tmp/vm_utils_run_err_%s", Random.rand)
         shell = "/bin/sh"
         args = format("-c '(%s) > %s 2> %s'", command.gsub("'", %q{\\\'}), tmp_out_fname, tmp_err_fname)
-      elsif windows? || shell == :cmd
+      elsif shell == :cmd
         tmp_out_fname = format('C:\Windows\TEMP\vm_utils_run_out_%s', Random.rand)
         tmp_err_fname = format('C:\Windows\TEMP\vm_utils_run_err_%s', Random.rand)
         shell = "cmd.exe"
@@ -83,14 +88,14 @@ class Support
         args = format('-Command "%s > %s 2> %s"', command.gsub("\"", %q{\\\"}), tmp_out_fname, tmp_err_fname)
       end
 
-      exit_code = run_program(shell, args, timeout)
-      proc_out = read_file(tmp_out_fname)
-      if exit_code != 0
-        proc_err = read_file(tmp_err_fname)
+      begin
+        exit_code = run_program(shell, args, timeout)
+      rescue StandardError
+        proc_err = "" # read_file(tmp_err_fname)
         raise format("Error executing command %s. Exit code: %d. StdErr %s", command, exit_code, proc_err)
       end
 
-      proc_out
+      read_file(tmp_out_fname)
     end
 
     def write_file(remote_file, contents)

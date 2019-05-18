@@ -3,6 +3,8 @@ source "https://rubygems.org"
 gemspec
 
 group :development do
+  gem "guard"
+  gem "guard-shell"
   gem "chefstyle", git: "https://github.com/chef/chefstyle.git", branch: "master"
 end
 

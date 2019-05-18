@@ -125,6 +125,8 @@ The following parameters should be set in the main `driver` section as they are 
  - `vm_wait_timeout` - Number of seconds to wait for VM connectivity. Default: 90
  - `vm_wait_interval` - Check interval between tries on VM connectivity. Default: 2.0
  - `vm_rollback` - Automatic roll back (destroy) of VMs failing the connectivity check. Default: false
+ - `benchmark` - Write benchmark data for comparisons. Default: false
+ - `benchmark_file` - Filename to write CSV data to. Default: "kitchen-vcenter.csv"
 
 The following optional parameters should be used in the `driver` for the platform.
 
@@ -140,10 +142,18 @@ The following optional parameters should be used in the `driver` for the platfor
  - `customize` - Dictionary of `xsd:*`-type customizations like annotation, memoryMB or numCPUs (see
 [VirtualMachineConfigSpec](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.smssdk.doc%2Fvim.vm.ConfigSpec.html)). Default: none
  - `interface`- VM Network name to use for kitchen connections. Default: not set = first interface with usable IP
- - `aggressive` - Use aggressive IP retrieval to speed up provisioning. Default: false
- - `aggressive_os` - OS family of the VM . Values: "linux", "windows". Default: autodetect from VMware
- - `aggressive_username` - Username to access the VM. Default: "vagrant"
- - `aggressive_password` - Password to access the VM. Default: "vagrant"
+
+ The following optional parameters are relevant for active IP discovery.
+
+ - `active_discovery` - Use active IP retrieval to speed up provisioning. Default: false
+ - `active_discovery_command` - String or list of specific commands to retrieve VM IP (see Active Discovery Mode section below)
+ - `vm_os` - OS family of the VM . Values: "linux", "windows". Default: autodetect from VMware
+ - `vm_username` - Username to access the VM. Default: "vagrant"
+ - `vm_password` - Password to access the VM. Default: "vagrant"
+
+In addition to active IP discovery, the following optional parameter is relevant for instant clones using Windows.
+
+ - `vm_win_network` - Internal Windows name of the Kitchen network adapter for reloading. Default: Ethernet0
 
 ## Clone types
 
@@ -151,11 +161,30 @@ The following optional parameters should be used in the `driver` for the platfor
 
 This takes a VM or template, copies the whole disk and then boots up the machine. Default mode of operation.
 
+Required prilveges:
+- Datastore.AllocateSpace
+- Network.Assign
+- Resource.AssignVMToPool
+- VirtualMachine.Interact.PowerOn
+- VirtualMachine.Provisioning.Clone
+- VirtualMachine.Provisioning.DeployTemplate
+
+- VirtualMachine.Config.Annotation (depending on `customize` parameters)
+- VirtualMachine.Config.CPUCount (depending on `customize` parameters)
+- VirtualMachine.Config.Memory (depending on `customize` parameters)
+- VirtualMachine.Config.EditDevice (if `network_name` is used)
+- DVSwitch.CanUse (if `network_name is used with dVS/lVS)
+- DVPortgroup.CanUse (if `network_name is used with dVS/lVS)
+
 ### Clone mode: linked
 
-Instead of a full copy, "linked" uses delta disks to speed up the cloning process and uses many fewer IO operations. The `template` parameter has to reference a VM in this case, a template will not work. After creation of the delta disks, the machine is booted up and writes only to its delta disks.
+Instead of a full copy, "linked" uses delta disks to speed up the cloning process and uses many fewer IO operations. After creation of the delta disks, the machine is booted up and writes only to its delta disks.
+
+The `template` parameter has to reference a VM (a template will not work) and a snapshot must be present. Otherwise, the driver will fall back to creating a full clone.
 
 Depending on the underlying storage system, performance may vary greatly compared to full clones.
+
+Required prilveges: (see "Clone mode: full")
 
 ### Clone mode: instant
 
@@ -166,6 +195,7 @@ Prerequisites:
 - vSphere Hypervisor (aka ESXi) version 6.7.0 or higher
 - VMware Tools installed and running
 - a running source virtual machine (`template` parameter)
+- for Linux, currently only `dhclient` is supported as DHCP client
 
 Limitations:
 - A new VM is always on the same host because of memory sharing
@@ -173,27 +203,52 @@ Limitations:
 
 Freezing the source VM:
 - Login to the machine
-- Execute the freeze operation, for example via `vmtoolsd -cmd "instantclone.freeze"`
+- Execute the freeze operation, for example via `vmtoolsd --cmd "instantclone.freeze"`
 - The machine does not execute any CPU instructions after this point
 
-New clones resume from exactly the frozen point in time and also resume CPU activity automatically. In contrast to some early blog posts, they do not
-duplicate the source MAC address, but get a different one.
+New clones resume from exactly the frozen point in time and also resume CPU activity automatically. The OS level network adapters get rescanned automatically
+to pick up MAC address changes, which requires the privileges to use the Guest Operations API and login credentials (`vm_username`/`vm_password`).
 
 Architectural description see <https://www.virtuallyghetto.com/2018/04/new-instant-clone-architecture-in-vsphere-6-7-part-1.html>
 
-## Aggressive mode
+Needed privileges in addition to "Clone mode: full":
+- VirtualMachine.Config.EditDevice
+- VirtualMachine.Inventory.CreateFromExisting
+- VirtualMachine.GuestOperations.Execute
+- VirtualMachine.GuestOperations.Query
+
+## Active Discovery Mode
 
 This mode is used to speed up provisioning of kitchen machines as much as possible. One of the limiting factors despite actual provisioning time
 (which can be improved using the linked/instant clone modes) is waiting for the VM to return its IP address. While VMware tools are usually available and
 responding within 10-20 seconds, sending back IP/OS information to vCenter can take additional 30-40 seconds easily.
 
-Aggressive mode invokes OS specific commands for IP retrieval as soon as the VMware Tools are responding, by using the Guest Operations Manager
+Active mode invokes OS specific commands for IP retrieval as soon as the VMware Tools are responding, by using the Guest Operations Manager
 feature within the tools agent. Depending on the OS, a command to determine the IP will be executed using Bash (Linux) or CMD (Windows) and the
-resulting output parsed.
+resulting output parsed. While the driver has sensible default commands, you can set your own via the `active_discovery_command` directive on the
+platform level.
 
-If retrieving the IP fails for some reason, the VMware Tools provided data is used as fallback.
+Active mode can speed up tests and pipelines by up to 30 seconds, but may fail due to asynchronous OS interaction in some instances. If retrieving the IP
+fails for some reason, the VMware Tools provided data is used as fallback.
 
-Aggressive mode can speed up tests and pipelines by up to 30 seconds, but may fail due to asynchronous OS interaction in some instances.
+Needed privileges:
+- VirtualMachine.GuestOperations.Execute
+- VirtualMachine.GuestOperations.Query
+
+Linux default:
+`ip address show scope global | grep global | cut -b10- | cut -d/ -f1`
+
+Windows default:
+`sleep 5 & ipconfig`
+
+## Benchmarking
+
+To get some insight into the performance of your environment with different configurations, some simple benchmark functionality was built in. When you
+enable this via the `benchmark` property, data gets appended to a CSV file (`benchmark_file` property) and printed to standard out (`-l debug` on CLI)
+
+This file includes a header line describing the different fields such as the value of `template`, `clone_type` and `active_discovery` plus the different
+steps within cloning a VM. The timing of steps is relative to each other and followed by a column with the total number of seconds for the whole cloning
+operation.
 
 ## Contributing
 
@@ -216,10 +271,10 @@ Pull requests are very welcome! Make sure your patches are well tested. Ideally 
 ## License
 
 Author:: Russell Seymour ([rseymour@chef.io](mailto:rseymour@chef.io))
-
 Author:: JJ Asghar ([jj@chef.io](mailto:jj@chef.io))
+Author:: Thomas Heinen ([theinen@tecracer.de](mailto:theinen@tecracer.de))
 
-Copyright:: Copyright (c) 2017-2018 Chef Software, Inc.
+Copyright:: Copyright (c) 2017-2019 Chef Software, Inc.
 
 License:: Apache License, Version 2.0
 
