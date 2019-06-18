@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.3.0 -->
-## [v2.3.0](https://github.com/chef/kitchen-vcenter/tree/v2.3.0) (2019-04-24)
+<!-- latest_release 2.4.0 -->
+## [v2.4.0](https://github.com/chef/kitchen-vcenter/tree/v2.4.0) (2019-06-18)
 
 #### Merged Pull Requests
-- Implement aggressive IP polling mode [#66](https://github.com/chef/kitchen-vcenter/pull/66) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Improve and fix support for Instant Clones, add Benchmark option [#70](https://github.com/chef/kitchen-vcenter/pull/70) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.2.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Improve and fix support for Instant Clones, add Benchmark option [#70](https://github.com/chef/kitchen-vcenter/pull/70) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.4.0 -->
 - Implement aggressive IP polling mode [#66](https://github.com/chef/kitchen-vcenter/pull/66) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.3.0 -->
 <!-- release_rollup -->
 
