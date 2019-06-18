@@ -1,5 +1,2 @@
-# Offense count: 36
-# Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
-# URISchemes: http, https
-Metrics/LineLength:
-  Max: 147
+AllCops:
+  TargetRubyVersion: 2.5

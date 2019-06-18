@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-#
 # Author:: Chef Partner Engineering (<partnereng@chef.io>)
 # Copyright:: Copyright (c) 2017 Chef Software, Inc.
 # License:: Apache License, Version 2.0
@@ -53,10 +51,32 @@ module Kitchen
       default_config :vm_rollback, false
       default_config :customize, nil
       default_config :interface, nil
-      default_config :aggressive, false
-      default_config :aggressive_os, nil
-      default_config :aggressive_username, "vagrant"
-      default_config :aggressive_password, "vagrant"
+      default_config :active_discovery, false
+      default_config :active_discovery_command, nil
+      default_config :vm_os, nil
+      default_config :vm_username, "vagrant"
+      default_config :vm_password, "vagrant"
+      default_config :vm_win_network, "Ethernet0"
+
+      default_config :benchmark, false
+      default_config :benchmark_file, "kitchen-vcenter.csv"
+
+      deprecate_config_for :aggressive_mode, Util.outdent!(<<-MSG)
+        The 'aggressive_mode' setting was renamed to 'active_discovery' and
+        will be removed in future versions
+      MSG
+      deprecate_config_for :aggressive_os, Util.outdent!(<<-MSG)
+        The 'aggressive_os' setting was renamed to 'vm_os' and will be
+        removed in future versions.
+      MSG
+      deprecate_config_for :aggressive_username, Util.outdent!(<<-MSG)
+        The 'aggressive_username' setting was renamed to 'vm_username' and will
+        be removed in future versions.
+      MSG
+      deprecate_config_for :aggressive_password, Util.outdent!(<<-MSG)
+        The 'aggressive_password' setting was renamed to 'vm_password' and will
+        be removed in future versions.
+      MSG
 
       # The main create method
       #
@@ -121,16 +141,20 @@ module Kitchen
           datacenter: config[:datacenter],
           folder: config[:folder],
           resource_pool: config[:resource_pool],
-          clone_type: config[:clone_type],
+          clone_type: config[:clone_type].to_sym,
           network_name: config[:network_name],
           interface: config[:interface],
           wait_timeout: config[:vm_wait_timeout],
           wait_interval: config[:vm_wait_interval],
           customize: config[:customize],
-          aggressive: config[:aggressive],
-          aggressive_os: config[:aggressive_os],
-          aggressive_username: config[:aggressive_username],
-          aggressive_password: config[:aggressive_password],
+          active_discovery: config[:active_discovery],
+          active_discovery_command: config[:active_discovery_command],
+          vm_os: config[:vm_os],
+          vm_username: config[:vm_username],
+          vm_password: config[:vm_password],
+          vm_win_network: config[:vm_win_network],
+          benchmark: config[:benchmark],
+          benchmark_file: config[:benchmark_file],
         }
 
         begin
@@ -234,6 +258,12 @@ module Kitchen
         # if config[:cluster].nil? && config[:resource_pool].nil?
         #   warn("It is recommended to specify cluster and/or resource_pool to avoid unpredictable machine placement on large deployments")
         # end
+
+        # Process deprecated parameters
+        config[:active_discovery] = config[:aggressive_mode] unless config[:aggressive_mode].nil?
+        config[:vm_os] = config[:aggressive_os] unless config[:aggressive_os].nil?
+        config[:vm_username] = config[:aggressive_username] unless config[:aggressive_username].nil?
+        config[:vm_password] = config[:aggressive_password] unless config[:aggressive_password].nil?
       end
 
       # A helper method to validate the state
