@@ -95,6 +95,9 @@ platforms:
       customize:
         numCPUs: 4
         memoryMB: 1024
+        add_disks:
+         - type: "thin"
+           size_mb: 10240
     transport:
       username: "Administrator"
       password: "p@ssW0rd!"
@@ -139,8 +142,7 @@ The following optional parameters should be used in the `driver` for the platfor
  - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
  - `network_name` - Network to reconfigure the first interface to, needs a VM Network name. Default: do not change
  - `tags` - Array of pre-defined vCenter tag names to assign (VMware tags are not key/value pairs). Default: none
- - `customize` - Dictionary of `xsd:*`-type customizations like annotation, memoryMB or numCPUs (see
-[VirtualMachineConfigSpec](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.smssdk.doc%2Fvim.vm.ConfigSpec.html)). Default: none
+ - `customize` - Dictionary customizations like annotation, memoryMB or numCPUs (see below for details). Default: none
  - `interface`- VM Network name to use for kitchen connections. Default: not set = first interface with usable IP
 
  The following optional parameters are relevant for active IP discovery.
@@ -154,6 +156,14 @@ The following optional parameters should be used in the `driver` for the platfor
 In addition to active IP discovery, the following optional parameter is relevant for instant clones using Windows.
 
  - `vm_win_network` - Internal Windows name of the Kitchen network adapter for reloading. Default: Ethernet0
+
+The following subkeys to `customize` are available, by default they will inherit from the specified `template`.
+
+ - `annotation` - Notes to attach to the VM (requires VirtualMachine.Config.Rename)
+ - `memoryMB` - Memory size to set in Megabytes (requires VirtualMachine.Config.Memory)
+ - `numCPUs` - Number of CPUs to assign (requires VirtualMachine.Config.CpuCount)
+ - `add_disks` - Array of disks to add to the VM (requires VirtualMachine.Config.AddNewDisk).
+   Keys per disk: `type` (default: `thin`, other values: `flat`/`flat_lazy` or `flat_eager`), `size_mb` in MB (default: 10 GB)
 
 ## Clone types
 
@@ -173,8 +183,8 @@ Required prilveges:
 - VirtualMachine.Config.CPUCount (depending on `customize` parameters)
 - VirtualMachine.Config.Memory (depending on `customize` parameters)
 - VirtualMachine.Config.EditDevice (if `network_name` is used)
-- DVSwitch.CanUse (if `network_name is used with dVS/lVS)
-- DVPortgroup.CanUse (if `network_name is used with dVS/lVS)
+- DVSwitch.CanUse (if `network_name` is used with dVS/lVS)
+- DVPortgroup.CanUse (if `network_name` is used with dVS/lVS)
 
 ### Clone mode: linked
 

@@ -293,12 +293,89 @@ class Support
       true
     end
 
+    def check_add_disk_config(disk_config)
+      valid_types = %w{thin flat flat_lazy flat_eager}
+
+      unless valid_types.include? disk_config[:type].to_s
+        message = format("Unknown disk type in add_disks: %s. Allowed: %s",
+          disk_config[:type].to_s,
+          valid_types.join(", "))
+
+        raise Support::CloneError.new(message)
+      end
+    end
+
     def reconfigure_guest
       Kitchen.logger.info "Waiting for reconfiguration to finish"
 
-      # Pass contents of the customization option/Hash through to allow full customization
+      # Pass some contents right through
       # https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.smssdk.doc%2Fvim.vm.ConfigSpec.html
-      config_spec = RbVmomi::VIM.VirtualMachineConfigSpec(options[:customize])
+      config = options[:customize].select { |key, _| %i{annotation memoryMB numCPUs}.include? key }
+
+      add_disks = options[:customize]&.fetch(:add_disks, nil)
+      unless add_disks.nil?
+        config[:deviceChange] = []
+
+        # Will create a stem like "default-ubuntu-12345678/default-ubuntu-12345678"
+        filename_base = vm.disks.first.backing.fileName.gsub(/(-[0-9]+)?.vmdk/, "")
+
+        # Storage Controller and ID mapping
+        controller = vm.config.hardware.device.select { |device| device.is_a? RbVmomi::VIM::VirtualSCSIController }.first
+
+        add_disks.each_with_index do |disk_config, idx|
+          # Default to Thin Provisioning and 10GB disk size
+          disk_config[:type]    ||= :thin
+          disk_config[:size_mb] ||= 10240
+
+          check_add_disk_config(disk_config)
+
+          disk_spec = RbVmomi::VIM.VirtualDeviceConfigSpec(
+            fileOperation: "create",
+            operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("add"),
+            device: RbVmomi::VIM.VirtualDisk(
+              backing: RbVmomi::VIM.VirtualDiskFlatVer2BackingInfo(
+                thinProvisioned: true,
+                diskMode: "persistent",
+                fileName: format("%s_disk%03d.vmdk", filename_base, idx + 1),
+                datastore: vm.disks.first.backing.datastore
+              ),
+              deviceInfo: RbVmomi::VIM::Description(
+                label: format("Additional disk %d", idx + 1),
+                summary: format("%d MB", disk_config[:size_mb])
+              )
+            )
+          )
+
+          # capacityInKB is marked a deprecated in 6.7 but still a required parameter
+          disk_spec.device.capacityInBytes = disk_config[:size_mb] * 1024**2
+          disk_spec.device.capacityInKB = disk_config[:size_mb] * 1024
+
+          disk_spec.device.controllerKey = controller.key
+
+          highest_id = vm.disks.map(&:unitNumber).sort.last
+          next_id = highest_id + idx + 1
+
+          # Avoid the SCSI controller ID
+          next_id += 1 if next_id == controller.scsiCtlrUnitNumber
+
+          # Theoretically could add another SCSI controller, but there are limits to what kitchen should support
+          if next_id > 14
+            raise Support::CloneError.new(format("Ran out of SCSI IDs while trying to assign new disk %d", idx + 1))
+          end
+
+          disk_spec.device.unitNumber = next_id
+
+          device_keys = vm.config.hardware.device.map(&:key).sort
+          disk_spec.device.key = device_keys.last + (idx + 1) * 1000
+
+          disk_spec.device.backing.eagerlyScrub = true if disk_config[:type].to_s == "flat_eager"
+          disk_spec.device.backing.thinProvisioned = false if disk_config[:type].to_s =~ /^flat/
+
+          config[:deviceChange] << disk_spec
+        end
+      end
+
+      config_spec = RbVmomi::VIM.VirtualMachineConfigSpec(config)
 
       task = vm.ReconfigVM_Task(spec: config_spec)
       task.wait_for_completion
