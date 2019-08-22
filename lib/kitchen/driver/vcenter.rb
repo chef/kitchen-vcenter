@@ -85,10 +85,6 @@ module Kitchen
         save_and_validate_parameters
         connect
 
-        # Using the clone class, create a machine for TK
-        # Find the identifier for the targethost to pass to rbvmomi
-        config[:targethost] = get_host(config[:targethost])
-
         # Use the root resource pool of a specified cluster, if any
         if config[:cluster].nil?
           # Find the first resource pool on any cluster
@@ -110,12 +106,21 @@ module Kitchen
             end
 
             raise format("Pool %s not found on cluster %s", config[:resource_pool], config[:cluster]) if found_pool.nil?
+
             config[:resource_pool] = found_pool
           end
         end
 
         # Check that the datacenter exists
         datacenter_exists?(config[:datacenter])
+
+        # Get datacenter and cluster information
+        datacenter = get_datacenter(config[:datacenter])
+        cluster_id = get_cluster_id(config[:cluster])
+
+        # Using the clone class, create a machine for TK
+        # Find the identifier for the targethost to pass to rbvmomi
+        config[:targethost] = get_host(config[:targethost], datacenter, cluster_id)
 
         # Check if network exists, if to be changed
         network_exists?(config[:network_name]) unless config[:network_name].nil?
@@ -193,6 +198,7 @@ module Kitchen
           # Error out on undefined tags
           invalid = config[:tags] - valid_tags.keys
           raise format("Specified tag(s) %s not valid", invalid.join(",")) unless invalid.empty?
+
           tag_service = VSphereAutomation::CIS::TaggingTagAssociationApi.new(api_client)
           tag_ids = config[:tags].map { |name| valid_tags[name] }
 
@@ -298,19 +304,18 @@ module Kitchen
       # Validates the host name of the server you can connect to
       #
       # @param [name] name is the name of the host
-      def get_host(name)
+      def get_host(name, datacenter, cluster)
         # create a host object to work with
         host_api = VSphereAutomation::VCenter::HostApi.new(api_client)
 
-        if name.nil?
-          hosts = host_api.list.value
-        else
-          hosts = host_api.list({ filter_names: name }).value
-        end
+        hosts = host_api.list({ filter_names: name,
+                                filter_datacenters: datacenter,
+                                filter_clusters: cluster,
+                                filter_connection_states: ["CONNECTED"] }).value
 
         raise format("Unable to find target host: %s", name) if hosts.empty?
 
-        hosts.first
+        hosts.sample
       end
 
       # Gets the folder you want to create the VM
@@ -318,9 +323,11 @@ module Kitchen
       # @param [name] name is the name of the folder
       def get_folder(name)
         folder_api = VSphereAutomation::VCenter::FolderApi.new(api_client)
-        folders = folder_api.list({ filter_names: name }).value
+        folders = folder_api.list({ filter_names: name, filter_type: "VIRTUAL_MACHINE" }).value
 
         raise format("Unable to find folder: %s", name) if folders.empty?
+
+        raise format("%s returned too many folders", name) if folders.length > 1
 
         folders.first.folder
       end
@@ -335,22 +342,46 @@ module Kitchen
         vms.first
       end
 
-      # Gets the info of the cluster
+      # Gets the info of the datacenter
+      #
+      # @param [name] name is the name of the Datacenter
+      def get_datacenter(name)
+        dc_api = VSphereAutomation::VCenter::DatacenterApi.new(api_client)
+        dcs = dc_api.list({ filter_names: name }).value
+
+        raise format("Unable to find data center: %s", name) if dcs.empty?
+
+        raise format("%s returned too many data centers", name) if dcs.length > 1
+
+        dcs.first.datacenter
+      end
+
+      # Gets the ID of the cluster
       #
       # @param [name] name is the name of the Cluster
-      def get_cluster(name)
+      def get_cluster_id(name)
         cluster_api = VSphereAutomation::VCenter::ClusterApi.new(api_client)
         clusters = cluster_api.list({ filter_names: name }).value
 
         raise format("Unable to find Cluster: %s", name) if clusters.empty?
 
-        cluster_id = clusters.first.cluster
+        raise format("%s returned too many clusters", name) if clusters.length > 1
+
+        clusters.first.cluster
+      end
+
+      # Gets the info of the cluster
+      #
+      # @param [name] name is the name of the Cluster
+      def get_cluster(name)
+        cluster_id = get_cluster_id(name)
 
         host_api = VSphereAutomation::VCenter::HostApi.new(api_client)
         hosts = host_api.list({ filter_clusters: cluster_id, connection_states: "CONNECTED" }).value
 
         raise format("Unable to find active host in cluster %s", name) if hosts.empty?
 
+        cluster_api = VSphereAutomation::VCenter::ClusterApi.new(api_client)
         cluster_api.get(cluster_id).value
       end
 
@@ -375,14 +406,14 @@ module Kitchen
 
           # Remove default pool for first pass (<= 1.2.1 behaviour to pick first user-defined pool found)
           resource_pools = rp_api.list.value.delete_if { |pool| pool.name == "Resources" }
-          debug("Search of all resource pools found: " + resource_pools.map { |pool| pool.name }.to_s)
+          debug("Search of all resource pools found: " + resource_pools.map(&:name).to_s)
 
           # Revert to default pool, if no user-defined pool found (> 1.2.1 behaviour)
           # (This one might not be found under some circumstances by the statement above)
           return get_resource_pool("Resources") if resource_pools.empty?
         else
           resource_pools = rp_api.list({ filter_names: name }).value
-          debug("Search for resource pools found: " + resource_pools.map { |pool| pool.name }.to_s)
+          debug("Search for resource pools found: " + resource_pools.map(&:name).to_s)
         end
 
         raise format("Unable to find Resource Pool: %s", name) if resource_pools.empty?
