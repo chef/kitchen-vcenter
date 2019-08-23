@@ -47,6 +47,7 @@ class Support
       loop do
         return unless process_is_running(pid)
         break if (Time.new - start) >= timeout
+
         sleep interval
       end
 

@@ -58,6 +58,7 @@ class Support
           return
         end
         break if (Time.new - start) >= timeout
+
         sleep interval
       end
 
@@ -178,7 +179,7 @@ class Support
           RbVmomi::VIM.VirtualDeviceConfigSpec(
             operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
             device: network_device
-          )
+          ),
         ]
       )
 
@@ -212,7 +213,7 @@ class Support
         return [
           "/sbin/modprobe -r vmxnet3",
           "/sbin/modprobe vmxnet3",
-          "/sbin/dhclient"
+          "/sbin/dhclient",
         ]
       when :windows
         return [
@@ -229,7 +230,7 @@ class Support
       case options[:vm_os].downcase.to_sym
       when :linux
         [
-          "/usr/bin/vmware-toolbox-cmd info update network"
+          "/usr/bin/vmware-toolbox-cmd info update network",
         ]
       when :windows
         [
@@ -386,7 +387,7 @@ class Support
           RbVmomi::VIM.VirtualDeviceConfigSpec(
             operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
             device: network_device
-          )
+          ),
         ]
       end
 
@@ -397,15 +398,17 @@ class Support
       if instant_clone?
         vcenter_data = vim.serviceInstance.content.about
         raise Support::CloneError.new("Instant clones only supported with vCenter 6.7 or higher") unless vcenter_data.version.to_f >= 6.7
+
         Kitchen.logger.debug format("Detected %s", vcenter_data.fullName)
 
         resources = dc.hostFolder.children
-        hosts = resources.select { |resource| resource.class.to_s =~ /ComputeResource$/ }.map { |c| c.host }.flatten
+        hosts = resources.select { |resource| resource.class.to_s =~ /ComputeResource$/ }.map(&:host).flatten
         targethost = hosts.select { |host| host.summary.config.name == options[:targethost].name }.first
         raise Support::CloneError.new("No matching ComputeResource found in host folder") if targethost.nil?
 
         esx_data = targethost.summary.config.product
         raise Support::CloneError.new("Instant clones only supported with ESX 6.7 or higher") unless esx_data.version.to_f >= 6.7
+
         Kitchen.logger.debug format("Detected %s", esx_data.fullName)
 
         # Other tools check for VMWare Tools status, but that will be toolsNotRunning on frozen VMs
@@ -431,7 +434,7 @@ class Support
           RbVmomi::VIM.VirtualDeviceConfigSpec(
             operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
             device: network_device
-          )
+          ),
         ]
 
         clone_spec = RbVmomi::VIM.VirtualMachineInstantCloneSpec(location: relocate_spec,
