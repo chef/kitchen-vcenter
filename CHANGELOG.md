@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.5.0 -->
+## [v2.5.0](https://github.com/chef/kitchen-vcenter/tree/v2.5.0) (2019-08-23)
+
+#### Merged Pull Requests
+- Improve loose target host and folder filters [#73](https://github.com/chef/kitchen-vcenter/pull/73) ([sandratiffin](https://github.com/sandratiffin))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.4.0 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Improve loose target host and folder filters [#73](https://github.com/chef/kitchen-vcenter/pull/73) ([sandratiffin](https://github.com/sandratiffin)) <!-- 2.5.0 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
