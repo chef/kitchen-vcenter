@@ -1,27 +1,24 @@
 # Change Log
 
-<!-- latest_release 2.5.2 -->
-## [v2.5.2](https://github.com/chef/kitchen-vcenter/tree/v2.5.2) (2019-09-16)
-
-#### Merged Pull Requests
-- Implement functionality to add disks to the cloned VM [#76](https://github.com/chef/kitchen-vcenter/pull/76) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
-<!-- release_rollup since=2.4.0 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Implement functionality to add disks to the cloned VM [#76](https://github.com/chef/kitchen-vcenter/pull/76) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.5.2 -->
-- Fix error if no clusters are defined or targethost is not a member [#75](https://github.com/chef/kitchen-vcenter/pull/75) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.5.1 -->
-- Improve loose target host and folder filters [#73](https://github.com/chef/kitchen-vcenter/pull/73) ([sandratiffin](https://github.com/sandratiffin)) <!-- 2.5.0 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.5.2](https://github.com/chef/kitchen-vcenter/tree/v2.5.2) (2019-09-16)
+
+#### Merged Pull Requests
+- Improve loose target host and folder filters [#73](https://github.com/chef/kitchen-vcenter/pull/73) ([sandratiffin](https://github.com/sandratiffin))
+- Fix error if no clusters are defined or targethost is not a member [#75](https://github.com/chef/kitchen-vcenter/pull/75) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Implement functionality to add disks to the cloned VM [#76](https://github.com/chef/kitchen-vcenter/pull/76) ([tecracer-theinen](https://github.com/tecracer-theinen))
+<!-- latest_stable_release -->
+
 ## [v2.4.0](https://github.com/chef/kitchen-vcenter/tree/v2.4.0) (2019-06-19)
 
 #### Merged Pull Requests
 - Implement aggressive IP polling mode [#66](https://github.com/chef/kitchen-vcenter/pull/66) ([tecracer-theinen](https://github.com/tecracer-theinen))
 - Improve and fix support for Instant Clones, add Benchmark option [#70](https://github.com/chef/kitchen-vcenter/pull/70) ([tecracer-theinen](https://github.com/tecracer-theinen))
-<!-- latest_stable_release -->
 
 ## [v2.2.2](https://github.com/chef/kitchen-vcenter/tree/v2.2.2) (2019-03-20)
 
