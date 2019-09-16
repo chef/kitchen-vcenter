@@ -157,7 +157,7 @@ In addition to active IP discovery, the following optional parameter is relevant
 
  - `vm_win_network` - Internal Windows name of the Kitchen network adapter for reloading. Default: Ethernet0
 
-The following subkeys to `customize` are available, by default they will inherit from the specified `template`.
+The following `customize` subkeys are available. They inherit from the specified `template` by default.
 
  - `annotation` - Notes to attach to the VM (requires VirtualMachine.Config.Rename)
  - `memoryMB` - Memory size to set in Megabytes (requires VirtualMachine.Config.Memory)
