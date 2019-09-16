@@ -304,7 +304,7 @@ module Kitchen
       # Validates the host name of the server you can connect to
       #
       # @param [name] name is the name of the host
-      def get_host(name, datacenter, cluster)
+      def get_host(name, datacenter, cluster = nil)
         # create a host object to work with
         host_api = VSphereAutomation::VCenter::HostApi.new(api_client)
 
@@ -360,6 +360,8 @@ module Kitchen
       #
       # @param [name] name is the name of the Cluster
       def get_cluster_id(name)
+        return nil if name.nil?
+
         cluster_api = VSphereAutomation::VCenter::ClusterApi.new(api_client)
         clusters = cluster_api.list({ filter_names: name }).value
 
