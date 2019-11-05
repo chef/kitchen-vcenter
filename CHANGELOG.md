@@ -1,26 +1,23 @@
 # Change Log
 
-<!-- latest_release 2.6.0 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+
+<!-- latest_stable_release -->
 ## [v2.6.0](https://github.com/chef/kitchen-vcenter/tree/v2.6.0) (2019-11-05)
 
 #### Merged Pull Requests
 - Update to allow for the new rbvmomi [#80](https://github.com/chef/kitchen-vcenter/pull/80) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
-<!-- release_rollup since=2.5.2 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Update to allow for the new rbvmomi [#80](https://github.com/chef/kitchen-vcenter/pull/80) ([tas50](https://github.com/tas50)) <!-- 2.6.0 -->
-<!-- release_rollup -->
-
 <!-- latest_stable_release -->
+
 ## [v2.5.2](https://github.com/chef/kitchen-vcenter/tree/v2.5.2) (2019-09-16)
 
 #### Merged Pull Requests
 - Improve loose target host and folder filters [#73](https://github.com/chef/kitchen-vcenter/pull/73) ([sandratiffin](https://github.com/sandratiffin))
 - Fix error if no clusters are defined or targethost is not a member [#75](https://github.com/chef/kitchen-vcenter/pull/75) ([tecracer-theinen](https://github.com/tecracer-theinen))
 - Implement functionality to add disks to the cloned VM [#76](https://github.com/chef/kitchen-vcenter/pull/76) ([tecracer-theinen](https://github.com/tecracer-theinen))
-<!-- latest_stable_release -->
 
 ## [v2.4.0](https://github.com/chef/kitchen-vcenter/tree/v2.4.0) (2019-06-19)
 
