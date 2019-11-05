@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.6.0 -->
+## [v2.6.0](https://github.com/chef/kitchen-vcenter/tree/v2.6.0) (2019-11-05)
+
+#### Merged Pull Requests
+- Update to allow for the new rbvmomi [#80](https://github.com/chef/kitchen-vcenter/pull/80) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.5.2 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Update to allow for the new rbvmomi [#80](https://github.com/chef/kitchen-vcenter/pull/80) ([tas50](https://github.com/tas50)) <!-- 2.6.0 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
