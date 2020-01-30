@@ -89,7 +89,7 @@ platforms:
   - name: windows2012R2
     driver:
       targethost: 10.0.0.42
-      network_name: "Internal"
+      interface: "Internal"
       template: folder/windows2012R2-template
       datacenter: "Datacenter"
       customize:
@@ -140,7 +140,7 @@ The following optional parameters should be used in the `driver` for the platfor
  - `poweron` - Power on the new virtual machine. Default: true
  - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
  - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
- - `network_name` - Network to reconfigure the first interface to, needs a VM Network name. Default: do not change
+ - `interface` - Network to reconfigure the first interface to, needs a VM Network name. Default: do not change
  - `tags` - Array of pre-defined vCenter tag names to assign (VMware tags are not key/value pairs). Default: none
  - `customize` - Dictionary customizations like annotation, memoryMB or numCPUs (see below for details). Default: none
  - `interface`- VM Network name to use for kitchen connections. Default: not set = first interface with usable IP
@@ -182,9 +182,9 @@ Required prilveges:
 - VirtualMachine.Config.Annotation (depending on `customize` parameters)
 - VirtualMachine.Config.CPUCount (depending on `customize` parameters)
 - VirtualMachine.Config.Memory (depending on `customize` parameters)
-- VirtualMachine.Config.EditDevice (if `network_name` is used)
-- DVSwitch.CanUse (if `network_name` is used with dVS/lVS)
-- DVPortgroup.CanUse (if `network_name` is used with dVS/lVS)
+- VirtualMachine.Config.EditDevice (if `interface` is used)
+- DVSwitch.CanUse (if `interface` is used with dVS/lVS)
+- DVPortgroup.CanUse (if `interface` is used with dVS/lVS)
 
 ### Clone mode: linked
 
