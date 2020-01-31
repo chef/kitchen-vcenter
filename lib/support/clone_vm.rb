@@ -436,6 +436,7 @@ class Support
 
         Kitchen.logger.warn format("Found %d networks named %s, picking first one", networks.count, options[:network_name]) if networks.count > 1
         network_obj = networks.first
+        network_device = network_device(src_vm)
 
         if network_obj.is_a? RbVmomi::VIM::DistributedVirtualPortgroup
           Kitchen.logger.info format("Assigning network %s...", network_obj.pretty_path)
@@ -443,7 +444,6 @@ class Support
           vds_obj = network_obj.config.distributedVirtualSwitch
           Kitchen.logger.info format("Using vDS '%s' for network connectivity...", vds_obj.name)
 
-          network_device = network_device(src_vm)
           network_device.backing = RbVmomi::VIM.VirtualEthernetCardDistributedVirtualPortBackingInfo(
             port: RbVmomi::VIM.DistributedVirtualSwitchPortConnection(
               portgroupKey: network_obj.key,
