@@ -1,6 +1,6 @@
 require "kitchen"
 require "rbvmomi"
-require "support/guest_operations"
+require_relative "guest_operations"
 
 class Support
   class CloneError < RuntimeError; end
