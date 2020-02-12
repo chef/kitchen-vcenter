@@ -18,7 +18,7 @@
 require "kitchen"
 require "vsphere-automation-cis"
 require "vsphere-automation-vcenter"
-require "support/clone_vm"
+require_relative "../../support/clone_vm"
 require "securerandom"
 require "uri"
 
