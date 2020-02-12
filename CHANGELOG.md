@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.6.1 -->
-## [v2.6.1](https://github.com/chef/kitchen-vcenter/tree/v2.6.1) (2020-01-31)
+<!-- latest_release 2.6.2 -->
+## [v2.6.2](https://github.com/chef/kitchen-vcenter/tree/v2.6.2) (2020-02-12)
 
 #### Merged Pull Requests
-- declare network_device var in the correct scope [#84](https://github.com/chef/kitchen-vcenter/pull/84) ([teknofire](https://github.com/teknofire))
+- Remove unused savon dep and use require_relative [#85](https://github.com/chef/kitchen-vcenter/pull/85) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 <!-- release_rollup since=2.6.0 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Remove unused savon dep and use require_relative [#85](https://github.com/chef/kitchen-vcenter/pull/85) ([tas50](https://github.com/tas50)) <!-- 2.6.2 -->
 - declare network_device var in the correct scope [#84](https://github.com/chef/kitchen-vcenter/pull/84) ([teknofire](https://github.com/teknofire)) <!-- 2.6.1 -->
 <!-- release_rollup -->
 
