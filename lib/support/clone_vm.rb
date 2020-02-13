@@ -251,6 +251,8 @@ class Support
           # "wmic nicconfig get IPAddress",
           # "netsh interface ip show ipaddress #{options[:vm_win_network]}"
         end
+      else
+        return options[:active_discovery_command]
       end
     end
 
