@@ -432,7 +432,7 @@ class Support
       # Change network, if wanted
       unless options[:network_name].nil?
         networks = dc.network.select { |n| n.name == options[:network_name] }
-        raise Support::CloneError.new(format("Could not find network named %s", option[:network_name])) if networks.empty?
+        raise Support::CloneError.new(format("Could not find network named %s", options[:network_name])) if networks.empty?
 
         Kitchen.logger.warn format("Found %d networks named %s, picking first one", networks.count, options[:network_name]) if networks.count > 1
         network_obj = networks.first
