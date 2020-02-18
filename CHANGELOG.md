@@ -1,26 +1,23 @@
 # Change Log
 
-<!-- latest_release 2.6.4 -->
-## [v2.6.4](https://github.com/chef/kitchen-vcenter/tree/v2.6.4) (2020-02-18)
-
-#### Merged Pull Requests
-- Fix active discovery command [#89](https://github.com/chef/kitchen-vcenter/pull/89) ([leotaglia](https://github.com/leotaglia))
 <!-- latest_release -->
-<!-- release_rollup since=2.6.2 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Fix active discovery command [#89](https://github.com/chef/kitchen-vcenter/pull/89) ([leotaglia](https://github.com/leotaglia)) <!-- 2.6.4 -->
-- Fix reference to undefined variable in CloneError message [#90](https://github.com/chef/kitchen-vcenter/pull/90) ([cattywampus](https://github.com/cattywampus)) <!-- 2.6.3 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.6.4](https://github.com/chef/kitchen-vcenter/tree/v2.6.4) (2020-02-18)
+
+#### Merged Pull Requests
+- Fix reference to undefined variable in CloneError message [#90](https://github.com/chef/kitchen-vcenter/pull/90) ([cattywampus](https://github.com/cattywampus))
+- Fix active discovery command [#89](https://github.com/chef/kitchen-vcenter/pull/89) ([leotaglia](https://github.com/leotaglia))
+<!-- latest_stable_release -->
+
 ## [v2.6.2](https://github.com/chef/kitchen-vcenter/tree/v2.6.2) (2020-02-12)
 
 #### Merged Pull Requests
 - declare network_device var in the correct scope [#84](https://github.com/chef/kitchen-vcenter/pull/84) ([teknofire](https://github.com/teknofire))
 - Remove unused savon dep and use require_relative [#85](https://github.com/chef/kitchen-vcenter/pull/85) ([tas50](https://github.com/tas50))
-<!-- latest_stable_release -->
 
 ## [v2.6.0](https://github.com/chef/kitchen-vcenter/tree/v2.6.0) (2019-11-05)
 
