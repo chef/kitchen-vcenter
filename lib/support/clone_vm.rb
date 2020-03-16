@@ -397,15 +397,34 @@ class Support
       options[:clone_type] == :full
     end
 
+    def root_folder
+      @root_folder ||= vim.serviceInstance.content.rootFolder
+    end
+
+    #
+    # @return [String]
+    #
+    def datacenter
+      options[:datacenter]
+    end
+
+    #
+    # @return [RbVmomi::VIM::Datacenter]
+    #
+    def find_datacenter
+      vim.serviceInstance.find_datacenter(datacenter)
+    rescue RbVmomi::Fault
+      root_folder.childEntity.grep(RbVmomi::VIM::Datacenter).find { |x| x.name == datacenter }
+    end
+
     def clone
       benchmark_start if benchmark?
 
       # set the datacenter name
-      dc = vim.serviceInstance.find_datacenter(options[:datacenter])
+      dc = find_datacenter
 
       # reference template using full inventory path
-      root_folder = vim.serviceInstance.content.rootFolder
-      inventory_path = format("/%s/vm/%s", options[:datacenter], options[:template])
+      inventory_path = format("/%s/vm/%s", datacenter, options[:template])
       src_vm = root_folder.findByInventoryPath(inventory_path)
       raise Support::CloneError.new(format("Unable to find template: %s", options[:template])) if src_vm.nil?
 
