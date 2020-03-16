@@ -1,25 +1,22 @@
 # Change Log
 
-<!-- latest_release 2.6.5 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+
+<!-- latest_stable_release -->
 ## [v2.6.5](https://github.com/chef/kitchen-vcenter/tree/v2.6.5) (2020-03-16)
 
 #### Merged Pull Requests
 - Fallback to datacenter lookup that requires less privileges [#82](https://github.com/chef/kitchen-vcenter/pull/82) ([jasonwbarnett](https://github.com/jasonwbarnett))
-<!-- latest_release -->
-<!-- release_rollup since=2.6.4 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Fallback to datacenter lookup that requires less privileges [#82](https://github.com/chef/kitchen-vcenter/pull/82) ([jasonwbarnett](https://github.com/jasonwbarnett)) <!-- 2.6.5 -->
-<!-- release_rollup -->
-
 <!-- latest_stable_release -->
+
 ## [v2.6.4](https://github.com/chef/kitchen-vcenter/tree/v2.6.4) (2020-02-18)
 
 #### Merged Pull Requests
 - Fix reference to undefined variable in CloneError message [#90](https://github.com/chef/kitchen-vcenter/pull/90) ([cattywampus](https://github.com/cattywampus))
 - Fix active discovery command [#89](https://github.com/chef/kitchen-vcenter/pull/89) ([leotaglia](https://github.com/leotaglia))
-<!-- latest_stable_release -->
 
 ## [v2.6.2](https://github.com/chef/kitchen-vcenter/tree/v2.6.2) (2020-02-12)
 
