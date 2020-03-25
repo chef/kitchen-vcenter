@@ -130,6 +130,7 @@ The following parameters should be set in the main `driver` section as they are 
  - `vm_rollback` - Automatic roll back (destroy) of VMs failing the connectivity check. Default: false
  - `benchmark` - Write benchmark data for comparisons. Default: false
  - `benchmark_file` - Filename to write CSV data to. Default: "kitchen-vcenter.csv"
+ - `transform_ip` - Ruby code to rewrite instance IP (available as `ip` variable in contents)
 
 The following optional parameters should be used in the `driver` for the platform.
 
@@ -259,6 +260,25 @@ enable this via the `benchmark` property, data gets appended to a CSV file (`ben
 This file includes a header line describing the different fields such as the value of `template`, `clone_type` and `active_discovery` plus the different
 steps within cloning a VM. The timing of steps is relative to each other and followed by a column with the total number of seconds for the whole cloning
 operation.
+
+## 1:1 NAT Support
+
+Due to limited IPv4 space, some enterprises use NAT to transform the VM IPs into a routable IP. As the driver cannot detect such a NAT automatically,
+but has to rely on the IP retrieved by the Guest OS, this has to be handled manually.
+
+Example:
+```
+driver:
+  # ... other settings
+  network_name: TEST-NET
+  transform_ip: "ip.sub '172.16.', '10.25.'"
+```
+
+This example reassociates the VM to the separate VMware network "TEST-NET", which would provision addresses from 172.16.x.x to the VMs. In between
+this network and the developers, there is a router with 1:1 NAT configured so that those machines will be reachable as 10.25.x.x externally.
+
+Any passed Ruby code will be executed with the `ip` variable (as discovered by VMware) available. The returned value will then be used as new IP.
+As you can use arbitrary Ruby code, it is possible to do complex arithmetics or even implement remote API/IPAM lookups.
 
 ## Contributing
 
