@@ -81,6 +81,17 @@ class Support
       raise Support::CloneError.new("Timeout waiting for IP address") if ip.nil?
       raise Support::CloneError.new(format("Error getting accessible IP address, got %s. Check DHCP server and scope exhaustion", ip)) if ip =~ /^169\.254\./
 
+      # Allow IP rewriting (e.g. for 1:1 NAT)
+      if options[:transform_ip]
+        Kitchen.logger.info format("Received IP: %s", ip)
+
+        # rubocop:disable Security/Eval
+        ip = lambda { eval options[:transform_ip] }.call
+        # rubocop:enable Security/Eval
+
+        Kitchen.logger.info format("Transformed to IP: %s", ip)
+      end
+
       @ip = ip
     end
 
@@ -251,8 +262,8 @@ class Support
           # "wmic nicconfig get IPAddress",
           # "netsh interface ip show ipaddress #{options[:vm_win_network]}"
         end
-      else  
-        return options[:active_discovery_command]
+      else
+        options[:active_discovery_command]
       end
     end
 

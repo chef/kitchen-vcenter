@@ -18,6 +18,7 @@
 require "kitchen"
 require "vsphere-automation-cis"
 require "vsphere-automation-vcenter"
+require_relative "../../kitchen-vcenter/version"
 require_relative "../../support/clone_vm"
 require "securerandom"
 require "uri"
@@ -57,6 +58,7 @@ module Kitchen
       default_config :vm_username, "vagrant"
       default_config :vm_password, "vagrant"
       default_config :vm_win_network, "Ethernet0"
+      default_config :transform_ip, nil
 
       default_config :benchmark, false
       default_config :benchmark_file, "kitchen-vcenter.csv"
@@ -82,6 +84,8 @@ module Kitchen
       #
       # @param [Object] state is the state of the vm
       def create(state)
+        debug format("Starting kitchen-vcenter %s", ::KitchenVcenter::VERSION)
+
         save_and_validate_parameters
         connect
 
@@ -158,6 +162,7 @@ module Kitchen
           vm_username: config[:vm_username],
           vm_password: config[:vm_password],
           vm_win_network: config[:vm_win_network],
+          transform_ip: config[:transform_ip],
           benchmark: config[:benchmark],
           benchmark_file: config[:benchmark_file],
         }
