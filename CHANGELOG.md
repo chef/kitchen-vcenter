@@ -1,24 +1,21 @@
 # Change Log
 
-<!-- latest_release 2.7.0 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+
+<!-- latest_stable_release -->
 ## [v2.7.0](https://github.com/chef/kitchen-vcenter/tree/v2.7.0) (2020-04-14)
 
 #### Merged Pull Requests
 - Add ability to transform VM IP for 1:1 NAT environments [#92](https://github.com/chef/kitchen-vcenter/pull/92) ([tecracer-theinen](https://github.com/tecracer-theinen))
-<!-- latest_release -->
-<!-- release_rollup since=2.6.5 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Add ability to transform VM IP for 1:1 NAT environments [#92](https://github.com/chef/kitchen-vcenter/pull/92) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.7.0 -->
-<!-- release_rollup -->
-
 <!-- latest_stable_release -->
+
 ## [v2.6.5](https://github.com/chef/kitchen-vcenter/tree/v2.6.5) (2020-03-16)
 
 #### Merged Pull Requests
 - Fallback to datacenter lookup that requires less privileges [#82](https://github.com/chef/kitchen-vcenter/pull/82) ([jasonwbarnett](https://github.com/jasonwbarnett))
-<!-- latest_stable_release -->
 
 ## [v2.6.4](https://github.com/chef/kitchen-vcenter/tree/v2.6.4) (2020-02-18)
 
