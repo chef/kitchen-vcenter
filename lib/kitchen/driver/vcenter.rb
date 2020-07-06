@@ -55,10 +55,12 @@ module Kitchen
       default_config :active_discovery, false
       default_config :active_discovery_command, nil
       default_config :vm_os, nil
-      default_config :vm_username, "vagrant"
-      default_config :vm_password, "vagrant"
+      default_config :vm_username, nil
+      default_config :vm_password, nil
       default_config :vm_win_network, "Ethernet0"
       default_config :transform_ip, nil
+      default_config :post_create_script, nil
+      default_config :post_create_script_timeout, 60
 
       default_config :benchmark, false
       default_config :benchmark_file, "kitchen-vcenter.csv"
@@ -163,6 +165,8 @@ module Kitchen
           vm_password: config[:vm_password],
           vm_win_network: config[:vm_win_network],
           transform_ip: config[:transform_ip],
+          post_create_script: config[:post_create_script],
+          post_create_script_timeout: config[:post_create_script_timeout],
           benchmark: config[:benchmark],
           benchmark_file: config[:benchmark_file],
         }

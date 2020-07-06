@@ -146,13 +146,15 @@ The following optional parameters should be used in the `driver` for the platfor
  - `customize` - Dictionary customizations like annotation, memoryMB or numCPUs (see below for details). Default: none
  - `interface`- VM Network name to use for kitchen connections. Default: not set = first interface with usable IP
 
- The following optional parameters are relevant for active IP discovery.
+ The following optional parameters are relevant for active IP discovery or post create scripts.
 
  - `active_discovery` - Use active IP retrieval to speed up provisioning. Default: false
  - `active_discovery_command` - String or list of specific commands to retrieve VM IP (see Active Discovery Mode section below)
- - `vm_os` - OS family of the VM . Values: "linux", "windows". Default: autodetect from VMware
- - `vm_username` - Username to access the VM. Default: "vagrant"
- - `vm_password` - Password to access the VM. Default: "vagrant"
+ - `post_create_script` - Commands to execute before handing over the VM. Default: none
+ - `post_create_script_timeout` - Timeout for `post_create_script` in seconds. Default: 60
+ - `vm_os` - OS family of the VM. Values: "linux", "windows". Default: autodetect from VMware
+ - `vm_username` - Username to access the VM. Default: used from transport settings
+ - `vm_password` - Password to access the VM. Default: used from transport settings
 
 In addition to active IP discovery, the following optional parameter is relevant for instant clones using Windows.
 
@@ -218,7 +220,8 @@ Freezing the source VM:
 - The machine does not execute any CPU instructions after this point
 
 New clones resume from exactly the frozen point in time and also resume CPU activity automatically. The OS level network adapters get rescanned automatically
-to pick up MAC address changes, which requires the privileges to use the Guest Operations API and login credentials (`vm_username`/`vm_password`).
+to pick up MAC address changes, which requires the privileges to use the Guest Operations API and login credentials. By default, the credentials from the
+transport are used, but you can override these (`vm_username`/`vm_password`).
 
 Architectural description see <https://www.virtuallyghetto.com/2018/04/new-instant-clone-architecture-in-vsphere-6-7-part-1.html>
 
@@ -252,6 +255,21 @@ Linux default:
 Windows default:
 `sleep 5 & ipconfig`
 
+## Post Create Script
+
+This offers a way to make VMs ready for connections by a TestKitchen transport. In some cases, the default firewall settings will not allow immediate
+connections via WinRM. With a post create script, you can remotely execute statements to enable this.
+
+Add all necessary commands with the `post_create_script` property. These commands get invoked via the Guest Operations API (VMware Tools), which does not
+require network connectivity. As such, they need additional privileges in vCenter.
+
+Needed privileges:
+- VirtualMachine.GuestOperations.Execute
+- VirtualMachine.GuestOperations.Query
+
+The commands gets executed with the credentials specified for the transport, but can be overridden via `vm_username` and `vm_password`. The default
+timeout is 60 seconds, but can be adjusted via `post_create_script_timeout`.
+
 ## Benchmarking
 
 To get some insight into the performance of your environment with different configurations, some simple benchmark functionality was built in. When you
@@ -280,6 +298,20 @@ this network and the developers, there is a router with 1:1 NAT configured so th
 Any passed Ruby code will be executed with the `ip` variable (as discovered by VMware) available. The returned value will then be used as new IP.
 As you can use arbitrary Ruby code, it is possible to do complex arithmetics or even implement remote API/IPAM lookups.
 
+Windows by default does only allow WinRM connections from the local subnet. In a 1:1 NAT situation, you either have to open up the firewall before,
+when creating the template, or you can use a post create script like this:
+
+```
+platforms:
+  - name: windows2019
+     driver:
+      template: windows-2019_rtm
+      post_create_script: |
+        netsh advfirewall firewall set rule name="Windows Remote Management (HTTP-In)" profile="Public" new remoteip="any"
+```
+
+For more details, see the `Post Create Script` section of this document.
+
 ## Contributing
 
 For information on contributing to this project see <https://github.com/chef/chef/blob/master/CONTRIBUTING.md>
@@ -304,7 +336,7 @@ Author:: Russell Seymour ([rseymour@chef.io](mailto:rseymour@chef.io))
 Author:: JJ Asghar ([jj@chef.io](mailto:jj@chef.io))
 Author:: Thomas Heinen ([theinen@tecracer.de](mailto:theinen@tecracer.de))
 
-Copyright:: Copyright (c) 2017-2019 Chef Software, Inc.
+Copyright:: Copyright (c) 2017-2020 Chef Software, Inc.
 
 License:: Apache License, Version 2.0
 

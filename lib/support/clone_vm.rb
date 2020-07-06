@@ -6,7 +6,7 @@ class Support
   class CloneError < RuntimeError; end
 
   class CloneVm
-    attr_reader :vim, :options, :ssl_verify, :vm, :name, :ip, :guest_auth, :username
+    attr_reader :vim, :options, :ssl_verify, :vm, :name, :ip, :guest_auth, :username, :post_create
 
     def initialize(conn_opts, options)
       @options = options
@@ -16,11 +16,21 @@ class Support
       # Connect to vSphere
       @vim ||= RbVmomi::VIM.connect conn_opts
 
-      @username = options[:vm_username]
-      password = options[:vm_password]
+      @username = options[:vm_username] || kitchen_transport_config[:username]
+      password = options[:vm_password] || kitchen_transport_config[:password]
       @guest_auth = RbVmomi::VIM::NamePasswordAuthentication(interactiveSession: false, username: username, password: password)
 
       @benchmark_data = {}
+      @post_create = []
+    end
+
+    def kitchen
+      require "binding_of_caller"
+      binding.callers.find { |b| b.frame_description == "create" && b.receiver.class == Kitchen::Instance }.receiver
+    end
+
+    def kitchen_transport_config
+      kitchen.transport.send(:provided_config)
     end
 
     def active_discovery?
@@ -52,7 +62,7 @@ class Support
 
       loop do
         if vm.guest.toolsRunningStatus == "guestToolsRunning"
-          benchmark_checkpoint("tools_detected") if benchmark?
+          benchmark_checkpoint("tools_detected")
 
           Kitchen.logger.debug format("Tools detected after %.1f seconds", Time.new - start)
           return
@@ -104,6 +114,8 @@ class Support
     end
 
     def benchmark_start
+      return unless benchmark?
+
       Kitchen.logger.debug("Starting benchmark data collection.")
 
       @benchmark_data = {
@@ -116,6 +128,8 @@ class Support
     end
 
     def benchmark_checkpoint(title)
+      return unless benchmark?
+
       timestamp = Time.new
       checkpoints = @benchmark_data[:checkpoints]
 
@@ -132,6 +146,8 @@ class Support
     end
 
     def benchmark_persist
+      return unless benchmark?
+
       # Add total time spent as well
       checkpoints = @benchmark_data[:checkpoints]
       checkpoints << {
@@ -197,7 +213,7 @@ class Support
       task = vm.ReconfigVM_Task(spec: config_spec)
       task.wait_for_completion
 
-      benchmark_checkpoint("nic_reconfigured") if benchmark?
+      benchmark_checkpoint("nic_reconfigured")
     end
 
     def standard_ip_discovery
@@ -221,13 +237,13 @@ class Support
       case options[:vm_os].downcase.to_sym
       when :linux
         # @todo: allow override if no dhclient
-        return [
+        [
           "/sbin/modprobe -r vmxnet3",
           "/sbin/modprobe vmxnet3",
           "/sbin/dhclient",
         ]
       when :windows
-        return [
+        [
           "netsh interface set Interface #{options[:vm_win_network]} disable",
           "netsh interface set Interface #{options[:vm_win_network]} enable",
           "ipconfig /renew",
@@ -272,38 +288,79 @@ class Support
       return unless active_discovery? || instant_clone?
 
       Kitchen.logger.info "Attempting active IP discovery"
-      begin
-        tools = Support::GuestOperations.new(vim, vm, guest_auth, ssl_verify)
 
-        commands = []
-        commands << rescan_commands if instant_clone?
-        # commands << trigger_tools # deactivated for now, as benefit is doubtful
-        commands << discovery_commands
-        script = commands.flatten.join(command_separator)
+      commands = []
+      commands << rescan_commands if instant_clone?
+      # commands << trigger_tools # deactivated for now, as benefit is doubtful
+      commands << discovery_commands
+      script = commands.flatten.join(command_separator)
 
-        stdout = tools.run_shell_capture_output(script, :auto, 20)
+      output = execute_via_tools(script)
 
-        # Windows returns wrongly encoded UTF-8 for some reason
-        stdout = stdout.bytes.map { |b| (32..126).cover?(b.ord) ? b.chr : nil }.join unless stdout.ascii_only?
-        @ip = stdout.match(/([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})/m)&.captures&.first
-
-        Kitchen.logger.debug format("Script output: %s", stdout)
-        raise Support::CloneError.new(format("Could not find IP in script output, fallback to standard discovery")) if ip.nil?
-        raise Support::CloneError.new(format("Error getting accessible IP address, got %s. Check DHCP server, scope exhaustion or timing issues", ip)) if ip =~ /^169\.254\./
-      rescue RbVmomi::Fault => e
-        if e.fault.class.wsdl_name == "InvalidGuestLogin"
-          message = format('Error authenticating to guest OS as "%s", check configuration of "vm_username"/"vm_password"', username)
-        else
-          message = e.message
-        end
-
-        raise Support::CloneError.new(message)
-      rescue ::StandardError => e
-        Kitchen.logger.info format("Active discovery failed: %s", e.message)
-        return false
-      end
+      @ip = output.match(/([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})/m)&.captures&.first
+      raise Support::CloneError.new(format("Could not find IP in script output, fallback to standard discovery")) if ip.nil?
+      raise Support::CloneError.new(format("Error getting accessible IP address, got %s. Check DHCP server, scope exhaustion or timing issues", ip)) if ip =~ /^169\.254\./
 
       true
+
+    rescue ::StandardError => e
+      Kitchen.logger.info format("Active discovery failed: %s", e.message)
+
+      false
+    end
+
+    def execute_via_tools(script, timeout = 20)
+      Kitchen.logger.debug format("Script execution: %s", script)
+
+      tools = Support::GuestOperations.new(vim, vm, guest_auth, ssl_verify)
+      output = tools.run_shell_capture_output(script, :auto, timeout)
+      output = sanitize_script_output(output) unless output.ascii_only?
+
+      Kitchen.logger.debug format("Script output: %s", output)
+
+      output
+
+    rescue RbVmomi::Fault => e
+      if e.fault.class.wsdl_name == "InvalidGuestLogin"
+        message = format('Error authenticating to guest OS as "%s", check configuration of "vm_username"/"vm_password"', username)
+      else
+        message = e.message
+      end
+
+      raise Support::CloneError.new(message)
+    end
+
+    def sanitize_script_output(output)
+      # Windows returns wrongly encoded UTF-8 for some reason
+      output.bytes.map { |b| (32..126).cover?(b.ord) ? b.chr : nil }.join
+    end
+
+    def add_post_create_script(contents, name: nil)
+      return unless contents
+
+      @post_create << {
+        name: name || format("unnamed-%d", Time.now.to_i),
+        contents: contents,
+      }
+    end
+
+    def post_create_scripts?
+      !post_create.empty?
+    end
+
+    def execute_post_create_scripts
+      return unless post_create_scripts?
+
+      timeout = options[:post_create_script_timeout]
+
+      post_create.each do |data|
+        Kitchen.logger.info format("Running post create script '%s'", data[:name])
+
+        output = execute_via_tools(data[:contents], timeout)
+        Kitchen.logger.debug format("Script output: %s", output)
+      end
+
+      benchmark_checkpoint("post_create_script")
     end
 
     def check_add_disk_config(disk_config)
@@ -319,6 +376,8 @@ class Support
     end
 
     def reconfigure_guest
+      return unless options[:customize]
+
       Kitchen.logger.info "Waiting for reconfiguration to finish"
 
       # Pass some contents right through
@@ -393,7 +452,7 @@ class Support
       task = vm.ReconfigVM_Task(spec: config_spec)
       task.wait_for_completion
 
-      benchmark_checkpoint("reconfigured") if benchmark?
+      benchmark_checkpoint("reconfigured")
     end
 
     def instant_clone?
@@ -429,7 +488,7 @@ class Support
     end
 
     def clone
-      benchmark_start if benchmark?
+      benchmark_start
 
       # set the datacenter name
       dc = find_datacenter
@@ -549,21 +608,20 @@ class Support
         clone_spec = RbVmomi::VIM.VirtualMachineInstantCloneSpec(location: relocate_spec,
                                                                  name: name)
 
-        benchmark_checkpoint("initialized") if benchmark?
+        benchmark_checkpoint("initialized")
         task = src_vm.InstantClone_Task(spec: clone_spec)
       else
         clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(location: relocate_spec,
                                                           powerOn: options[:poweron] && options[:customize].nil?,
                                                           template: false)
 
-        benchmark_checkpoint("initialized") if benchmark?
+        benchmark_checkpoint("initialized")
         task = src_vm.CloneVM_Task(spec: clone_spec, folder: dest_folder, name: name)
       end
       task.wait_for_completion
 
-      benchmark_checkpoint("cloned") if benchmark?
+      benchmark_checkpoint("cloned")
 
-      # get the IP address of the machine for bootstrapping
       # machine name is based on the path, e.g. that includes the folder
       path = options[:folder].nil? ? name : format("%s/%s", options[:folder][:name], name)
       @vm = dc.find_vm(path)
@@ -581,22 +639,27 @@ class Support
         reconnect_network_device(vm)
       end
 
-      reconfigure_guest unless options[:customize].nil?
+      reconfigure_guest
 
       # Start only if specified or customizations wanted; no need for instant clones as they start in running state
       if options[:poweron] && !options[:customize].nil? && !instant_clone?
         task = vm.PowerOnVM_Task
         task.wait_for_completion
       end
-      benchmark_checkpoint("powered_on") if benchmark?
+      benchmark_checkpoint("powered_on")
 
       Kitchen.logger.info format("Waiting for VMware tools to become available (timeout: %d seconds)...", options[:wait_timeout])
       wait_for_tools(options[:wait_timeout], options[:wait_interval])
 
-      active_ip_discovery || standard_ip_discovery
-      benchmark_checkpoint("ip_detected") if benchmark?
+      add_post_create_script(options[:post_create_script], name: "kitchen.yml")
 
-      benchmark_persist if benchmark?
+      execute_post_create_scripts
+
+      active_ip_discovery || standard_ip_discovery
+      benchmark_checkpoint("ip_detected")
+
+      benchmark_persist
+
       Kitchen.logger.info format("Created machine %s with IP %s", name, ip)
     end
   end
