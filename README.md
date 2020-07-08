@@ -257,7 +257,7 @@ Windows default:
 
 ## Post Create Script
 
-This offers a way to make VMs ready for connections by a TestKitchen transport. In some cases, the default firewall settings will not allow immediate
+This offers a way to make VMs ready for connections by a Test Kitchen transport. In some cases, the default firewall settings will not allow immediate
 connections via WinRM. With a post create script, you can remotely execute statements to enable this.
 
 Add all necessary commands with the `post_create_script` property. These commands get invoked via the Guest Operations API (VMware Tools), which does not
