@@ -1,14 +1,13 @@
 # kitchen-vcenter
 
 [![Gem Version](https://badge.fury.io/rb/kitchen-vcenter.svg)](https://rubygems.org/gems/kitchen-vcenter)
-[![Inline docs](http://inch-ci.org/github/chef/kitchen-vcenter.svg?branch=master)](http://inch-ci.org/github/chef/kitchen-vcenter)
+[![Build status](https://badge.buildkite.com/4b0ca1bb5cd02dee51d9ce789f8346eb05730685c5be7fbba9.svg?branch=master)](https://buildkite.com/chef-oss/chef-kitchen-vcenter-master-verify)
 
 This is the official Chef test-kitchen plugin for VMware REST API. This plugin gives kitchen the ability to create, bootstrap, and test VMware vms.
 
 - Documentation: [https://github.com/chef/kitchen-vcenter/blob/master/README.md](https://github.com/chef/kitchen-vcenter/blob/master/README.md)
 - Source: [https://github.com/chef/kitchen-vcenter/tree/master](https://github.com/chef/kitchen-vcenter/tree/master)
 - Issues: [https://github.com/chef/kitchen-vcenter/issues](https://github.com/chef/knife-vcenter/issues)
-- Slack: sign up: https://code.vmware.com/slack/ slack channel: #chef
 - Mailing list: [https://discourse.chef.io/](https://discourse.chef.io/)
 
 This is a `test-kitchen` plugin that allows interaction with vSphere using the vSphere Automation SDK.
@@ -17,26 +16,14 @@ Please refer to the [CHANGELOG](CHANGELOG.md) for version history and known issu
 
 ## Requirements
 
-- Chef 13.0 higher
-- Ruby 2.3.3 or higher
+- Ruby 2.4 or higher
 - VMware vCenter/vSphere 5.5 or higher
 - VMs or templates to clone, with open-vm-tools installed
 - DHCP server to assign IPs to kitchen instances
 
 ## Installation
 
-Using [ChefDK](https://downloads.chef.io/chef-dk/), simply install the Gem:
-
-```bash
-chef gem install kitchen-vcenter
-```
-
-If you're using bundler, simply add Chef and kitchen-vcenter to your Gemfile:
-
-```ruby
-gem 'chef'
-gem 'kitchen-vcenter'
-```
+This gem ships as part of Chef Workstation. See the [Chef Workstation Download Page](https://downloads.chef.io/products/workstation) for the install package.
 
 ## Usage
 
