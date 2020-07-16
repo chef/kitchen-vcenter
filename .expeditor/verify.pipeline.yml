@@ -10,3 +10,10 @@ expeditor:
       timeout_in_minutes: 30
 
 steps:
+- label: lint-chefstyle
+  command:
+    - .expeditor/run_linux_tests.sh "rake style"
+  expeditor:
+    executor:
+      docker:
+        image: ruby:2.7-buster
