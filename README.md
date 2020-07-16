@@ -1,7 +1,6 @@
 # kitchen-vcenter
 
 [![Gem Version](https://badge.fury.io/rb/kitchen-vcenter.svg)](https://rubygems.org/gems/kitchen-vcenter)
-[![Build Status](https://travis-ci.org/chef/kitchen-vcenter.svg?branch=master)](https://travis-ci.org/chef/kitchen-vcenter)
 [![Inline docs](http://inch-ci.org/github/chef/kitchen-vcenter.svg?branch=master)](http://inch-ci.org/github/chef/kitchen-vcenter)
 
 This is the official Chef test-kitchen plugin for VMware REST API. This plugin gives kitchen the ability to create, bootstrap, and test VMware vms.
@@ -304,7 +303,7 @@ Author:: Russell Seymour ([rseymour@chef.io](mailto:rseymour@chef.io))
 Author:: JJ Asghar ([jj@chef.io](mailto:jj@chef.io))
 Author:: Thomas Heinen ([theinen@tecracer.de](mailto:theinen@tecracer.de))
 
-Copyright:: Copyright (c) 2017-2019 Chef Software, Inc.
+Copyright:: Copyright (c) 2017-2020 Chef Software, Inc.
 
 License:: Apache License, Version 2.0
 

@@ -5,7 +5,8 @@ gemspec
 group :development do
   gem "guard"
   gem "guard-shell"
-  gem "chefstyle", git: "https://github.com/chef/chefstyle.git", branch: "master"
+  gem "rake"
+  gem "chefstyle", "1.2.0"
 end
 
 group :docs do
