@@ -23,7 +23,7 @@ Please refer to the [CHANGELOG](CHANGELOG.md) for version history and known issu
 
 ## Installation
 
-This gem ships as part of Chef Workstation. See the [Chef Workstation Download Page](https://downloads.chef.io/products/workstation) for the install package.
+This gem ships as part of Chef Workstation. See the [Chef Workstation Download Page](https://downloads.chef.io/products/workstation) to download the installation package.
 
 ## Usage
 
