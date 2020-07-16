@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.7.1 -->
+## [v2.7.1](https://github.com/chef/kitchen-vcenter/tree/v2.7.1) (2020-07-16)
+
+#### Merged Pull Requests
+- Support datacenters stored in folders [#98](https://github.com/chef/kitchen-vcenter/pull/98) ([clintoncwolfe](https://github.com/clintoncwolfe))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.7.0 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Support datacenters stored in folders [#98](https://github.com/chef/kitchen-vcenter/pull/98) ([clintoncwolfe](https://github.com/clintoncwolfe)) <!-- 2.7.1 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
