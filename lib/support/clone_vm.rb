@@ -428,11 +428,82 @@ class Support
       root_folder.childEntity.grep(RbVmomi::VIM::Datacenter).find { |x| x.name == datacenter }
     end
 
+    def customization_spec
+      unless options[:guest_customization]
+        return false
+      end
+
+      block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
+      re = /\A#{block}\.#{block}\.#{block}\.#{block}\z/
+
+      unless re =~ options[:guest_customization][:ipAddress]
+        raise Support::CloneError.new("Guest customization error: ipAddress is required to be formatted as an IPv4 address")
+      end
+
+      unless re =~ options[:guest_customization][:subnetMask]
+        raise Support::CloneError.new("Guest customization error: subnetMask is required to be formatted as an IPv4 address")
+      end
+
+      options[:guest_customization][:gateway].each do |v|
+        unless re =~ v
+          raise Support::CloneError.new("Guest customization error: gateway is required to be formatted as an IPv4 address")
+        end
+      end
+
+      options[:guest_customization][:dnsServerList].each do |v|
+        unless re =~ v
+          raise Support::CloneError.new("Guest customization error: dnsServerList is required to be formatted as an IPv4 address")
+        end
+      end
+
+      unless %i[dnsDomain timezone dnsServerList dnsSuffixList ipAddress gateway subnetMask].all? { |k| options[:guest_customization].key? k }
+        raise Support::CloneError.new("Guest customization error: currently all options are required to support guest customization")
+      end
+
+      if !options[:guest_customization][:dnsServerList].is_a?(Array)
+        raise Support::CloneError.new("Guest customization error: dnsServerList must be an array")
+      elsif !options[:guest_customization][:dnsSuffixList].is_a?(Array)
+        raise Support::CloneError.new("Guest customization error: dnsSuffixList must be an array")
+      elsif !options[:guest_customization][:gateway].is_a?(Array)
+        raise Support::CloneError.new("Guest customization error: gateway must be an array")
+      end
+
+      spec = RbVmomi::VIM::CustomizationSpec.new(
+        identity: RbVmomi::VIM::CustomizationLinuxPrep.new(
+          domain: options[:guest_customization][:dnsDomain],
+          hostName: RbVmomi::VIM::CustomizationFixedName.new(
+            name: name
+          ),
+          hwClockUTC: true,
+          timeZone: options[:guest_customization][:timezone]
+        ),
+        globalIPSettings: RbVmomi::VIM::CustomizationGlobalIPSettings.new(
+          dnsServerList: options[:guest_customization][:dnsServerList],
+          dnsSuffixList: options[:guest_customization][:dnsSuffixList]
+        ),
+        nicSettingMap: [RbVmomi::VIM::CustomizationAdapterMapping.new(
+          adapter: RbVmomi::VIM::CustomizationIPSettings.new(
+            ip: RbVmomi::VIM::CustomizationFixedIp(
+            ipAddress: options[:guest_customization][:ipAddress]
+          ),
+            gateway: options[:guest_customization][:gateway],
+            subnetMask: options[:guest_customization][:subnetMask],
+            dnsDomain: options[:guest_customization][:dnsDomain]
+          )
+        )]
+      )
+
+      spec
+    end
+
     def clone
       benchmark_start if benchmark?
 
       # set the datacenter name
       dc = find_datacenter
+
+      # get guest customization spec
+      guest_customization = customization_spec
 
       # reference template using full inventory path
       inventory_path = format("/%s/vm/%s", datacenter, options[:template])
@@ -552,9 +623,15 @@ class Support
         benchmark_checkpoint("initialized") if benchmark?
         task = src_vm.InstantClone_Task(spec: clone_spec)
       else
-        clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(location: relocate_spec,
-                                                          powerOn: options[:poweron] && options[:customize].nil?,
-                                                          template: false)
+        clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(
+          location: relocate_spec,
+          powerOn: options[:poweron] && options[:customize].nil?,
+          template: false
+        )
+
+        if guest_customization
+          clone_spec.customization = guest_customization
+        end
 
         benchmark_checkpoint("initialized") if benchmark?
         task = src_vm.CloneVM_Task(spec: clone_spec, folder: dest_folder, name: name)
