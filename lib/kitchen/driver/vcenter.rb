@@ -116,10 +116,13 @@ module Kitchen
         end
 
         # Check that the datacenter exists
-        datacenter_exists?(config[:datacenter])
+        dc_folder = File.dirname(config[:datacenter])
+        dc_folder = nil if dc_folder == "."
+        dc_name = File.basename(config[:datacenter])
+        datacenter_exists?(dc_folder, dc_name)
 
         # Get datacenter and cluster information
-        datacenter = get_datacenter(config[:datacenter])
+        datacenter = get_datacenter(dc_folder, dc_name)
         cluster_id = get_cluster_id(config[:cluster])
 
         # Using the clone class, create a machine for TK
@@ -288,10 +291,13 @@ module Kitchen
 
       # Sees in the datacenter exists or not
       #
+      # @param [folder] folder is the name of the folder in which the Datacenter is stored in inventory, possibly nil
       # @param [name] name is the name of the datacenter
-      def datacenter_exists?(name)
+      def datacenter_exists?(folder, name)
         dc_api = VSphereAutomation::VCenter::DatacenterApi.new(api_client)
-        dcs = dc_api.list({ filter_names: name }).value
+        opts = { filter_names: name }
+        opts[:filter_folders] = get_folder(folder, "DATACENTER") if folder
+        dcs = dc_api.list(opts).value
 
         raise format("Unable to find data center: %s", name) if dcs.empty?
       end
@@ -326,9 +332,10 @@ module Kitchen
       # Gets the folder you want to create the VM
       #
       # @param [name] name is the name of the folder
-      def get_folder(name)
+      # @param [type] type is the type of the folder, one of VIRTUAL_MACHINE, DATACENTER, possibly other values
+      def get_folder(name, type = "VIRTUAL_MACHINE")
         folder_api = VSphereAutomation::VCenter::FolderApi.new(api_client)
-        folders = folder_api.list({ filter_names: name, filter_type: "VIRTUAL_MACHINE" }).value
+        folders = folder_api.list({ filter_names: name, filter_type: type }).value
 
         raise format("Unable to find folder: %s", name) if folders.empty?
 
@@ -349,10 +356,13 @@ module Kitchen
 
       # Gets the info of the datacenter
       #
+      # @param [folder] folder is the name of the folder in which the Datacenter is stored in inventory, possibly nil
       # @param [name] name is the name of the Datacenter
-      def get_datacenter(name)
+      def get_datacenter(folder, name)
         dc_api = VSphereAutomation::VCenter::DatacenterApi.new(api_client)
-        dcs = dc_api.list({ filter_names: name }).value
+        opts = { filter_names: name }
+        opts[:filter_folders] = get_folder(folder, "DATACENTER") if folder
+        dcs = dc_api.list(opts).value
 
         raise format("Unable to find data center: %s", name) if dcs.empty?
 

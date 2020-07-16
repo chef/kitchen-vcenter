@@ -221,13 +221,13 @@ class Support
       case options[:vm_os].downcase.to_sym
       when :linux
         # @todo: allow override if no dhclient
-        return [
+        [
           "/sbin/modprobe -r vmxnet3",
           "/sbin/modprobe vmxnet3",
           "/sbin/dhclient",
         ]
       when :windows
-        return [
+        [
           "netsh interface set Interface #{options[:vm_win_network]} disable",
           "netsh interface set Interface #{options[:vm_win_network]} enable",
           "ipconfig /renew",
