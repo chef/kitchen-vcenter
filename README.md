@@ -255,20 +255,20 @@ Linux default:
 Windows default:
 `sleep 5 & ipconfig`
 
-## Post Create Script
+## Post-Create Script
 
-This offers a way to make VMs ready for connections by a Test Kitchen transport. In some cases, the default firewall settings will not allow immediate
-connections via WinRM. With a post create script, you can remotely execute statements to enable this.
+Post-create scripts offer a way to make VMs ready for connections by a Test Kitchen transport.
+In some cases, the default firewall settings block immediate connections through WinRM. Post-create scripts let you remotely execute commands to enable immediate access through WinRM.
 
-Add all necessary commands with the `post_create_script` property. These commands get invoked via the Guest Operations API (VMware Tools), which does not
-require network connectivity. As such, they need additional privileges in vCenter.
+Add all of the required commands for enabling WinRM connections with the `post_create_script` property.
+The Guest Operations API (VMware Tools) executes the commands from the `post_create_script`. The GuestOperatons endpoint does not require network connectivity, but it does require additional privileges in vCenter.
 
-Needed privileges:
+Enable these privileges in vCenter:
 - VirtualMachine.GuestOperations.Execute
 - VirtualMachine.GuestOperations.Query
 
-The commands gets executed with the credentials specified for the transport, but can be overridden via `vm_username` and `vm_password`. The default
-timeout is 60 seconds, but can be adjusted via `post_create_script_timeout`.
+The commands are executed with the credentials specified for the transport, which you can override with `vm_username` and `vm_password`.
+The `post_create_script` default timeout is 60 seconds. Configure the timeout with `post_create_script_timeout`.
 
 ## Benchmarking
 
@@ -298,8 +298,8 @@ this network and the developers, there is a router with 1:1 NAT configured so th
 Any passed Ruby code will be executed with the `ip` variable (as discovered by VMware) available. The returned value will then be used as new IP.
 As you can use arbitrary Ruby code, it is possible to do complex arithmetics or even implement remote API/IPAM lookups.
 
-Windows by default does only allow WinRM connections from the local subnet. In a 1:1 NAT situation, you either have to open up the firewall before,
-when creating the template, or you can use a post create script like this:
+The Windows default behavior allows only WinRM connections from the local subnet.
+There are two options for a 1:1 NAT situation, either open up the firewall at the time you create the template or open it with a post-create script, for example:
 
 ```
 platforms:
