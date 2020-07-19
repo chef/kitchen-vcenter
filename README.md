@@ -194,7 +194,7 @@ platforms:
         subnet_mask: 255.255.252.0
         dns_domain: 'example.com'
         timezone: 'US/Pacific'
-        dns_serverList:
+        dns_server_list:
         - 8.8.8.8
         - 7.7.7.7
         dns_suffix_list:
