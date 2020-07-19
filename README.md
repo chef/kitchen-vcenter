@@ -166,15 +166,16 @@ The following `customize` subkeys are available. They inherit from the specified
  - `add_disks` - Array of disks to add to the VM (requires VirtualMachine.Config.AddNewDisk).
    Keys per disk: `type` (default: `thin`, other values: `flat`/`flat_lazy` or `flat_eager`), `size_mb` in MB (default: 10 GB)
 
-The following `guest_customization` subkeys are available. To configure the guest OS you must define all of the provided parameters. Below the parameters is an example of their usage in a platform driver configuration.
+The following `guest_customization` subkeys are available for Linux guest OS customization. To configure the guest OS you must define all of the provided parameters. Below the parameters is an example of their usage in a platform driver configuration.
+**Note: Does not currently support Windows guest OS customization**
 
- - `ipAddress` - String for configuring a static IPv4 address (performs validation as IPv4 only is supported at this time)
+ - `ip_address` - String for configuring a static IPv4 address (performs validation as IPv4 only is supported at this time)
  - `gateway` - Array for configuring IPv4 addresses as gateways
- - `subnetMask` - String for configuring subnet mask
- - `dnsDomain` - String for configuring DNS domain
+ - `subnet_mask` - String for configuring subnet mask
+ - `dns_domain` - String for configuring DNS domain
  - `timezone` - String for configuring timezone
- - `dnsServerList` - Array for configuring DNS servers
- - `dnsSuffixList` - Array for configuring DNS suffixes
+ - `dns_server_sist` - Array for configuring DNS servers
+ - `dns_suffix_list` - Array for configuring DNS suffixes
 
 ```yml
 platforms:
@@ -187,16 +188,16 @@ platforms:
       poweron: true
       vm_name: centos-7-kitchen
       guest_customization:
-        ipAddress: 10.10.176.15
+        ip_address: 10.10.176.15
         gateway:
         - 17.10.176.1
-        subnetMask: 255.255.252.0
-        dnsDomain: 'example.com'
+        subnet_mask: 255.255.252.0
+        dns_domain: 'example.com'
         timezone: 'US/Pacific'
-        dnsServerList:
+        dns_serverList:
         - 8.8.8.8
         - 7.7.7.7
-        dnsSuffixList:
+        dns_suffix_list:
         - 'test.example.com'
         - 'example.com'
     transport:

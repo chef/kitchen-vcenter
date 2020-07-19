@@ -51,6 +51,7 @@ module Kitchen
       default_config :vm_wait_interval, 2.0
       default_config :vm_rollback, false
       default_config :customize, nil
+      default_config :guest_customization, nil
       default_config :interface, nil
       default_config :active_discovery, false
       default_config :active_discovery_command, nil
@@ -156,6 +157,7 @@ module Kitchen
           wait_timeout: config[:vm_wait_timeout],
           wait_interval: config[:vm_wait_interval],
           customize: config[:customize],
+          guest_customization: config[:guest_customization],
           active_discovery: config[:active_discovery],
           active_discovery_command: config[:active_discovery_command],
           vm_os: config[:vm_os],
