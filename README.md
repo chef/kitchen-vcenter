@@ -174,7 +174,7 @@ The following `guest_customization` subkeys are available for Linux guest OS cus
  - `subnet_mask` - String for configuring subnet mask
  - `dns_domain` - String for configuring DNS domain
  - `timezone` - String for configuring timezone
- - `dns_server_sist` - Array for configuring DNS servers
+ - `dns_server_list` - Array for configuring DNS servers
  - `dns_suffix_list` - Array for configuring DNS suffixes
 
 ```yml
