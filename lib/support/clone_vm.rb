@@ -460,7 +460,7 @@ class Support
         end
       end
 
-      unless %i[dns_domain timezone dns_server_list dns_suffix_list ip_address gateway subnet_mask].all? { |k| options[:guest_customization].key? k }
+      unless %i{dns_domain timezone dns_server_list dns_suffix_list ip_address gateway subnet_mask}.all? { |k| options[:guest_customization].key? k }
         raise Support::CloneError.new("Guest customization error: currently all options are required to support guest customization")
       end
 
