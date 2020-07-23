@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.7.5 -->
+## [v2.7.5](https://github.com/chef/kitchen-vcenter/tree/v2.7.5) (2020-07-23)
+
+#### Merged Pull Requests
+- Enable Guest OS customization [#97](https://github.com/chef/kitchen-vcenter/pull/97) ([mkennedy85](https://github.com/mkennedy85))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.7.0 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Enable Guest OS customization [#97](https://github.com/chef/kitchen-vcenter/pull/97) ([mkennedy85](https://github.com/mkennedy85)) <!-- 2.7.5 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
