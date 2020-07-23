@@ -1,20 +1,18 @@
 # Change Log
 
-<!-- latest_release 2.7.6 -->
-## [v2.7.6](https://github.com/chef/kitchen-vcenter/tree/v2.7.6) (2020-07-23)
-
-#### Merged Pull Requests
-- Cleaning up a linting error [#103](https://github.com/chef/kitchen-vcenter/pull/103) ([tyler-ball](https://github.com/tyler-ball))
 <!-- latest_release -->
-<!-- release_rollup since=2.7.0 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Cleaning up a linting error [#103](https://github.com/chef/kitchen-vcenter/pull/103) ([tyler-ball](https://github.com/tyler-ball)) <!-- 2.7.6 -->
-- Enable Guest OS customization [#97](https://github.com/chef/kitchen-vcenter/pull/97) ([mkennedy85](https://github.com/mkennedy85)) <!-- 2.7.5 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.7.6](https://github.com/chef/kitchen-vcenter/tree/v2.7.6) (2020-07-23)
+
+#### Merged Pull Requests
+- Enable Guest OS customization [#97](https://github.com/chef/kitchen-vcenter/pull/97) ([mkennedy85](https://github.com/mkennedy85))
+- Cleaning up a linting error [#103](https://github.com/chef/kitchen-vcenter/pull/103) ([tyler-ball](https://github.com/tyler-ball))
+<!-- latest_stable_release -->
+
 ## [v2.7.4](https://github.com/chef/kitchen-vcenter/tree/v2.7.4) (2020-07-16)
 
 #### Merged Pull Requests
@@ -22,7 +20,6 @@
 - Add chefstyle validation on each PR [#100](https://github.com/chef/kitchen-vcenter/pull/100) ([tas50](https://github.com/tas50))
 - Cleanup the github templates and codeowners [#102](https://github.com/chef/kitchen-vcenter/pull/102) ([tas50](https://github.com/tas50))
 - Drop support for Ruby 2.3 [#101](https://github.com/chef/kitchen-vcenter/pull/101) ([tas50](https://github.com/tas50))
-<!-- latest_stable_release -->
 
 ## [v2.7.0](https://github.com/chef/kitchen-vcenter/tree/v2.7.0) (2020-04-14)
 
