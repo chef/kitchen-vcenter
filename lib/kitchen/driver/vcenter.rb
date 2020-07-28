@@ -420,14 +420,14 @@ module Kitchen
           # impact on small environments, but on large deployments with lots of clusters and pools,
           # provisioned machines are likely to "jump around" available hosts.
           #
-          # This behaviour is carried on from versions 1.2.1 and lower, but likely to be removed in
+          # This behavior is carried on from versions 1.2.1 and lower, but likely to be removed in
           # a new major version due to these insufficiencies and the confusing code for it
 
-          # Remove default pool for first pass (<= 1.2.1 behaviour to pick first user-defined pool found)
+          # Remove default pool for first pass (<= 1.2.1 behavior to pick first user-defined pool found)
           resource_pools = rp_api.list.value.delete_if { |pool| pool.name == "Resources" }
           debug("Search of all resource pools found: " + resource_pools.map(&:name).to_s)
 
-          # Revert to default pool, if no user-defined pool found (> 1.2.1 behaviour)
+          # Revert to default pool, if no user-defined pool found (> 1.2.1 behavior)
           # (This one might not be found under some circumstances by the statement above)
           return get_resource_pool("Resources") if resource_pools.empty?
         else

@@ -198,6 +198,7 @@ platforms:
 This takes a VM or template, copies the whole disk and then boots up the machine. Default mode of operation.
 
 Required prilveges:
+
 - Datastore.AllocateSpace
 - Network.Assign
 - Resource.AssignVMToPool
@@ -220,7 +221,7 @@ The `template` parameter has to reference a VM (a template will not work) and a 
 
 Depending on the underlying storage system, performance may vary greatly compared to full clones.
 
-Required prilveges: (see "Clone mode: full")
+Required privileges: (see "Clone mode: full")
 
 ### Clone mode: instant
 
