@@ -1,26 +1,23 @@
 # Change Log
 
-<!-- latest_release 2.7.8 -->
-## [v2.7.8](https://github.com/chef/kitchen-vcenter/tree/v2.7.8) (2020-07-31)
-
-#### Merged Pull Requests
-- Update rbvmomi requirement from &gt;= 1.11, &lt; 3.0 to &gt;= 1.11, &lt; 4.0 [#105](https://github.com/chef/kitchen-vcenter/pull/105) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
-<!-- release_rollup since=2.7.6 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Update rbvmomi requirement from &gt;= 1.11, &lt; 3.0 to &gt;= 1.11, &lt; 4.0 [#105](https://github.com/chef/kitchen-vcenter/pull/105) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.7.8 -->
-- Fix minor spelling mistakes [#104](https://github.com/chef/kitchen-vcenter/pull/104) ([tas50](https://github.com/tas50)) <!-- 2.7.7 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.7.8](https://github.com/chef/kitchen-vcenter/tree/v2.7.8) (2020-07-31)
+
+#### Merged Pull Requests
+- Fix minor spelling mistakes [#104](https://github.com/chef/kitchen-vcenter/pull/104) ([tas50](https://github.com/tas50))
+- Update rbvmomi requirement from &gt;= 1.11, &lt; 3.0 to &gt;= 1.11, &lt; 4.0 [#105](https://github.com/chef/kitchen-vcenter/pull/105) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+<!-- latest_stable_release -->
+
 ## [v2.7.6](https://github.com/chef/kitchen-vcenter/tree/v2.7.6) (2020-07-23)
 
 #### Merged Pull Requests
 - Enable Guest OS customization [#97](https://github.com/chef/kitchen-vcenter/pull/97) ([mkennedy85](https://github.com/mkennedy85))
 - Cleaning up a linting error [#103](https://github.com/chef/kitchen-vcenter/pull/103) ([tyler-ball](https://github.com/tyler-ball))
-<!-- latest_stable_release -->
 
 ## [v2.7.4](https://github.com/chef/kitchen-vcenter/tree/v2.7.4) (2020-07-16)
 
