@@ -472,7 +472,7 @@ class Support
         raise Support::CloneError.new("Guest customization error: gateway must be an array")
       end
 
-      spec = RbVmomi::VIM::CustomizationSpec.new(
+      RbVmomi::VIM::CustomizationSpec.new(
         identity: RbVmomi::VIM::CustomizationLinuxPrep.new(
           domain: options[:guest_customization][:dns_domain],
           hostName: RbVmomi::VIM::CustomizationFixedName.new(
@@ -496,8 +496,6 @@ class Support
           )
         )]
       )
-
-      spec
     end
 
     def clone
