@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.7.9 -->
+## [v2.7.9](https://github.com/chef/kitchen-vcenter/tree/v2.7.9) (2020-08-06)
+
+#### Merged Pull Requests
+- Resolve Style/RedundantAssignment warning [#106](https://github.com/chef/kitchen-vcenter/pull/106) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.7.8 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Resolve Style/RedundantAssignment warning [#106](https://github.com/chef/kitchen-vcenter/pull/106) ([tas50](https://github.com/tas50)) <!-- 2.7.9 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
