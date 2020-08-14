@@ -337,7 +337,15 @@ module Kitchen
       # @param [type] type is the type of the folder, one of VIRTUAL_MACHINE, DATACENTER, possibly other values
       def get_folder(name, type = "VIRTUAL_MACHINE")
         folder_api = VSphereAutomation::VCenter::FolderApi.new(api_client)
-        folders = folder_api.list({ filter_names: name, filter_type: type }).value
+
+        # Handle sub-folders
+        if name.include? '/'
+          folder_stack = name.split('/').reject(&:empty?)
+          name = folder_stack.pop
+          folders = folder_api.list({ parent_folders: folder_stack, filter_names: name, filter_type: type }).value
+        else
+          folders = folder_api.list({ filter_names: name, filter_type: type }).value
+        end
 
         raise format("Unable to find folder: %s", name) if folders.empty?
 
