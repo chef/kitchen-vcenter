@@ -152,16 +152,16 @@ The following `customize` subkeys are available. They inherit from the specified
  - `add_disks` - Array of disks to add to the VM (requires VirtualMachine.Config.AddNewDisk).
    Keys per disk: `type` (default: `thin`, other values: `flat`/`flat_lazy` or `flat_eager`), `size_mb` in MB (default: 10 GB)
 
-The following `guest_customization` subkeys are available for Linux guest OS customization. To configure the guest OS you must define all of the provided parameters. Below the parameters is an example of their usage in a platform driver configuration.
+The following `guest_customization` subkeys are available for Linux guest OS customization. Below the parameters is an example of their usage in a platform driver configuration.
 **Note: Does not currently support Windows guest OS customization**
 
- - `ip_address` - String for configuring a static IPv4 address (performs validation as IPv4 only is supported at this time)
- - `gateway` - Array for configuring IPv4 addresses as gateways
- - `subnet_mask` - String for configuring subnet mask
- - `dns_domain` - String for configuring DNS domain
- - `timezone` - String for configuring timezone
- - `dns_server_list` - Array for configuring DNS servers
- - `dns_suffix_list` - Array for configuring DNS suffixes
+ - `ip_address` - (_Optional_) String for configuring a static IPv4 address (performs validation as IPv4 only is supported at this time), if omitted DHCP will be used
+ - `gateway` - (_Optional_) Array for configuring IPv4 addresses as gateways
+ - `subnet_mask` - (_Optional_) String for configuring subnet mask, this is _required if_ `ip_address` is set
+ - `dns_domain` - (_Required_) String for configuring DNS domain
+ - `timezone` - (_Required_) String for configuring timezone
+ - `dns_server_list` - (_Required_) Array for configuring DNS servers
+ - `dns_suffix_list` - (_Required_) Array for configuring DNS suffixes
 
 ```yml
 platforms:
