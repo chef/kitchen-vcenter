@@ -137,7 +137,7 @@ module Kitchen
         unless config[:folder].nil?
           config[:folder] = {
             name: config[:folder],
-            id: get_folder(config[:folder]),
+            id: get_folder(config[:folder], "VIRTUAL_MACHINE", datacenter),
           }
         end
 
@@ -335,13 +335,19 @@ module Kitchen
       #
       # @param [name] name is the name of the folder
       # @param [type] type is the type of the folder, one of VIRTUAL_MACHINE, DATACENTER, possibly other values
-      def get_folder(name, type = "VIRTUAL_MACHINE")
+      # @param [datacenter] datacenter is the datacenter of the folder
+      def get_folder(name, type = "VIRTUAL_MACHINE", datacenter = nil)
         folder_api = VSphereAutomation::VCenter::FolderApi.new(api_client)
-        folders = folder_api.list({ filter_names: name, filter_type: type }).value
+        parent_path, basename = File.split(name)
+        filter = { filter_names: basename, filter_type: type }
+        filter[:filter_datacenters] = datacenter if datacenter
+        filter[:filter_parent_folders] = get_folder(parent_path, type, datacenter) unless parent_path == "."
 
-        raise format("Unable to find folder: %s", name) if folders.empty?
+        folders = folder_api.list(filter).value
 
-        raise format("%s returned too many folders", name) if folders.length > 1
+        raise format("Unable to find folder: %s", basename) if folders.empty?
+
+        raise format("`%s` returned too many folders", basename) if folders.length > 1
 
         folders.first.folder
       end
