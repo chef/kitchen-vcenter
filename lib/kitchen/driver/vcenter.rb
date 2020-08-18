@@ -347,8 +347,6 @@ module Kitchen
           folders = folder_api.list({ filter_names: name, filter_type: type }).value
         end
 
-        folders = folder_api.list({ filter_names: name, filter_type: type }).value
-
         raise format("Unable to find folder: %s", name) if folders.empty?
 
         raise format("%s returned too many folders", name) if folders.length > 1
