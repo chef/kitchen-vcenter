@@ -339,8 +339,8 @@ module Kitchen
         folder_api = VSphereAutomation::VCenter::FolderApi.new(api_client)
 
         # Handle sub-folders
-        if name.include? '/'
-          folder_stack = name.split('/').reject(&:empty?)
+        if name.include? "/"
+          folder_stack = name.split("/").reject(&:empty?)
           name = folder_stack.pop
           folders = folder_api.list({ parent_folders: folder_stack, filter_names: name, filter_type: type }).value
         else
