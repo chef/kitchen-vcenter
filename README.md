@@ -123,7 +123,7 @@ The following optional parameters should be used in the `driver` for the platfor
  - `resource_pool` - Name of the resource pool to use when creating the machine. Default: first pool
  - `cluster` - Cluster on which the new virtual machine should be created. Default: cluster of the `targethost` machine.
  - `targethost` - Host on which the new virtual machine should be created. If not specified then the first host in the cluster is used.
- - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist.
+ - `folder` - Folder into which the new machine should be stored. If the `folder` value contains a `/` then a full-path must be specified and allows nested folders to be used. If specified the folder _must_ already exist.
  - `poweron` - Power on the new virtual machine. Default: true
  - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
  - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
