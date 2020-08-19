@@ -339,13 +339,14 @@ module Kitchen
         folder_api = VSphereAutomation::VCenter::FolderApi.new(api_client)
 
         # Handle sub-folders
+        options = { filter_names: name, filter_type: type }
         if name.include? "/"
           folder_stack = name.split("/").reject(&:empty?)
           name = folder_stack.pop
-          folders = folder_api.list({ parent_folders: folder_stack, filter_names: name, filter_type: type }).value
-        else
-          folders = folder_api.list({ filter_names: name, filter_type: type }).value
+          options[:filter_names] = name
+          options[:filter_parent_folders] = folder_stack
         end
+        folders = folder_api.list(options).value
 
         raise format("Unable to find folder: %s", name) if folders.empty?
 
