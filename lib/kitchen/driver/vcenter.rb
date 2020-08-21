@@ -20,8 +20,8 @@ require "vsphere-automation-cis"
 require "vsphere-automation-vcenter"
 require_relative "../../kitchen-vcenter/version"
 require_relative "../../support/clone_vm"
-require "securerandom"
-require "uri"
+require "securerandom" unless defined?(SecureRandom)
+require "uri" unless defined?(URI)
 
 # The main kitchen module
 module Kitchen
