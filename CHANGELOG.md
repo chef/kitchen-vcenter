@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.7.10 -->
-## [v2.7.10](https://github.com/chef/kitchen-vcenter/tree/v2.7.10) (2020-08-11)
+<!-- latest_release 2.7.11 -->
+## [v2.7.11](https://github.com/chef/kitchen-vcenter/tree/v2.7.11) (2020-08-21)
 
 #### Merged Pull Requests
-- Update chefstyle requirement from 1.2.0 to 1.2.1 [#107](https://github.com/chef/kitchen-vcenter/pull/107) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Allow folder to support nested paths [#108](https://github.com/chef/kitchen-vcenter/pull/108) ([cattywampus](https://github.com/cattywampus))
 <!-- latest_release -->
 <!-- release_rollup since=2.7.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Allow folder to support nested paths [#108](https://github.com/chef/kitchen-vcenter/pull/108) ([cattywampus](https://github.com/cattywampus)) <!-- 2.7.11 -->
 - Update chefstyle requirement from 1.2.0 to 1.2.1 [#107](https://github.com/chef/kitchen-vcenter/pull/107) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.7.10 -->
 <!-- release_rollup -->
 
