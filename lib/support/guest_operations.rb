@@ -1,5 +1,5 @@
 require "rbvmomi"
-require "net/http"
+require "net/http" unless defined?(Net::HTTP)
 
 class Support
   # Encapsulate VMware Tools GOM interaction, inspired by github:dnuffer/raidopt

@@ -10,7 +10,7 @@ rescue LoadError
   puts "chefstyle gem is not installed. bundle install first to make sure all dependencies are installed."
 end
 
-require "yard"
+require "yard" unless defined?(YARD)
 
 RuboCop::RakeTask.new(:style)
 YARD::Rake::YardocTask.new do |t|
