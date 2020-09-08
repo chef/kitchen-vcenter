@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.7.13 -->
-## [v2.7.13](https://github.com/chef/kitchen-vcenter/tree/v2.7.13) (2020-09-02)
+<!-- latest_release 2.7.14 -->
+## [v2.7.14](https://github.com/chef/kitchen-vcenter/tree/v2.7.14) (2020-09-08)
 
 #### Merged Pull Requests
-- Update chefstyle requirement from 1.2.1 to 1.3.2 [#114](https://github.com/chef/kitchen-vcenter/pull/114) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Enable IP customization using DHCP [#112](https://github.com/chef/kitchen-vcenter/pull/112) ([cattywampus](https://github.com/cattywampus))
 <!-- latest_release -->
 <!-- release_rollup since=2.7.12 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Enable IP customization using DHCP [#112](https://github.com/chef/kitchen-vcenter/pull/112) ([cattywampus](https://github.com/cattywampus)) <!-- 2.7.14 -->
 - Update chefstyle requirement from 1.2.1 to 1.3.2 [#114](https://github.com/chef/kitchen-vcenter/pull/114) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.7.13 -->
 <!-- release_rollup -->
 
