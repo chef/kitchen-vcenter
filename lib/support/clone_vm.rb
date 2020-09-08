@@ -440,18 +440,36 @@ class Support
         return false
       end
 
-      unless ip?(options[:guest_customization][:ip_address])
-        raise Support::CloneError.new("Guest customization error: ip_address is required to be formatted as an IPv4 address")
-      end
-
-      unless ip?(options[:guest_customization][:subnet_mask])
-        raise Support::CloneError.new("Guest customization error: subnet_mask is required to be formatted as an IPv4 address")
-      end
-
-      options[:guest_customization][:gateway].each do |v|
-        unless ip?(v)
-          raise Support::CloneError.new("Guest customization error: gateway is required to be formatted as an IPv4 address")
+      if options[:guest_customization][:ip_address]
+        unless ip?(options[:guest_customization][:ip_address])
+          raise Support::CloneError.new("Guest customization error: ip_address is required to be formatted as an IPv4 address")
         end
+
+        unless options[:guest_customization][:subnet_mask]
+          raise Support::CloneError.new("Guest customization error: subnet_mask is required if assigning a fixed IPv4 address")
+        end
+
+        unless ip?(options[:guest_customization][:subnet_mask])
+          raise Support::CloneError.new("Guest customization error: subnet_mask is required to be formatted as an IPv4 address")
+        end
+      end
+
+      if options[:guest_customization][:gateway]
+        unless options[:guest_customization][:gateway].is_a?(Array)
+          raise Support::CloneError.new("Guest customization error: gateway must be an array")
+        end
+
+        options[:guest_customization][:gateway].each do |v|
+          unless ip?(v)
+            raise Support::CloneError.new("Guest customization error: gateway is required to be formatted as an IPv4 address")
+          end
+        end
+      end
+
+      required = %i{dns_domain timezone dns_server_list dns_suffix_list}
+      missing = required - options[:guest_customization].keys
+      unless missing.empty?
+        raise Support::CloneError.new("Guest customization error: #{missing.join(", ")} are required to support guest customization")
       end
 
       options[:guest_customization][:dns_server_list].each do |v|
@@ -460,16 +478,24 @@ class Support
         end
       end
 
-      unless %i{dns_domain timezone dns_server_list dns_suffix_list ip_address gateway subnet_mask}.all? { |k| options[:guest_customization].key? k }
-        raise Support::CloneError.new("Guest customization error: currently all options are required to support guest customization")
-      end
-
       if !options[:guest_customization][:dns_server_list].is_a?(Array)
         raise Support::CloneError.new("Guest customization error: dns_server_list must be an array")
       elsif !options[:guest_customization][:dns_suffix_list].is_a?(Array)
         raise Support::CloneError.new("Guest customization error: dns_suffix_list must be an array")
-      elsif !options[:guest_customization][:gateway].is_a?(Array)
-        raise Support::CloneError.new("Guest customization error: gateway must be an array")
+      end
+
+      if options[:guest_customization][:ip_address]
+        customized_ip = RbVmomi::VIM::CustomizationIPSettings.new(
+          ip: RbVmomi::VIM::CustomizationFixedIp(ipAddress: options[:guest_customization][:ip_address]),
+          gateway: options[:guest_customization][:gateway],
+          subnetMask: options[:guest_customization][:subnet_mask],
+          dnsDomain: options[:guest_customization][:dns_domain]
+        )
+      else
+        customized_ip = RbVmomi::VIM::CustomizationIPSettings.new(
+          ip: RbVmomi::VIM::CustomizationDhcpIpGenerator.new,
+          dnsDomain: options[:guest_customization][:dns_domain]
+        )
       end
 
       RbVmomi::VIM::CustomizationSpec.new(
@@ -486,14 +512,7 @@ class Support
           dnsSuffixList: options[:guest_customization][:dns_suffix_list]
         ),
         nicSettingMap: [RbVmomi::VIM::CustomizationAdapterMapping.new(
-          adapter: RbVmomi::VIM::CustomizationIPSettings.new(
-            ip: RbVmomi::VIM::CustomizationFixedIp(
-            ipAddress: options[:guest_customization][:ip_address]
-          ),
-            gateway: options[:guest_customization][:gateway],
-            subnetMask: options[:guest_customization][:subnet_mask],
-            dnsDomain: options[:guest_customization][:dns_domain]
-          )
+          adapter: customized_ip
         )]
       )
     end
