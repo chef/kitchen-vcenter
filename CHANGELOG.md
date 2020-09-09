@@ -1,28 +1,25 @@
 # Change Log
 
-<!-- latest_release 2.8.0 -->
-## [v2.8.0](https://github.com/chef/kitchen-vcenter/tree/v2.8.0) (2020-09-09)
-
-#### Merged Pull Requests
-- Minor readme tweaks [#115](https://github.com/chef/kitchen-vcenter/pull/115) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
-<!-- release_rollup since=2.7.12 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Minor readme tweaks [#115](https://github.com/chef/kitchen-vcenter/pull/115) ([tas50](https://github.com/tas50)) <!-- 2.8.0 -->
-- Enable IP customization using DHCP [#112](https://github.com/chef/kitchen-vcenter/pull/112) ([cattywampus](https://github.com/cattywampus)) <!-- 2.7.14 -->
-- Update chefstyle requirement from 1.2.1 to 1.3.2 [#114](https://github.com/chef/kitchen-vcenter/pull/114) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.7.13 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.8.0](https://github.com/chef/kitchen-vcenter/tree/v2.8.0) (2020-09-09)
+
+#### Merged Pull Requests
+- Update chefstyle requirement from 1.2.1 to 1.3.2 [#114](https://github.com/chef/kitchen-vcenter/pull/114) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Enable IP customization using DHCP [#112](https://github.com/chef/kitchen-vcenter/pull/112) ([cattywampus](https://github.com/cattywampus))
+- Minor readme tweaks [#115](https://github.com/chef/kitchen-vcenter/pull/115) ([tas50](https://github.com/tas50))
+<!-- latest_stable_release -->
+
 ## [v2.7.12](https://github.com/chef/kitchen-vcenter/tree/v2.7.12) (2020-08-21)
 
 #### Merged Pull Requests
 - Update chefstyle requirement from 1.2.0 to 1.2.1 [#107](https://github.com/chef/kitchen-vcenter/pull/107) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 - Allow folder to support nested paths [#108](https://github.com/chef/kitchen-vcenter/pull/108) ([cattywampus](https://github.com/cattywampus))
 - Optimize our requires [#113](https://github.com/chef/kitchen-vcenter/pull/113) ([tas50](https://github.com/tas50))
-<!-- latest_stable_release -->
 
 ## [v2.7.9](https://github.com/chef/kitchen-vcenter/tree/v2.7.9) (2020-08-06)
 
