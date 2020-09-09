@@ -318,18 +318,17 @@ Pull requests are very welcome! Make sure your patches are well tested. Ideally 
 
 1. Fork the repo
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Run the tests and rubocop, `bundle exec rake spec` and `bundle exec rake rubocop`
+3. Run the tests and chefstyle, `bundle exec rake spec` and `bundle exec rake style`
 4. Commit your changes (`git commit -am 'Added some feature'`)
 5. Push to the branch (`git push origin my-new-feature`)
 6. Create new Pull Request
 
-
 ## License
 
-Author:: Russell Seymour ([rseymour@chef.io](mailto:rseymour@chef.io))
-Author:: JJ Asghar ([jj@chef.io](mailto:jj@chef.io))
-Author:: Thomas Heinen ([theinen@tecracer.de](mailto:theinen@tecracer.de))
-Author:: Michael Kennedy ([michael_l_kennedy@me.com](mailto:michael_l_kennedy@me.com))
+- Author:: Russell Seymour ([rseymour@chef.io](mailto:rseymour@chef.io))
+- Author:: JJ Asghar ([jj@chef.io](mailto:jj@chef.io))
+- Author:: Thomas Heinen ([theinen@tecracer.de](mailto:theinen@tecracer.de))
+- Author:: Michael Kennedy ([michael_l_kennedy@me.com](mailto:michael_l_kennedy@me.com))
 
 Copyright:: Copyright (c) 2017-2020 Chef Software, Inc.
 
