@@ -365,7 +365,7 @@ class Support
 
           disk_spec.device.controllerKey = controller.key
 
-          highest_id = vm.disks.map(&:unitNumber).sort.last
+          highest_id = vm.disks.map(&:unitNumber).max
           next_id = highest_id + idx + 1
 
           # Avoid the SCSI controller ID
