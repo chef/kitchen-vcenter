@@ -383,7 +383,7 @@ module Kitchen
       #
       # @param [name] name is the name of the Cluster
       def get_cluster_id(name)
-        return nil if name.nil?
+        return if name.nil?
 
         cluster_api = VSphereAutomation::VCenter::ClusterApi.new(api_client)
         clusters = cluster_api.list({ filter_names: name }).value
