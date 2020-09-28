@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.8.1 -->
-## [v2.8.1](https://github.com/chef/kitchen-vcenter/tree/v2.8.1) (2020-09-18)
+<!-- latest_release 2.8.2 -->
+## [v2.8.2](https://github.com/chef/kitchen-vcenter/tree/v2.8.2) (2020-09-28)
 
 #### Merged Pull Requests
-- Minor perf optimizations from rubocop-performance [#116](https://github.com/chef/kitchen-vcenter/pull/116) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from 1.3.2 to 1.4.0 [#117](https://github.com/chef/kitchen-vcenter/pull/117) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=2.8.0 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from 1.3.2 to 1.4.0 [#117](https://github.com/chef/kitchen-vcenter/pull/117) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.8.2 -->
 - Minor perf optimizations from rubocop-performance [#116](https://github.com/chef/kitchen-vcenter/pull/116) ([tas50](https://github.com/tas50)) <!-- 2.8.1 -->
 <!-- release_rollup -->
 
