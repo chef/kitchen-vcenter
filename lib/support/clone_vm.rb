@@ -425,7 +425,10 @@ class Support
     def find_datacenter
       vim.serviceInstance.find_datacenter(datacenter)
     rescue RbVmomi::Fault
-      root_folder.childEntity.grep(RbVmomi::VIM::Datacenter).find { |x| x.name == datacenter }
+      dc = root_folder.findByInventoryPath(datacenter)
+      return dc if dc.is_a?(RbVmomi::VIM::Datacenter)
+
+      raise Support::CloneError.new("Unable to locate datacenter at '#{datacenter}'")
     end
 
     def ip?(string)
