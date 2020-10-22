@@ -1,28 +1,25 @@
 # Change Log
 
-<!-- latest_release 2.8.6 -->
-## [v2.8.6](https://github.com/chef/kitchen-vcenter/tree/v2.8.6) (2020-10-22)
-
-#### Merged Pull Requests
-- Support datacenters in folders when falling back in dc lookup [#123](https://github.com/chef/kitchen-vcenter/pull/123) ([clintoncwolfe](https://github.com/clintoncwolfe))
 <!-- latest_release -->
-<!-- release_rollup since=2.8.2 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Support datacenters in folders when falling back in dc lookup [#123](https://github.com/chef/kitchen-vcenter/pull/123) ([clintoncwolfe](https://github.com/clintoncwolfe)) <!-- 2.8.6 -->
-- Update chefstyle requirement from 1.4.4 to 1.4.5 [#122](https://github.com/chef/kitchen-vcenter/pull/122) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.8.5 -->
-- Update chefstyle requirement from 1.4.3 to 1.4.4 [#120](https://github.com/chef/kitchen-vcenter/pull/120) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.8.4 -->
-- Update chefstyle requirement from 1.4.0 to 1.4.2 [#118](https://github.com/chef/kitchen-vcenter/pull/118) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.8.3 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.8.6](https://github.com/chef/kitchen-vcenter/tree/v2.8.6) (2020-10-22)
+
+#### Merged Pull Requests
+- Update chefstyle requirement from 1.4.0 to 1.4.2 [#118](https://github.com/chef/kitchen-vcenter/pull/118) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from 1.4.3 to 1.4.4 [#120](https://github.com/chef/kitchen-vcenter/pull/120) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from 1.4.4 to 1.4.5 [#122](https://github.com/chef/kitchen-vcenter/pull/122) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Support datacenters in folders when falling back in dc lookup [#123](https://github.com/chef/kitchen-vcenter/pull/123) ([clintoncwolfe](https://github.com/clintoncwolfe))
+<!-- latest_stable_release -->
+
 ## [v2.8.2](https://github.com/chef/kitchen-vcenter/tree/v2.8.2) (2020-09-29)
 
 #### Merged Pull Requests
 - Minor perf optimizations from rubocop-performance [#116](https://github.com/chef/kitchen-vcenter/pull/116) ([tas50](https://github.com/tas50))
 - Update chefstyle requirement from 1.3.2 to 1.4.0 [#117](https://github.com/chef/kitchen-vcenter/pull/117) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
-<!-- latest_stable_release -->
 
 ## [v2.8.0](https://github.com/chef/kitchen-vcenter/tree/v2.8.0) (2020-09-09)
 
