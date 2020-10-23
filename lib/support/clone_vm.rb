@@ -1,20 +1,25 @@
 require "kitchen"
 require "rbvmomi"
+
+require_relative "guest_customization"
 require_relative "guest_operations"
 
 class Support
   class CloneError < RuntimeError; end
 
   class CloneVm
-    attr_reader :vim, :options, :ssl_verify, :vm, :name, :ip, :guest_auth, :username
+    attr_reader :vim, :vem, :options, :ssl_verify, :src_vm, :vm, :vm_name, :ip, :guest_auth, :username
+
+    include GuestCustomization
 
     def initialize(conn_opts, options)
       @options = options
-      @name = options[:name]
+      @vm_name = options[:vm_name]
       @ssl_verify = !conn_opts[:insecure]
 
       # Connect to vSphere
       @vim ||= RbVmomi::VIM.connect conn_opts
+      @vem ||= vim.serviceContent.eventManager
 
       @username = options[:vm_username]
       password = options[:vm_password]
@@ -156,8 +161,8 @@ class Support
       Kitchen.logger.debug format("Benchmark: Appended data to file %s", benchmark_file)
     end
 
-    def detect_os
-      vm.config&.guestId&.match(/^win/) ? :windows : :linux
+    def detect_os(vm_or_template)
+      vm_or_template.config&.guestId&.match(/^win/) ? :windows : :linux
     end
 
     def windows?
@@ -318,14 +323,14 @@ class Support
       end
     end
 
-    def reconfigure_guest
-      Kitchen.logger.info "Waiting for reconfiguration to finish"
+    def vm_customization
+      Kitchen.logger.info "Waiting for VM customization..."
 
       # Pass some contents right through
       # https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.wssdk.smssdk.doc%2Fvim.vm.ConfigSpec.html
-      config = options[:customize].select { |key, _| %i{annotation memoryMB numCPUs}.include? key }
+      config = options[:vm_customization].select { |key, _| %i{annotation memoryMB numCPUs}.include? key }
 
-      add_disks = options[:customize]&.fetch(:add_disks, nil)
+      add_disks = options[:vm_customization]&.fetch(:add_disks, nil)
       unless add_disks.nil?
         config[:deviceChange] = []
 
@@ -438,86 +443,16 @@ class Support
       false
     end
 
-    def customization_spec
-      unless options[:guest_customization]
-        return false
-      end
+    def vm_events(event_types = [])
+      raise Support::CloneError.new("`vm_events` called before VM clone") unless vm
 
-      if options[:guest_customization][:ip_address]
-        unless ip?(options[:guest_customization][:ip_address])
-          raise Support::CloneError.new("Guest customization error: ip_address is required to be formatted as an IPv4 address")
-        end
-
-        unless options[:guest_customization][:subnet_mask]
-          raise Support::CloneError.new("Guest customization error: subnet_mask is required if assigning a fixed IPv4 address")
-        end
-
-        unless ip?(options[:guest_customization][:subnet_mask])
-          raise Support::CloneError.new("Guest customization error: subnet_mask is required to be formatted as an IPv4 address")
-        end
-      end
-
-      if options[:guest_customization][:gateway]
-        unless options[:guest_customization][:gateway].is_a?(Array)
-          raise Support::CloneError.new("Guest customization error: gateway must be an array")
-        end
-
-        options[:guest_customization][:gateway].each do |v|
-          unless ip?(v)
-            raise Support::CloneError.new("Guest customization error: gateway is required to be formatted as an IPv4 address")
-          end
-        end
-      end
-
-      required = %i{dns_domain timezone dns_server_list dns_suffix_list}
-      missing = required - options[:guest_customization].keys
-      unless missing.empty?
-        raise Support::CloneError.new("Guest customization error: #{missing.join(", ")} are required to support guest customization")
-      end
-
-      options[:guest_customization][:dns_server_list].each do |v|
-        unless ip?(v)
-          raise Support::CloneError.new("Guest customization error: dns_server_list is required to be formatted as an IPv4 address")
-        end
-      end
-
-      if !options[:guest_customization][:dns_server_list].is_a?(Array)
-        raise Support::CloneError.new("Guest customization error: dns_server_list must be an array")
-      elsif !options[:guest_customization][:dns_suffix_list].is_a?(Array)
-        raise Support::CloneError.new("Guest customization error: dns_suffix_list must be an array")
-      end
-
-      if options[:guest_customization][:ip_address]
-        customized_ip = RbVmomi::VIM::CustomizationIPSettings.new(
-          ip: RbVmomi::VIM::CustomizationFixedIp(ipAddress: options[:guest_customization][:ip_address]),
-          gateway: options[:guest_customization][:gateway],
-          subnetMask: options[:guest_customization][:subnet_mask],
-          dnsDomain: options[:guest_customization][:dns_domain]
-        )
-      else
-        customized_ip = RbVmomi::VIM::CustomizationIPSettings.new(
-          ip: RbVmomi::VIM::CustomizationDhcpIpGenerator.new,
-          dnsDomain: options[:guest_customization][:dns_domain]
-        )
-      end
-
-      RbVmomi::VIM::CustomizationSpec.new(
-        identity: RbVmomi::VIM::CustomizationLinuxPrep.new(
-          domain: options[:guest_customization][:dns_domain],
-          hostName: RbVmomi::VIM::CustomizationFixedName.new(
-            name: name
-          ),
-          hwClockUTC: true,
-          timeZone: options[:guest_customization][:timezone]
+      vem.QueryEvents(filter: RbVmomi::VIM::EventFilterSpec(
+        entity: RbVmomi::VIM::EventFilterSpecByEntity(
+          entity: vm,
+          recursion: RbVmomi::VIM::EventFilterSpecRecursionOption(:self)
         ),
-        globalIPSettings: RbVmomi::VIM::CustomizationGlobalIPSettings.new(
-          dnsServerList: options[:guest_customization][:dns_server_list],
-          dnsSuffixList: options[:guest_customization][:dns_suffix_list]
-        ),
-        nicSettingMap: [RbVmomi::VIM::CustomizationAdapterMapping.new(
-          adapter: customized_ip
-        )]
-      )
+        eventTypeId: event_types
+      ))
     end
 
     def clone
@@ -526,12 +461,9 @@ class Support
       # set the datacenter name
       dc = find_datacenter
 
-      # get guest customization spec
-      guest_customization = customization_spec
-
       # reference template using full inventory path
       inventory_path = format("/%s/vm/%s", datacenter, options[:template])
-      src_vm = root_folder.findByInventoryPath(inventory_path)
+      @src_vm = root_folder.findByInventoryPath(inventory_path)
       raise Support::CloneError.new(format("Unable to find template: %s", options[:template])) if src_vm.nil?
 
       if src_vm.config.template && !full_clone?
@@ -542,6 +474,13 @@ class Support
       if src_vm.snapshot.nil? && !full_clone?
         Kitchen.logger.warn "Source VM has no snapshot available, thus falling back to full clone. Create a snapshot for linked/instant clones."
         options[:clone_type] = :full
+      end
+
+      # Autodetect OS, if none given
+      if options[:vm_os].nil?
+        os = detect_os(src_vm)
+        Kitchen.logger.debug format('OS for VM not configured, got "%s" from VMware', os.to_s.capitalize)
+        options[:vm_os] = os
       end
 
       # Specify where the machine is going to be created
@@ -642,23 +581,21 @@ class Support
         ]
 
         clone_spec = RbVmomi::VIM.VirtualMachineInstantCloneSpec(location: relocate_spec,
-                                                                 name: name)
+                                                                 name: vm_name)
 
         benchmark_checkpoint("initialized") if benchmark?
         task = src_vm.InstantClone_Task(spec: clone_spec)
       else
         clone_spec = RbVmomi::VIM.VirtualMachineCloneSpec(
           location: relocate_spec,
-          powerOn: options[:poweron] && options[:customize].nil?,
+          powerOn: options[:poweron] && options[:vm_customization].nil?,
           template: false
         )
 
-        if guest_customization
-          clone_spec.customization = guest_customization
-        end
+        clone_spec.customization = guest_customization_spec if options[:guest_customization]
 
         benchmark_checkpoint("initialized") if benchmark?
-        task = src_vm.CloneVM_Task(spec: clone_spec, folder: dest_folder, name: name)
+        task = src_vm.CloneVM_Task(spec: clone_spec, folder: dest_folder, name: vm_name)
       end
       task.wait_for_completion
 
@@ -666,15 +603,9 @@ class Support
 
       # get the IP address of the machine for bootstrapping
       # machine name is based on the path, e.g. that includes the folder
-      path = options[:folder].nil? ? name : format("%s/%s", options[:folder][:name], name)
+      path = options[:folder].nil? ? vm_name : format("%s/%s", options[:folder][:name], vm_name)
       @vm = dc.find_vm(path)
       raise Support::CloneError.new(format("Unable to find machine: %s", path)) if vm.nil?
-
-      if options[:vm_os].nil?
-        os = detect_os
-        Kitchen.logger.debug format('OS for VM not configured, got "%s" from VMware', os.to_s.capitalize)
-        options[:vm_os] = os
-      end
 
       # Reconnect network device after Instant Clone is ready
       if instant_clone?
@@ -682,14 +613,17 @@ class Support
         reconnect_network_device(vm)
       end
 
-      reconfigure_guest unless options[:customize].nil?
+      vm_customization if options[:vm_customization]
 
       # Start only if specified or customizations wanted; no need for instant clones as they start in running state
-      if options[:poweron] && !options[:customize].nil? && !instant_clone?
+      if options[:poweron] && !options[:vm_customization].nil? && !instant_clone?
         task = vm.PowerOnVM_Task
         task.wait_for_completion
       end
       benchmark_checkpoint("powered_on") if benchmark?
+
+      # Windows customization takes a while, so check for its completion
+      guest_customization_wait if options[:guest_customization]
 
       Kitchen.logger.info format("Waiting for VMware tools to become available (timeout: %d seconds)...", options[:wait_timeout])
       wait_for_tools(options[:wait_timeout], options[:wait_interval])
@@ -698,7 +632,7 @@ class Support
       benchmark_checkpoint("ip_detected") if benchmark?
 
       benchmark_persist if benchmark?
-      Kitchen.logger.info format("Created machine %s with IP %s", name, ip)
+      Kitchen.logger.info format("Created machine %s with IP %s", vm_name, ip)
     end
   end
 end

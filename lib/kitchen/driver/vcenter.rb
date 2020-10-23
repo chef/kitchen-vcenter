@@ -50,7 +50,7 @@ module Kitchen
       default_config :vm_wait_timeout, 90
       default_config :vm_wait_interval, 2.0
       default_config :vm_rollback, false
-      default_config :customize, nil
+      default_config :vm_customization, nil
       default_config :guest_customization, nil
       default_config :interface, nil
       default_config :active_discovery, false
@@ -78,6 +78,10 @@ module Kitchen
       MSG
       deprecate_config_for :aggressive_password, Util.outdent!(<<-MSG)
         The 'aggressive_password' setting was renamed to 'vm_password' and will
+        be removed in future versions.
+      MSG
+      deprecate_config_for :customize, Util.outdent!(<<-MSG)
+        The `customize` setting was renamed to `vm_customization` and will
         be removed in future versions.
       MSG
 
@@ -147,7 +151,7 @@ module Kitchen
 
         # Create a hash of options that the clone requires
         options = {
-          name: config[:vm_name],
+          vm_name: config[:vm_name],
           targethost: config[:targethost],
           poweron: config[:poweron],
           template: config[:template],
@@ -159,7 +163,7 @@ module Kitchen
           interface: config[:interface],
           wait_timeout: config[:vm_wait_timeout],
           wait_interval: config[:vm_wait_interval],
-          customize: config[:customize],
+          vm_customization: config[:vm_customization],
           guest_customization: config[:guest_customization],
           active_discovery: config[:active_discovery],
           active_discovery_command: config[:active_discovery_command],
@@ -178,7 +182,7 @@ module Kitchen
           new_vm.clone
 
           state[:hostname] = new_vm.ip
-          state[:vm_name] = new_vm.name
+          state[:vm_name] = new_vm.vm_name
 
         rescue # Kitchen::ActionFailed => e
           if config[:vm_rollback] == true
