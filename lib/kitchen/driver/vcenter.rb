@@ -284,6 +284,7 @@ module Kitchen
         config[:vm_os] = config[:aggressive_os] unless config[:aggressive_os].nil?
         config[:vm_username] = config[:aggressive_username] unless config[:aggressive_username].nil?
         config[:vm_password] = config[:aggressive_password] unless config[:aggressive_password].nil?
+        config[:vm_customization] = config[:customize] unless config[:customize].nil?
       end
 
       # A helper method to validate the state

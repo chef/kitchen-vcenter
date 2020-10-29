@@ -297,7 +297,8 @@ class Support
     # Wait for new IP to be reported, if any.
     #
     # @param [Integer] timeout Timeout in seconds. Tools report every 30 seconds, Default: 30 seconds
-    def guest_customization_wait_ip(timeout = 30)
+    # @param [Integer] sleep_time Time to wait between tries
+    def guest_customization_wait_ip(timeout = 30, sleep_time = 1)
       return unless guest_customization_ip_change?
 
       waited_seconds = 0
