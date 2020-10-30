@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.9.0 -->
+## [v2.9.0](https://github.com/chef/kitchen-vcenter/tree/v2.9.0) (2020-10-30)
+
+#### Merged Pull Requests
+- Add Windows guest customization [#124](https://github.com/chef/kitchen-vcenter/pull/124) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.8.6 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Add Windows guest customization [#124](https://github.com/chef/kitchen-vcenter/pull/124) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.9.0 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
