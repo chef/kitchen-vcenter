@@ -125,7 +125,7 @@ The following optional parameters should be used in the `driver` for the platfor
  - `targethost` - Host on which the new virtual machine should be created. If not specified then the first host in the cluster is used.
  - `folder` - Folder into which the new machine should be stored. If specified the folder _must_ already exist. Nested folders can be specified by separating the folder names with a `/`.
  - `poweron` - Power on the new virtual machine. Default: true
- - `vm_name` - Specify name of virtual machine. Default: `<suite>-<platform>-<random-hexid>`
+ - `vm_name` - Specify name of virtual machine in vSphere. Default: `<suite>-<platform>-<random-hexid>`
  - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
  - `network_name` - Network to reconfigure the first interface to, needs a VM Network name. Default: do not change
  - `tags` - Array of pre-defined vCenter tag names to assign (VMware tags are not key/value pairs). Default: none
@@ -144,7 +144,7 @@ In addition to active IP discovery, the following optional parameter is relevant
 
  - `vm_win_network` - Internal Windows name of the Kitchen network adapter for reloading. Default: Ethernet0
 
-The following `customize` subkeys are available. They inherit from the specified `template` by default.
+The following `vm_customization` (previously `customize`) subkeys for VM customization are available. They inherit from the specified `template` by default.
 
  - `annotation` - Notes to attach to the VM (requires VirtualMachine.Config.Rename)
  - `memoryMB` - Memory size to set in Megabytes (requires VirtualMachine.Config.Memory)
@@ -152,27 +152,29 @@ The following `customize` subkeys are available. They inherit from the specified
  - `add_disks` - Array of disks to add to the VM (requires VirtualMachine.Config.AddNewDisk).
    Keys per disk: `type` (default: `thin`, other values: `flat`/`flat_lazy` or `flat_eager`), `size_mb` in MB (default: 10 GB)
 
-The following `guest_customization` subkeys are available for Linux guest OS customization. Below the parameters is an example of their usage in a platform driver configuration.
-**Note: Does not currently support Windows guest OS customization**
+The following `guest_customization` subkeys are available for general guest OS customization. Please note that this feature will significantly slow instance creation.
 
  - `ip_address` - (_Optional_) String for configuring a static IPv4 address (performs validation as IPv4 only is supported at this time), if omitted DHCP will be used
  - `gateway` - (_Optional_) Array for configuring IPv4 addresses as gateways
  - `subnet_mask` - (_Optional_) String for configuring subnet mask, this is _required if_ `ip_address` is set
  - `dns_domain` - (_Required_) String for configuring DNS domain
- - `timezone` - (_Required_) String for configuring timezone
+ - `timezone` - (_Required_) String for configuring timezone. Linux requires "Area/Location", while Windows requires a numeric value. Default: UTC
+ - `hostname` - (_Optional_) Hostname, will revert to `vm_name` if not given
  - `dns_server_list` - (_Required_) Array for configuring DNS servers
  - `dns_suffix_list` - (_Required_) Array for configuring DNS suffixes
+ - `timeout_task` - (_Optional_) Timeout for guest customization to finish. Default: 600 seconds
+ - `timeout_ip` - (_Optional_) Time to wait after successful customization to let vSphere catch a new static IP. Default: 30 seconds
+ - `continue_on_ip_conflict` - (_Optional_) Continue, even if a reachable host already uses the customized IP. Default: false
+
+### Linux Guest Customization
+
+Linux Example:
 
 ```yml
 platforms:
   - name: centos-7
     driver:
-      datacenter: 'Datacenter'
-      template: 'centos-7-template'
-      cluster: 'Kitchen'
-      interface: 'Kitchen Network'
-      poweron: true
-      vm_name: centos-7-kitchen
+      # ...
       guest_customization:
         ip_address: 10.10.176.15
         gateway:
@@ -186,10 +188,50 @@ platforms:
         dns_suffix_list:
         - 'test.example.com'
         - 'example.com'
-    transport:
-      username: "root"
-      password: "<%= ENV['ROOT_PASSWORD']%>"
+        hostname: 'centos-7-kitchen'
 ```
+
+Known customization issues:
+- sometimes the `libpath-class-file-stat-perl` package is missing which is needed for IP customization.
+- `open-vm-tools` should be newer than 10.3.10 to avoid compatibility issues
+
+### Windows Guest Customization
+
+The following `guest_customization` subkeys are Windows specific:
+
+ - `org_name` - (_Optional_) Organization name for the Machine. Default: "TestKitchen"
+ - `product_id` - (_Required_) Product Key for the OS. Default: Attempt automatic selection, but this might fail
+
+On guest customizations after Windows Vista the machine SID will be regenerated to avoid conflicts.
+
+Windows Example:
+
+```yml
+platforms:
+  - name: windows-2019
+    driver:
+      # ...
+      guest_customization:
+        ip_address: 10.10.176.16
+        gateway:
+        - 17.10.176.1
+        subnet_mask: 255.255.252.0
+        dns_domain: 'example.com'
+        timezone: 0x4
+        dns_server_list:
+        - 8.8.8.8
+        - 7.7.7.7
+        dns_suffix_list:
+        - 'test.example.com'
+        - 'example.com'
+        hostname: 'win2019-kitchen'
+        product_id: 00000-00000-00000-00000-00000
+```
+
+Debugging customization issues on Windows:
+- Timezone IDs can be found at [Microsoft Support](https://support.microsoft.com/en-us/help/973627/microsoft-time-zone-index-values)
+- Official KMS 120 day evaluation keys can be found at [Microsoft Documentation](https://docs.microsoft.com/en-us/windows-server/get-started/kmsclientkeys)
+- On "Windows could not parse or process the unattend answer file" errors press Shift-F10 and check `C:\\Windows\\Panther\\UnattendGC\\*.log`
 
 ## Clone types
 

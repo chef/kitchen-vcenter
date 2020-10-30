@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = KitchenVcenter::VERSION
   spec.authors       = ["Chef Software"]
   spec.email         = ["oss@chef.io"]
-  spec.summary       = "Test Kitchen driver for VMare vCenter"
+  spec.summary       = "Test Kitchen driver for VMware vCenter"
   spec.description   = "Test Kitchen driver for VMware vCenter using SDK"
   spec.homepage      = "https://github.com/chef/kitchen-vcenter"
   spec.license       = "Apache-2.0"
@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.4"
 
+  spec.add_dependency "net-ping", ">= 2.0.0", "< 3.0"
   spec.add_dependency "rbvmomi", ">= 1.11", "< 4.0"
   spec.add_dependency "test-kitchen", ">= 1.16", "< 3.0"
   spec.add_dependency "vsphere-automation-sdk", "~> 0.4"
