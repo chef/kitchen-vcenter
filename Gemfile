@@ -6,7 +6,7 @@ group :development do
   gem "guard"
   gem "guard-shell"
   gem "rake"
-  gem "chefstyle", "1.5.1"
+  gem "chefstyle", "1.5.2"
 end
 
 group :docs do
