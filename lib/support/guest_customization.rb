@@ -186,10 +186,10 @@ class Support
       end
 
       customization_pass = nil
-      if guest_customization[:password]
+      if guest_customization[:administrator_password]
         customization_pass = RbVmomi::VIM::CustomizationPassword.new(
           plainText: true,
-          value: guest_customization[:password]
+          value: guest_customization[:administrator_password]
         )
       end
 

@@ -201,7 +201,7 @@ The following `guest_customization` subkeys are Windows specific:
 
  - `org_name` - (_Optional_) Organization name for the Machine. Default: "TestKitchen"
  - `product_id` - (_Required_) Product Key for the OS. Default: Attempt automatic selection, but this might fail
- - `password` - (_Optional_) The plain text password to assign to the 'Administrator' account during customization
+ - `administrator_password` - (_Optional_) The plain text password to assign to the 'Administrator' account during customization
 
 On guest customizations after Windows Vista the machine SID will be regenerated to avoid conflicts.
 
