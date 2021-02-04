@@ -185,11 +185,20 @@ class Support
         ERROR
       end
 
+      customization_pass = nil
+      if guest_customization[:administrator_password]
+        customization_pass = RbVmomi::VIM::CustomizationPassword.new(
+          plainText: true,
+          value: guest_customization[:administrator_password]
+        )
+      end
+
       RbVmomi::VIM::CustomizationSysprep.new(
         guiUnattended: RbVmomi::VIM::CustomizationGuiUnattended.new(
           timeZone: timezone.to_i || DEFAULT_WINDOWS_TIMEZONE,
           autoLogon: false,
-          autoLogonCount: 1
+          autoLogonCount: 1,
+          password: customization_pass
         ),
         identification: RbVmomi::VIM::CustomizationIdentification.new,
         userData: RbVmomi::VIM::CustomizationUserData.new(
