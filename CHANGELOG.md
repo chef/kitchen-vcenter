@@ -1,31 +1,28 @@
 # Change Log
 
-<!-- latest_release 2.9.8 -->
-## [v2.9.8](https://github.com/chef/kitchen-vcenter/tree/v2.9.8) (2021-02-04)
-
-#### Merged Pull Requests
-- Add windows password customization [#136](https://github.com/chef/kitchen-vcenter/pull/136) ([lomeroe](https://github.com/lomeroe))
 <!-- latest_release -->
-<!-- release_rollup since=2.9.0 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Add windows password customization [#136](https://github.com/chef/kitchen-vcenter/pull/136) ([lomeroe](https://github.com/lomeroe)) <!-- 2.9.8 -->
-- Update chefstyle requirement from 1.6.1 to 1.6.2 [#134](https://github.com/chef/kitchen-vcenter/pull/134) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.9.7 -->
-- Update chefstyle requirement from 1.5.9 to 1.6.1 [#133](https://github.com/chef/kitchen-vcenter/pull/133) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.9.6 -->
-- Update chefstyle requirement from 1.5.8 to 1.5.9 [#131](https://github.com/chef/kitchen-vcenter/pull/131) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.9.5 -->
-- Update chefstyle requirement from 1.5.7 to 1.5.8 [#130](https://github.com/chef/kitchen-vcenter/pull/130) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.9.4 -->
-- Update chefstyle requirement from 1.5.1 to 1.5.2 [#127](https://github.com/chef/kitchen-vcenter/pull/127) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.9.3 -->
-- Update chefstyle requirement from 1.5.0 to 1.5.1 [#126](https://github.com/chef/kitchen-vcenter/pull/126) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.9.2 -->
-- Update chefstyle requirement from 1.4.5 to 1.5.0 [#125](https://github.com/chef/kitchen-vcenter/pull/125) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.9.1 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.9.8](https://github.com/chef/kitchen-vcenter/tree/v2.9.8) (2021-02-04)
+
+#### Merged Pull Requests
+- Update chefstyle requirement from 1.4.5 to 1.5.0 [#125](https://github.com/chef/kitchen-vcenter/pull/125) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from 1.5.0 to 1.5.1 [#126](https://github.com/chef/kitchen-vcenter/pull/126) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from 1.5.1 to 1.5.2 [#127](https://github.com/chef/kitchen-vcenter/pull/127) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from 1.5.7 to 1.5.8 [#130](https://github.com/chef/kitchen-vcenter/pull/130) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from 1.5.8 to 1.5.9 [#131](https://github.com/chef/kitchen-vcenter/pull/131) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from 1.5.9 to 1.6.1 [#133](https://github.com/chef/kitchen-vcenter/pull/133) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from 1.6.1 to 1.6.2 [#134](https://github.com/chef/kitchen-vcenter/pull/134) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Add windows password customization [#136](https://github.com/chef/kitchen-vcenter/pull/136) ([lomeroe](https://github.com/lomeroe))
+<!-- latest_stable_release -->
+
 ## [v2.9.0](https://github.com/chef/kitchen-vcenter/tree/v2.9.0) (2020-10-30)
 
 #### Merged Pull Requests
 - Add Windows guest customization [#124](https://github.com/chef/kitchen-vcenter/pull/124) ([tecracer-theinen](https://github.com/tecracer-theinen))
-<!-- latest_stable_release -->
 
 ## [v2.8.6](https://github.com/chef/kitchen-vcenter/tree/v2.8.6) (2020-10-22)
 
