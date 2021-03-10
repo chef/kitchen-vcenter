@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.9.9 -->
-## [v2.9.9](https://github.com/chef/kitchen-vcenter/tree/v2.9.9) (2021-02-16)
+<!-- latest_release 2.9.10 -->
+## [v2.9.10](https://github.com/chef/kitchen-vcenter/tree/v2.9.10) (2021-03-10)
 
 #### Merged Pull Requests
-- Update chefstyle requirement from 1.6.2 to 1.7.1 [#137](https://github.com/chef/kitchen-vcenter/pull/137) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from 1.7.1 to 1.7.2 [#138](https://github.com/chef/kitchen-vcenter/pull/138) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=2.9.8 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from 1.7.1 to 1.7.2 [#138](https://github.com/chef/kitchen-vcenter/pull/138) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.9.10 -->
 - Update chefstyle requirement from 1.6.2 to 1.7.1 [#137](https://github.com/chef/kitchen-vcenter/pull/137) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 2.9.9 -->
 <!-- release_rollup -->
 
