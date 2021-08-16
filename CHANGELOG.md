@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.10.1 -->
+## [v2.10.1](https://github.com/chef/kitchen-vcenter/tree/v2.10.1) (2021-08-16)
+
+#### Merged Pull Requests
+- Fix error handling and maintenance mode [#150](https://github.com/chef/kitchen-vcenter/pull/150) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.10.0 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Fix error handling and maintenance mode [#150](https://github.com/chef/kitchen-vcenter/pull/150) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.10.1 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
