@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.10.1 -->
-## [v2.10.1](https://github.com/chef/kitchen-vcenter/tree/v2.10.1) (2021-08-16)
+<!-- latest_release 2.10.2 -->
+## [v2.10.2](https://github.com/chef/kitchen-vcenter/tree/v2.10.2) (2021-08-16)
 
 #### Merged Pull Requests
-- Fix error handling and maintenance mode [#150](https://github.com/chef/kitchen-vcenter/pull/150) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Fix CI failures / nuke some dev deps [#151](https://github.com/chef/kitchen-vcenter/pull/151) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 <!-- release_rollup since=2.10.0 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Fix CI failures / nuke some dev deps [#151](https://github.com/chef/kitchen-vcenter/pull/151) ([tas50](https://github.com/tas50)) <!-- 2.10.2 -->
 - Fix error handling and maintenance mode [#150](https://github.com/chef/kitchen-vcenter/pull/150) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.10.1 -->
 <!-- release_rollup -->
 
