@@ -3,21 +3,18 @@ source "https://rubygems.org"
 gemspec
 
 group :development do
-  gem "guard"
-  gem "guard-shell"
   gem "rake"
   gem "chefstyle", "2.0.8"
-end
-
-group :docs do
-  gem "github-markup"
-  gem "redcarpet"
-  gem "yard"
+  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.6") # Remove this entirely once Ruby 2.5 support ends
+    gem "chef-utils", "< 16.7"
+  end
 end
 
 group :debug do
   gem "pry"
   gem "pry-byebug"
-  gem "pry-stack_explorer"
+  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.6") # Remove this pin once Ruby 2.5 support ends
+    gem "pry-stack_explorer", "< 0.5"
+  end
   gem "rb-readline"
 end
