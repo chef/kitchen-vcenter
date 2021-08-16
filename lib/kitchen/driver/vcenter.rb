@@ -16,6 +16,7 @@
 #
 
 require "kitchen"
+require "rbvmomi"
 require "vsphere-automation-cis"
 require "vsphere-automation-vcenter"
 require_relative "../../kitchen-vcenter/version"
@@ -29,7 +30,16 @@ module Kitchen
   module Driver
     # Extends the Base class for vCenter
     class Vcenter < Kitchen::Driver::Base
+      class UnauthenticatedError < RuntimeError; end
+      class ResourceMissingError < RuntimeError; end
+      class ResourceAmbiguousError < RuntimeError; end
+
       attr_accessor :connection_options, :ipaddress, :api_client
+
+      UNAUTH_CLASSES = [
+        VSphereAutomation::CIS::VapiStdErrorsUnauthenticated,
+        VSphereAutomation::VCenter::VapiStdErrorsUnauthenticated,
+      ].freeze
 
       required_config :vcenter_username
       required_config :vcenter_password
@@ -106,6 +116,7 @@ module Kitchen
             config[:resource_pool] = root_pool
           else
             rp_api = VSphereAutomation::VCenter::ResourcePoolApi.new(api_client)
+            raise_if_unauthenticated rp_api, "checking for resource pools"
 
             found_pool = nil
             pools = rp_api.get(root_pool).value.resource_pools
@@ -114,7 +125,7 @@ module Kitchen
               found_pool = pool if name == config[:resource_pool]
             end
 
-            raise format("Pool %s not found on cluster %s", config[:resource_pool], config[:cluster]) if found_pool.nil?
+            raise_if_missing found_pool, format("Resource pool `%s` not found on cluster `%s`", config[:resource_pool], config[:cluster])
 
             config[:resource_pool] = found_pool
           end
@@ -130,7 +141,6 @@ module Kitchen
         datacenter = get_datacenter(dc_folder, dc_name)
         cluster_id = get_cluster_id(config[:cluster])
 
-        # Using the clone class, create a machine for TK
         # Find the identifier for the targethost to pass to rbvmomi
         config[:targethost] = get_host(config[:targethost], datacenter, cluster_id)
 
@@ -144,6 +154,9 @@ module Kitchen
             id: get_folder(config[:folder], "VIRTUAL_MACHINE", datacenter),
           }
         end
+
+        # Check for valid tags before cloning
+        vm_tags = map_tags(config[:tags])
 
         # Allow different clone types
         config[:clone_type] = :linked if config[:clone_type] == "linked"
@@ -186,7 +199,7 @@ module Kitchen
 
         rescue # Kitchen::ActionFailed => e
           if config[:vm_rollback] == true
-            error format("Rolling back VM %s after critical error", config[:vm_name])
+            error format("Rolling back VM `%s` after critical error", config[:vm_name])
 
             # Inject name of failed VM for destroy to work
             state[:vm_name] = config[:vm_name]
@@ -197,31 +210,18 @@ module Kitchen
           raise
         end
 
-        unless config[:tags].nil? || config[:tags].empty?
-          tag_api = VSphereAutomation::CIS::TaggingTagApi.new(api_client)
-          vm_tags = tag_api.list.value
-          raise format("No configured tags found on VCenter, but %s specified", config[:tags].to_s) if vm_tags.empty?
-
-          valid_tags = {}
-          vm_tags.each do |uid|
-            tag = tag_api.get(uid)
-
-            valid_tags[tag.value.name] = tag.value.id if tag.is_a? VSphereAutomation::CIS::CisTaggingTagResult
-          end
-
-          # Error out on undefined tags
-          invalid = config[:tags] - valid_tags.keys
-          raise format("Specified tag(s) %s not valid", invalid.join(",")) unless invalid.empty?
+        if vm_tags
+          debug format("Setting tags on machine: `%s`", vm_tags.keys.join("`, `"))
 
           tag_service = VSphereAutomation::CIS::TaggingTagAssociationApi.new(api_client)
-          tag_ids = config[:tags].map { |name| valid_tags[name] }
+          raise_if_unauthenticated tag_service, "connecting to tagging service"
 
           request_body = {
             object_id: {
               id: get_vm(config[:vm_name]).vm,
               type: "VirtualMachine",
             },
-            tag_ids: tag_ids,
+            tag_ids: vm_tags.values,
           }
           tag_service.attach_multiple_tags_to_object(request_body)
         end
@@ -243,6 +243,7 @@ module Kitchen
         vm = get_vm(state[:vm_name])
         unless vm.nil?
           vm_api = VSphereAutomation::VCenter::VMApi.new(api_client)
+          raise_if_unauthenticated vm_api, "connecting to VM API"
 
           # shut the machine down if it is running
           if vm.power_state == "POWERED_ON"
@@ -296,17 +297,69 @@ module Kitchen
         state.key?(property) && !state[property].nil?
       end
 
+      # Handle the non-ruby way of the SDK to report errors.
+      #
+      # @param api_response [Object] a generic API response class, which might include an error type
+      # @param message [String] description to output in case of error
+      # @raise UnauthenticatedError
+      def raise_if_unauthenticated(api_response, message)
+        session_id = api_response.api_client.default_headers["vmware-api-session-id"]
+        return unless UNAUTH_CLASSES.include? session_id.class
+
+        message = format("Authentication or permissions error on %s", message)
+        raise UnauthenticatedError.new(message)
+      end
+
+      # Handle missing resources in a query.
+      #
+      # @param collection [Enumerable] list which is supposed to have at least one entry
+      # @param message [String] description to output in case of error
+      # @raise ResourceMissingError
+      def raise_if_missing(collection, message)
+        return unless collection.nil? || collection.empty?
+
+        raise ResourceMissingError.new(message)
+      end
+
+      # Handle ambiguous resources in a query.
+      #
+      # @param collection [Enumerable] list which is supposed to one entry at most
+      # @param message [String] description to output in case of error
+      # @raise ResourceAmbiguousError
+      def raise_if_ambiguous(collection, message)
+        return unless collection.length > 1
+
+        raise ResourceAmbiguousError.new(message)
+      end
+
+      # Access to legacy SOAP based vMOMI API for some functionality
+      #
+      # @return [RbVmomi::VIM] VIM instance
+      def vim
+        @vim ||= RbVmomi::VIM.connect(connection_options)
+      end
+
+      # Search host data via vMOMI
+      #
+      # @param moref [String] identifier of a host system ("host-xxxx")
+      # @return [RbVmomi::VIM::HostSystem]
+      def host_by_moref(moref)
+        vim.serviceInstance.content.hostSpecManager.RetrieveHostSpecification(host: moref, fromHost: false).host
+      end
+
       # Sees in the datacenter exists or not
       #
       # @param [folder] folder is the name of the folder in which the Datacenter is stored in inventory, possibly nil
       # @param [name] name is the name of the datacenter
       def datacenter_exists?(folder, name)
         dc_api = VSphereAutomation::VCenter::DatacenterApi.new(api_client)
+        raise_if_unauthenticated dc_api, "checking for datacenter `#{name}`"
+
         opts = { filter_names: name }
         opts[:filter_folders] = get_folder(folder, "DATACENTER") if folder
         dcs = dc_api.list(opts).value
 
-        raise format("Unable to find data center: %s", name) if dcs.empty?
+        raise_if_missing dcs, format("Unable to find data center `%s`", name)
       end
 
       # Checks if a network exists or not
@@ -314,9 +367,43 @@ module Kitchen
       # @param [name] name is the name of the Network
       def network_exists?(name)
         net_api = VSphereAutomation::VCenter::NetworkApi.new(api_client)
+        raise_if_unauthenticated net_api, "checking for VM network `#{name}`"
+
         nets = net_api.list({ filter_names: name }).value
 
-        raise format("Unable to find target network: %s", name) if nets.empty?
+        raise_if_missing nets, format("Unable to find target network: `%s`", name)
+      end
+
+      # Map VCenter tag names to URNs (VCenter needs tags to be predefined)
+      #
+      # @param tags [tags] tags is the list of tags to associate
+      # @return [Hash] mapping of VCenter tag name to URN
+      # @raise UnauthenticatedError
+      # @raise ResourceMissingError
+      def map_tags(tags)
+        return nil if tags.nil? || tags.empty?
+
+        tag_api = VSphereAutomation::CIS::TaggingTagApi.new(api_client)
+        raise_if_unauthenticated tag_api, "checking for tags"
+
+        vm_tags = tag_api.list.value
+        raise_if_missing vm_tags, format("No configured tags found on VCenter, but `%s` specified", config[:tags].to_s)
+
+        # Create list of all VCenter defined tags, associated with their internal ID
+        valid_tags = {}
+        vm_tags.each do |uid|
+          tag = tag_api.get(uid)
+
+          valid_tags[tag.value.name] = tag.value.id if tag.is_a? VSphereAutomation::CIS::CisTaggingTagResult
+        end
+
+        invalid = config[:tags] - valid_tags.keys
+        unless invalid.empty?
+          message = format("Specified tag(s) `%s` not preconfigured on VCenter", invalid.join("`, `"))
+          raise ResourceMissingError.new(message)
+        end
+
+        valid_tags.select { |tag, _urn| config[:tags].include? tag }
       end
 
       # Validates the host name of the server you can connect to
@@ -325,15 +412,31 @@ module Kitchen
       def get_host(name, datacenter, cluster = nil)
         # create a host object to work with
         host_api = VSphereAutomation::VCenter::HostApi.new(api_client)
+        raise_if_unauthenticated host_api, "checking for target host `#{name || "(any)"}`"
 
         hosts = host_api.list({ filter_names: name,
                                 filter_datacenters: datacenter,
                                 filter_clusters: cluster,
                                 filter_connection_states: ["CONNECTED"] }).value
 
-        raise format("Unable to find target host: %s", name) if hosts.empty?
+        raise_if_missing hosts, format("Unable to find target host `%s`", name || "(any)")
 
-        hosts.sample
+        filter_maintenance!(hosts)
+        raise_if_missing hosts, "Unable to find active target host in datacenter (check maintenance mode?)"
+
+        # Randomize returned hosts
+        host = hosts.sample
+        debug format("Selected host `%s` randomly for deployment", host.name)
+
+        host
+      end
+
+      def filter_maintenance!(hosts)
+        # Exclude hosts which are in maintenance mode (via SOAP API only)
+        hosts.reject! do |hostinfo|
+          host = host_by_moref(hostinfo.host)
+          host.runtime.inMaintenanceMode
+        end
       end
 
       # Gets the folder you want to create the VM
@@ -343,6 +446,8 @@ module Kitchen
       # @param [datacenter] datacenter is the datacenter of the folder
       def get_folder(name, type = "VIRTUAL_MACHINE", datacenter = nil)
         folder_api = VSphereAutomation::VCenter::FolderApi.new(api_client)
+        raise_if_unauthenticated folder_api, "checking for folder `#{name}`"
+
         parent_path, basename = File.split(name)
         filter = { filter_names: basename, filter_type: type }
         filter[:filter_datacenters] = datacenter if datacenter
@@ -350,9 +455,8 @@ module Kitchen
 
         folders = folder_api.list(filter).value
 
-        raise format("Unable to find folder: %s", basename) if folders.empty?
-
-        raise format("`%s` returned too many folders", basename) if folders.length > 1
+        raise_if_missing folders, format("Unable to find VM/template folder: `%s`", basename)
+        raise_if_ambiguous folders, format("`%s` returned too many VM/template folders", basename)
 
         folders.first.folder
       end
@@ -362,7 +466,12 @@ module Kitchen
       # @param [name] name is the name of the VM
       def get_vm(name)
         vm_api = VSphereAutomation::VCenter::VMApi.new(api_client)
+        raise_if_unauthenticated vm_api, "checking for VM `#{name}`"
+
         vms = vm_api.list({ filter_names: name }).value
+
+        raise_if_missing vms, format("Unable to find VM `%s`", name)
+        raise_if_ambiguous vms, format("`%s` returned too many VMs", name)
 
         vms.first
       end
@@ -373,13 +482,14 @@ module Kitchen
       # @param [name] name is the name of the Datacenter
       def get_datacenter(folder, name)
         dc_api = VSphereAutomation::VCenter::DatacenterApi.new(api_client)
+        raise_if_unauthenticated dc_api, "checking for datacenter `#{name}` in folder `#{folder}`"
+
         opts = { filter_names: name }
         opts[:filter_folders] = get_folder(folder, "DATACENTER") if folder
         dcs = dc_api.list(opts).value
 
-        raise format("Unable to find data center: %s", name) if dcs.empty?
-
-        raise format("%s returned too many data centers", name) if dcs.length > 1
+        raise_if_missing dcs, format("Unable to find data center: `%s`", name)
+        raise_if_ambiguous dcs, format("`%s` returned too many data centers", name)
 
         dcs.first.datacenter
       end
@@ -391,11 +501,12 @@ module Kitchen
         return if name.nil?
 
         cluster_api = VSphereAutomation::VCenter::ClusterApi.new(api_client)
+        raise_if_unauthenticated cluster_api, "checking for ID of cluster `#{name}`"
+
         clusters = cluster_api.list({ filter_names: name }).value
 
-        raise format("Unable to find Cluster: %s", name) if clusters.empty?
-
-        raise format("%s returned too many clusters", name) if clusters.length > 1
+        raise_if_missing clusters, format("Unable to find Cluster: `%s`", name)
+        raise_if_ambiguous clusters, format("`%s` returned too many clusters", name)
 
         clusters.first.cluster
       end
@@ -407,9 +518,11 @@ module Kitchen
         cluster_id = get_cluster_id(name)
 
         host_api = VSphereAutomation::VCenter::HostApi.new(api_client)
-        hosts = host_api.list({ filter_clusters: cluster_id, connection_states: "CONNECTED" }).value
+        raise_if_unauthenticated host_api, "checking for cluster `#{name}`"
 
-        raise format("Unable to find active host in cluster %s", name) if hosts.empty?
+        hosts = host_api.list({ filter_clusters: cluster_id, connection_states: "CONNECTED" }).value
+        filter_maintenance!(hosts)
+        raise_if_missing hosts, format("Unable to find active hosts in cluster `%s`", name)
 
         cluster_api = VSphereAutomation::VCenter::ClusterApi.new(api_client)
         cluster_api.get(cluster_id).value
@@ -422,6 +535,7 @@ module Kitchen
       def get_resource_pool(name)
         # Create a resource pool object
         rp_api = VSphereAutomation::VCenter::ResourcePoolApi.new(api_client)
+        raise_if_unauthenticated rp_api, "checking for resource pool `#{name || "(default)"}`"
 
         # If no name has been set, use the first resource pool that can be found,
         # otherwise try to find by given name
@@ -446,7 +560,7 @@ module Kitchen
           debug("Search for resource pools found: " + resource_pools.map(&:name).to_s)
         end
 
-        raise format("Unable to find Resource Pool: %s", name) if resource_pools.empty?
+        raise_if_missing resource_pools, format("Unable to find resource pool `%s`", name || "(default)")
 
         resource_pools.first.resource_pool
       end
