@@ -1,20 +1,18 @@
 # Change Log
 
-<!-- latest_release 2.10.2 -->
-## [v2.10.2](https://github.com/chef/kitchen-vcenter/tree/v2.10.2) (2021-08-16)
-
-#### Merged Pull Requests
-- Fix CI failures / nuke some dev deps [#151](https://github.com/chef/kitchen-vcenter/pull/151) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
-<!-- release_rollup since=2.10.0 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Fix CI failures / nuke some dev deps [#151](https://github.com/chef/kitchen-vcenter/pull/151) ([tas50](https://github.com/tas50)) <!-- 2.10.2 -->
-- Fix error handling and maintenance mode [#150](https://github.com/chef/kitchen-vcenter/pull/150) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.10.1 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.10.2](https://github.com/chef/kitchen-vcenter/tree/v2.10.2) (2021-08-16)
+
+#### Merged Pull Requests
+- Fix error handling and maintenance mode [#150](https://github.com/chef/kitchen-vcenter/pull/150) ([tecracer-theinen](https://github.com/tecracer-theinen))
+- Fix CI failures / nuke some dev deps [#151](https://github.com/chef/kitchen-vcenter/pull/151) ([tas50](https://github.com/tas50))
+<!-- latest_stable_release -->
+
 ## [v2.10.0](https://github.com/chef/kitchen-vcenter/tree/v2.10.0) (2021-07-02)
 
 #### Merged Pull Requests
@@ -23,7 +21,6 @@
 - Update chefstyle requirement from 1.7.2 to 1.7.5 [#140](https://github.com/chef/kitchen-vcenter/pull/140) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 - Upgrade to GitHub-native Dependabot [#142](https://github.com/chef/kitchen-vcenter/pull/142) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 - Support Test Kitchen 3.0 / Require Ruby 2.5+ [#145](https://github.com/chef/kitchen-vcenter/pull/145) ([tas50](https://github.com/tas50))
-<!-- latest_stable_release -->
 
 ## [v2.9.8](https://github.com/chef/kitchen-vcenter/tree/v2.9.8) (2021-02-04)
 
