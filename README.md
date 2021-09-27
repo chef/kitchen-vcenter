@@ -149,6 +149,9 @@ The following `vm_customization` (previously `customize`) subkeys for VM customi
  - `annotation` - Notes to attach to the VM (requires VirtualMachine.Config.Rename)
  - `memoryMB` - Memory size to set in Megabytes (requires VirtualMachine.Config.Memory)
  - `numCPUs` - Number of CPUs to assign (requires VirtualMachine.Config.CpuCount)
+ - `guestinfo.*` - Adds guestinfo to the VM, e.g.
+   - `guestinfo.my.thing`
+   - `guestinfo.other.thing`
  - `add_disks` - Array of disks to add to the VM (requires VirtualMachine.Config.AddNewDisk).
    Keys per disk: `type` (default: `thin`, other values: `flat`/`flat_lazy` or `flat_eager`), `size_mb` in MB (default: 10 GB)
 

@@ -393,6 +393,12 @@ class Support
         end
       end
 
+      guestinfo = options[:vm_customization].select { |key, _| key =~ /^guestinfo\..*/ }
+      unless guestinfo.empty?
+        gi = guestinfo.map { |k, v| { key: k, value: v } }
+        config[:extraConfig] = gi
+      end
+
       config_spec = RbVmomi::VIM.VirtualMachineConfigSpec(config)
 
       task = vm.ReconfigVM_Task(spec: config_spec)
