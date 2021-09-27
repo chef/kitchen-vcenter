@@ -37,7 +37,7 @@ driver:
   vcenter_password: <%= ENV['VCENTER_PASSWORD'] %>
   vcenter_host:  <%= ENV['VCENTER_HOST'] %>
   vcenter_disable_ssl_verify: true
-  customize:
+  vm_customization:
     annotation: "Kitchen VM by <%= ENV['USER'] %> on <%= Time.now.to_s %>"
 
 provisioner:
@@ -78,7 +78,7 @@ platforms:
       network_name: "Internal"
       template: folder/windows2012R2-template
       datacenter: "Datacenter"
-      customize:
+      vm_customization:
         numCPUs: 4
         memoryMB: 1024
         add_disks:
@@ -129,7 +129,7 @@ The following optional parameters should be used in the `driver` for the platfor
  - `clone_type` - Type of clone, use "full" to create complete copies of template. Values: "full", "linked", "instant". Default: "full"
  - `network_name` - Network to reconfigure the first interface to, needs a VM Network name. Default: do not change
  - `tags` - Array of pre-defined vCenter tag names to assign (VMware tags are not key/value pairs). Default: none
- - `customize` - Dictionary customizations like annotation, memoryMB or numCPUs (see below for details). Default: none
+ - `vm_customization` - Dictionary customizations like annotation, memoryMB or numCPUs (see below for details). Default: none
  - `interface`- VM Network name to use for kitchen connections. Default: not set = first interface with usable IP
 
  The following optional parameters are relevant for active IP discovery.
@@ -249,9 +249,9 @@ Required prilveges:
 - VirtualMachine.Provisioning.Clone
 - VirtualMachine.Provisioning.DeployTemplate
 
-- VirtualMachine.Config.Annotation (depending on `customize` parameters)
-- VirtualMachine.Config.CPUCount (depending on `customize` parameters)
-- VirtualMachine.Config.Memory (depending on `customize` parameters)
+- VirtualMachine.Config.Annotation (depending on `vm_customization` parameters)
+- VirtualMachine.Config.CPUCount (depending on `vm_customization` parameters)
+- VirtualMachine.Config.Memory (depending on `vm_customization` parameters)
 - VirtualMachine.Config.EditDevice (if `network_name` is used)
 - DVSwitch.CanUse (if `network_name` is used with dVS/lVS)
 - DVPortgroup.CanUse (if `network_name` is used with dVS/lVS)
