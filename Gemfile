@@ -4,6 +4,7 @@ gemspec
 
 group :development do
   gem "rake"
+  gem "rspec"
   gem "chefstyle", "2.0.9"
   if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.6") # Remove this entirely once Ruby 2.5 support ends
     gem "chef-utils", "< 16.7"
