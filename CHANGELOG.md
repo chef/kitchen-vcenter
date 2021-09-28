@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.10.3 -->
-## [v2.10.3](https://github.com/chef/kitchen-vcenter/tree/v2.10.3) (2021-08-27)
+<!-- latest_release 2.11.0 -->
+## [v2.11.0](https://github.com/chef/kitchen-vcenter/tree/v2.11.0) (2021-09-28)
 
 #### Merged Pull Requests
-- Update chefstyle requirement from 2.0.8 to 2.0.9 [#152](https://github.com/chef/kitchen-vcenter/pull/152) ([dependabot[bot]](https://github.com/dependabot[bot]))
+- Enable setting guestinfo [#153](https://github.com/chef/kitchen-vcenter/pull/153) ([jasonwbarnett](https://github.com/jasonwbarnett))
 <!-- latest_release -->
 <!-- release_rollup since=2.10.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Enable setting guestinfo [#153](https://github.com/chef/kitchen-vcenter/pull/153) ([jasonwbarnett](https://github.com/jasonwbarnett)) <!-- 2.11.0 -->
 - Update chefstyle requirement from 2.0.8 to 2.0.9 [#152](https://github.com/chef/kitchen-vcenter/pull/152) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.10.3 -->
 <!-- release_rollup -->
 
