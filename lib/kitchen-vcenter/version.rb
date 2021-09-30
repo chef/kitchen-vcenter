@@ -20,5 +20,5 @@
 # The main kitchen-vcenter module
 module KitchenVcenter
   # The version of this version of test-kitchen we assume enterprises want.
-  VERSION = "2.11.0"
+  VERSION = "2.11.1"
 end
