@@ -16,7 +16,7 @@ Please refer to the [CHANGELOG](CHANGELOG.md) for version history and known issu
 
 ## Requirements
 
-- Ruby 2.5 or higher
+- Ruby 2.6 or higher
 - VMware vCenter/vSphere 5.5 or higher
 - VMs or templates to clone, with open-vm-tools installed
 - DHCP server to assign IPs to kitchen instances
