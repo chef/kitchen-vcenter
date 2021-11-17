@@ -5,7 +5,7 @@ gemspec
 group :development do
   gem "rake"
   gem "rspec"
-  gem "chefstyle", "2.1.0"
+  gem "chefstyle", "2.1.3"
 end
 
 group :debug do
