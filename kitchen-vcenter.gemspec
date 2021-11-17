@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.files         = Dir["LICENSE", "lib/**/*"]
   spec.require_paths = ["lib"]
 
-  spec.required_ruby_version = ">= 2.5"
+  spec.required_ruby_version = ">= 2.6"
 
   spec.add_dependency "net-ping", ">= 2.0.0", "< 3.0"
   spec.add_dependency "rbvmomi", ">= 1.11", "< 4.0"
