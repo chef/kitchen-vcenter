@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.11.2 -->
-## [v2.11.2](https://github.com/chef/kitchen-vcenter/tree/v2.11.2) (2021-11-17)
+<!-- latest_release 2.11.3 -->
+## [v2.11.3](https://github.com/chef/kitchen-vcenter/tree/v2.11.3) (2021-11-17)
 
 #### Merged Pull Requests
-- Remove EOL Ruby 2.5 references [#158](https://github.com/chef/kitchen-vcenter/pull/158) ([vkarve-chef](https://github.com/vkarve-chef))
+- Update chefstyle requirement from 2.1.0 to 2.1.3 [#157](https://github.com/chef/kitchen-vcenter/pull/157) ([dependabot[bot]](https://github.com/dependabot[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=2.11.0 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from 2.1.0 to 2.1.3 [#157](https://github.com/chef/kitchen-vcenter/pull/157) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.11.3 -->
 - Remove EOL Ruby 2.5 references [#158](https://github.com/chef/kitchen-vcenter/pull/158) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 2.11.2 -->
 - Update chefstyle requirement from 2.0.9 to 2.1.0 [#154](https://github.com/chef/kitchen-vcenter/pull/154) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.11.1 -->
 <!-- release_rollup -->
