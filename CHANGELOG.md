@@ -1,28 +1,25 @@
 # Change Log
 
-<!-- latest_release 2.11.4 -->
-## [v2.11.4](https://github.com/chef/kitchen-vcenter/tree/v2.11.4) (2021-11-22)
-
-#### Merged Pull Requests
-- Fix cloning of machines without network interface [#160](https://github.com/chef/kitchen-vcenter/pull/160) ([tecracer-theinen](https://github.com/tecracer-theinen))
 <!-- latest_release -->
-<!-- release_rollup since=2.11.0 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Fix cloning of machines without network interface [#160](https://github.com/chef/kitchen-vcenter/pull/160) ([tecracer-theinen](https://github.com/tecracer-theinen)) <!-- 2.11.4 -->
-- Update chefstyle requirement from 2.1.0 to 2.1.3 [#157](https://github.com/chef/kitchen-vcenter/pull/157) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.11.3 -->
-- Remove EOL Ruby 2.5 references [#158](https://github.com/chef/kitchen-vcenter/pull/158) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 2.11.2 -->
-- Update chefstyle requirement from 2.0.9 to 2.1.0 [#154](https://github.com/chef/kitchen-vcenter/pull/154) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.11.1 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.11.4](https://github.com/chef/kitchen-vcenter/tree/v2.11.4) (2021-11-22)
+
+#### Merged Pull Requests
+- Update chefstyle requirement from 2.0.9 to 2.1.0 [#154](https://github.com/chef/kitchen-vcenter/pull/154) ([dependabot[bot]](https://github.com/dependabot[bot]))
+- Remove EOL Ruby 2.5 references [#158](https://github.com/chef/kitchen-vcenter/pull/158) ([vkarve-chef](https://github.com/vkarve-chef))
+- Update chefstyle requirement from 2.1.0 to 2.1.3 [#157](https://github.com/chef/kitchen-vcenter/pull/157) ([dependabot[bot]](https://github.com/dependabot[bot]))
+- Fix cloning of machines without network interface [#160](https://github.com/chef/kitchen-vcenter/pull/160) ([tecracer-theinen](https://github.com/tecracer-theinen))
+<!-- latest_stable_release -->
+
 ## [v2.11.0](https://github.com/chef/kitchen-vcenter/tree/v2.11.0) (2021-09-28)
 
 #### Merged Pull Requests
 - Update chefstyle requirement from 2.0.8 to 2.0.9 [#152](https://github.com/chef/kitchen-vcenter/pull/152) ([dependabot[bot]](https://github.com/dependabot[bot]))
 - Enable setting guestinfo [#153](https://github.com/chef/kitchen-vcenter/pull/153) ([jasonwbarnett](https://github.com/jasonwbarnett))
-<!-- latest_stable_release -->
 
 ## [v2.10.2](https://github.com/chef/kitchen-vcenter/tree/v2.10.2) (2021-08-16)
 
