@@ -184,6 +184,8 @@ class Support
 
     def reconnect_network_device(vm)
       network_device = network_device(vm)
+      return unless network_device
+
       network_device.connectable = RbVmomi::VIM.VirtualDeviceConnectInfo(
         allowGuestControl: true,
         startConnected: true,
@@ -502,13 +504,15 @@ class Support
       relocate_spec.pool = options[:resource_pool]
 
       # Change network, if wanted
-      unless options[:network_name].nil?
+      network_device = network_device(src_vm)
+      Kitchen.logger.warn format("Source VM/template does not have any network device (use VMware IPPools and vsphere-gom transport or govc to access)") unless network_device
+
+      unless network_device.nil? || options[:network_name].nil?
         networks = dc.network.select { |n| n.name == options[:network_name] }
         raise Support::CloneError.new(format("Could not find network named %s", options[:network_name])) if networks.empty?
 
         Kitchen.logger.warn format("Found %d networks named %s, picking first one", networks.count, options[:network_name]) if networks.count > 1
         network_obj = networks.first
-        network_device = network_device(src_vm)
 
         if network_obj.is_a? RbVmomi::VIM::DistributedVirtualPortgroup
           Kitchen.logger.info format("Assigning network %s...", network_obj.pretty_path)
@@ -572,19 +576,20 @@ class Support
         # MAC at least with 6.7.0 build 9433931
 
         # Disconnect network device, so wo don't get IP collisions on start
-        network_device = network_device(src_vm)
-        network_device.connectable = RbVmomi::VIM.VirtualDeviceConnectInfo(
-          allowGuestControl: true,
-          startConnected: true,
-          connected: false,
-          migrateConnect: "disconnect"
-        )
-        relocate_spec.deviceChange = [
-          RbVmomi::VIM.VirtualDeviceConfigSpec(
-            operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
-            device: network_device
-          ),
-        ]
+        if network_device
+          network_device.connectable = RbVmomi::VIM.VirtualDeviceConnectInfo(
+            allowGuestControl: true,
+            startConnected: true,
+            connected: false,
+            migrateConnect: "disconnect"
+          )
+          relocate_spec.deviceChange = [
+            RbVmomi::VIM.VirtualDeviceConfigSpec(
+              operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
+              device: network_device
+            ),
+          ]
+        end
 
         clone_spec = RbVmomi::VIM.VirtualMachineInstantCloneSpec(location: relocate_spec,
                                                                  name: vm_name)
