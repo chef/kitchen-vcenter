@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.11.5 -->
+## [v2.11.5](https://github.com/chef/kitchen-vcenter/tree/v2.11.5) (2022-02-09)
+
+#### Merged Pull Requests
+- Use chefstyle linting [#165](https://github.com/chef/kitchen-vcenter/pull/165) ([sanjain-progress](https://github.com/sanjain-progress))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.11.4 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Use chefstyle linting [#165](https://github.com/chef/kitchen-vcenter/pull/165) ([sanjain-progress](https://github.com/sanjain-progress)) <!-- 2.11.5 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
