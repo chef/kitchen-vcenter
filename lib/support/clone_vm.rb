@@ -507,41 +507,64 @@ class Support
       network_device = network_device(src_vm)
       Kitchen.logger.warn format("Source VM/template does not have any network device (use VMware IPPools and vsphere-gom transport or govc to access)") unless network_device
 
-      unless network_device.nil? || options[:network_name].nil?
+      # If the network_name option is set, perform add/update network operation
+      unless options[:network_name].nil?
         networks = dc.network.select { |n| n.name == options[:network_name] }
         raise Support::CloneError.new(format("Could not find network named %s", options[:network_name])) if networks.empty?
 
         Kitchen.logger.warn format("Found %d networks named %s, picking first one", networks.count, options[:network_name]) if networks.count > 1
         network_obj = networks.first
 
-        if network_obj.is_a? RbVmomi::VIM::DistributedVirtualPortgroup
-          Kitchen.logger.info format("Assigning network %s...", network_obj.pretty_path)
-
-          vds_obj = network_obj.config.distributedVirtualSwitch
-          Kitchen.logger.info format("Using vDS '%s' for network connectivity...", vds_obj.name)
-
-          network_device.backing = RbVmomi::VIM.VirtualEthernetCardDistributedVirtualPortBackingInfo(
-            port: RbVmomi::VIM.DistributedVirtualSwitchPortConnection(
-              portgroupKey: network_obj.key,
-              switchUuid: vds_obj.uuid
+        # This will add new network to the cloned vm
+        if network_device.nil?
+          relocate_spec.deviceChange = [
+            RbVmomi::VIM.VirtualDeviceConfigSpec(
+              fileOperation: :create,
+              operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation(:add),
+              device: RbVmomi::VIM.VirtualVmxnet3(
+                key: 0,
+                deviceInfo: {
+                  label: network_obj.name,
+                  summary: 'new device' # TODO: For testing
+                },
+                backing: RbVmomi::VIM.VirtualEthernetCardNetworkBackingInfo(
+                  network: network_obj,
+                  deviceName: network_obj.name
+                )
+              )
             )
-          )
-        elsif network_obj.is_a? RbVmomi::VIM::Network
-          Kitchen.logger.info format("Assigning network %s...", options[:network_name])
-
-          network_device.backing = RbVmomi::VIM.VirtualEthernetCardNetworkBackingInfo(
-            deviceName: options[:network_name]
-          )
+          ]
+        # This will update the exiting network to the new network
         else
-          raise Support::CloneError.new(format("Unknown network type %s for network name %s", network_obj.class.to_s, options[:network_name]))
-        end
+          if network_obj.is_a? RbVmomi::VIM::DistributedVirtualPortgroup
+            Kitchen.logger.info format("Assigning network %s...", network_obj.pretty_path)
 
-        relocate_spec.deviceChange = [
-          RbVmomi::VIM.VirtualDeviceConfigSpec(
-            operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
-            device: network_device
-          ),
-        ]
+            vds_obj = network_obj.config.distributedVirtualSwitch
+            Kitchen.logger.info format("Using vDS '%s' for network connectivity...", vds_obj.name)
+
+            network_device.backing = RbVmomi::VIM.VirtualEthernetCardDistributedVirtualPortBackingInfo(
+              port: RbVmomi::VIM.DistributedVirtualSwitchPortConnection(
+                portgroupKey: network_obj.key,
+                switchUuid: vds_obj.uuid
+              )
+            )
+          elsif network_obj.is_a? RbVmomi::VIM::Network
+            Kitchen.logger.info format("Assigning network %s...", options[:network_name])
+
+            network_device.backing = RbVmomi::VIM.VirtualEthernetCardNetworkBackingInfo(
+              deviceName: options[:network_name]
+            )
+          else
+            raise Support::CloneError.new(format("Unknown network type %s for network name %s", network_obj.class.to_s, options[:network_name]))
+          end
+
+          relocate_spec.deviceChange = [
+            RbVmomi::VIM.VirtualDeviceConfigSpec(
+              operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
+              device: network_device
+            ),
+          ]
+        end
       end
 
       # Set the folder to use
