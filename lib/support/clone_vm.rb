@@ -494,8 +494,7 @@ class Support
     #
     # The network_obj will be used as a backing for the network_device.
     def network_change_spec(network_device, network_obj, operation: :edit)
-      case network_obj
-      when RbVmomi::VIM::DistributedVirtualPortgroup
+      if network_obj.is_a? RbVmomi::VIM::DistributedVirtualPortgroup
         Kitchen.logger.info format("Assigning network %s...", network_obj.pretty_path)
 
         vds_obj = network_obj.config.distributedVirtualSwitch
@@ -507,7 +506,7 @@ class Support
             switchUuid: vds_obj.uuid
           )
         )
-      when RbVmomi::VIM::Network
+      elsif network_obj.is_a? RbVmomi::VIM::Network
         Kitchen.logger.info format("Assigning network %s...", options[:network_name])
 
         network_device.backing = RbVmomi::VIM.VirtualEthernetCardNetworkBackingInfo(
