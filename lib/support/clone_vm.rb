@@ -520,7 +520,7 @@ class Support
         RbVmomi::VIM.VirtualDeviceConfigSpec(
           operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation(operation),
           device: network_device
-        )
+        ),
       ]
     end
 
@@ -533,13 +533,13 @@ class Support
         key: 0,
         deviceInfo: {
           label: options[:network_name],
-          summary: options[:network_name]
+          summary: options[:network_name],
         }
       )
 
       config_spec = RbVmomi::VIM.VirtualMachineConfigSpec(
         {
-          deviceChange: network_change_spec(network_device, network_obj, operation: :add)
+          deviceChange: network_change_spec(network_device, network_obj, operation: :add),
         }
       )
 

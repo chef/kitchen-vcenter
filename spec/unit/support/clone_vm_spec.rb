@@ -197,13 +197,13 @@ describe Support::CloneVm do
 
     context "attaching a new vm" do
       before do
-        options[:network_name] = 'my-network'
+        options[:network_name] = "my-network"
 
         allow(subject).to receive(:network_device).and_return(nil)
       end
 
-      context '#add_network?' do
-        it 'should return true' do
+      context "#add_network?" do
+        it "should return true" do
           expect(subject.add_network?(nil)).to be_truthy
         end
       end
