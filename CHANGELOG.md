@@ -1,22 +1,20 @@
 # Change Log
 
-<!-- latest_release 2.11.8 -->
-## [v2.11.8](https://github.com/chef/kitchen-vcenter/tree/v2.11.8) (2022-02-28)
-
-#### Merged Pull Requests
-- Update chefstyle requirement from 2.1.3 to 2.2.2 [#166](https://github.com/chef/kitchen-vcenter/pull/166) ([dependabot[bot]](https://github.com/dependabot[bot]))
 <!-- latest_release -->
-<!-- release_rollup since=2.11.4 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Update chefstyle requirement from 2.1.3 to 2.2.2 [#166](https://github.com/chef/kitchen-vcenter/pull/166) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.11.8 -->
-- Cleanup the readme [#163](https://github.com/chef/kitchen-vcenter/pull/163) ([tas50](https://github.com/tas50)) <!-- 2.11.7 -->
-- Move config docs to kitchen.ci [#164](https://github.com/chef/kitchen-vcenter/pull/164) ([tas50](https://github.com/tas50)) <!-- 2.11.6 -->
-- Use chefstyle linting [#165](https://github.com/chef/kitchen-vcenter/pull/165) ([sanjain-progress](https://github.com/sanjain-progress)) <!-- 2.11.5 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.11.8](https://github.com/chef/kitchen-vcenter/tree/v2.11.8) (2022-02-28)
+
+#### Merged Pull Requests
+- Use chefstyle linting [#165](https://github.com/chef/kitchen-vcenter/pull/165) ([sanjain-progress](https://github.com/sanjain-progress))
+- Move config docs to kitchen.ci [#164](https://github.com/chef/kitchen-vcenter/pull/164) ([tas50](https://github.com/tas50))
+- Cleanup the readme [#163](https://github.com/chef/kitchen-vcenter/pull/163) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from 2.1.3 to 2.2.2 [#166](https://github.com/chef/kitchen-vcenter/pull/166) ([dependabot[bot]](https://github.com/dependabot[bot]))
+<!-- latest_stable_release -->
+
 ## [v2.11.4](https://github.com/chef/kitchen-vcenter/tree/v2.11.4) (2021-11-22)
 
 #### Merged Pull Requests
@@ -24,7 +22,6 @@
 - Remove EOL Ruby 2.5 references [#158](https://github.com/chef/kitchen-vcenter/pull/158) ([vkarve-chef](https://github.com/vkarve-chef))
 - Update chefstyle requirement from 2.1.0 to 2.1.3 [#157](https://github.com/chef/kitchen-vcenter/pull/157) ([dependabot[bot]](https://github.com/dependabot[bot]))
 - Fix cloning of machines without network interface [#160](https://github.com/chef/kitchen-vcenter/pull/160) ([tecracer-theinen](https://github.com/tecracer-theinen))
-<!-- latest_stable_release -->
 
 ## [v2.11.0](https://github.com/chef/kitchen-vcenter/tree/v2.11.0) (2021-09-28)
 
