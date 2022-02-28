@@ -1,15 +1,16 @@
 # Change Log
 
-<!-- latest_release 2.11.6 -->
-## [v2.11.6](https://github.com/chef/kitchen-vcenter/tree/v2.11.6) (2022-02-28)
+<!-- latest_release 2.11.7 -->
+## [v2.11.7](https://github.com/chef/kitchen-vcenter/tree/v2.11.7) (2022-02-28)
 
 #### Merged Pull Requests
-- Move config docs to kitchen.ci [#164](https://github.com/chef/kitchen-vcenter/pull/164) ([tas50](https://github.com/tas50))
+- Cleanup the readme [#163](https://github.com/chef/kitchen-vcenter/pull/163) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 <!-- release_rollup since=2.11.4 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Cleanup the readme [#163](https://github.com/chef/kitchen-vcenter/pull/163) ([tas50](https://github.com/tas50)) <!-- 2.11.7 -->
 - Move config docs to kitchen.ci [#164](https://github.com/chef/kitchen-vcenter/pull/164) ([tas50](https://github.com/tas50)) <!-- 2.11.6 -->
 - Use chefstyle linting [#165](https://github.com/chef/kitchen-vcenter/pull/165) ([sanjain-progress](https://github.com/sanjain-progress)) <!-- 2.11.5 -->
 <!-- release_rollup -->
