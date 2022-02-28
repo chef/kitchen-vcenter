@@ -3,14 +3,12 @@
 [![Gem Version](https://badge.fury.io/rb/kitchen-vcenter.svg)](https://rubygems.org/gems/kitchen-vcenter)
 [![Build status](https://badge.buildkite.com/4b0ca1bb5cd02dee51d9ce789f8346eb05730685c5be7fbba9.svg?branch=master)](https://buildkite.com/chef-oss/chef-kitchen-vcenter-master-verify)
 
-This is the official Chef test-kitchen plugin for VMware REST API. This plugin gives kitchen the ability to create, bootstrap, and test VMware vms.
+This is the official Test Kitchen plugin for VMware vCenter via the vCenter REST API. This plugin allows Test Kitchen the ability to create, bootstrap, and test VMs in VMware infrastructures.
 
 - Documentation: [https://github.com/chef/kitchen-vcenter/blob/master/README.md](https://github.com/chef/kitchen-vcenter/blob/master/README.md)
 - Source: [https://github.com/chef/kitchen-vcenter/tree/master](https://github.com/chef/kitchen-vcenter/tree/master)
 - Issues: [https://github.com/chef/kitchen-vcenter/issues](https://github.com/chef/knife-vcenter/issues)
 - Mailing list: [https://discourse.chef.io/](https://discourse.chef.io/)
-
-This is a `test-kitchen` plugin that allows interaction with vSphere using the vSphere Automation SDK.
 
 Please refer to the [CHANGELOG](CHANGELOG.md) for version history and known issues.
 
