@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.11.9 -->
+## [v2.11.9](https://github.com/chef/kitchen-vcenter/tree/v2.11.9) (2022-03-03)
+
+#### Merged Pull Requests
+- Support for adding new NIC while cloning the vm [#167](https://github.com/chef/kitchen-vcenter/pull/167) ([ashiqueps](https://github.com/ashiqueps))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.11.8 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Support for adding new NIC while cloning the vm [#167](https://github.com/chef/kitchen-vcenter/pull/167) ([ashiqueps](https://github.com/ashiqueps)) <!-- 2.11.9 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
