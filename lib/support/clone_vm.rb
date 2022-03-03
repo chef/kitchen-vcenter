@@ -173,6 +173,14 @@ class Support
       options[:vm_os].downcase.to_sym == :linux
     end
 
+    def update_network?(network_device)
+      options[:network_name] && network_device
+    end
+
+    def add_network?(network_device)
+      options[:network_name] && network_device.nil?
+    end
+
     def network_device(vm)
       all_network_devices = vm.config.hardware.device.select do |device|
         device.is_a?(RbVmomi::VIM::VirtualEthernetCard)
@@ -463,6 +471,82 @@ class Support
       ))
     end
 
+    # This method will fetch the network which is configured in the kitchen.yml file with
+    # network_name configuration.
+    # If there are multiple networks with the same name, first one will be used.
+    #
+    # @return Network object
+    #
+    def fetch_network(datacenter)
+      networks = datacenter.network.select { |n| n.name == options[:network_name] }
+      raise Support::CloneError, format("Could not find network named %s", options[:network_name]) if networks.empty?
+
+      if networks.count > 1
+        Kitchen.logger.warn(
+          format("Found %d networks named %s, picking first one", networks.count, options[:network_name])
+        )
+      end
+      networks.first
+    end
+
+    # This is a helper method that can be used to create the deviceChange spec which can be used
+    # to add a new network device or update the existing network device
+    #
+    # The network_obj will be used as a backing for the network_device.
+    def network_change_spec(network_device, network_obj, operation: :edit)
+      if network_obj.is_a? RbVmomi::VIM::DistributedVirtualPortgroup
+        Kitchen.logger.info format("Assigning network %s...", network_obj.pretty_path)
+
+        vds_obj = network_obj.config.distributedVirtualSwitch
+        Kitchen.logger.info format("Using vDS '%s' for network connectivity...", vds_obj.name)
+
+        network_device.backing = RbVmomi::VIM.VirtualEthernetCardDistributedVirtualPortBackingInfo(
+          port: RbVmomi::VIM.DistributedVirtualSwitchPortConnection(
+            portgroupKey: network_obj.key,
+            switchUuid: vds_obj.uuid
+          )
+        )
+      elsif network_obj.is_a? RbVmomi::VIM::Network
+        Kitchen.logger.info format("Assigning network %s...", options[:network_name])
+
+        network_device.backing = RbVmomi::VIM.VirtualEthernetCardNetworkBackingInfo(
+          deviceName: options[:network_name]
+        )
+      else
+        raise Support::CloneError, format("Unknown network type %s for network name %s", network_obj.class.to_s, options[:network_name])
+      end
+
+      [
+        RbVmomi::VIM.VirtualDeviceConfigSpec(
+          operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation(operation),
+          device: network_device
+        ),
+      ]
+    end
+
+    # This method can be used to add new network device to the target vm
+    # This fill find the network which defined in kitchen.yml in network_name configuration
+    # and attach that to the target vm.
+    def add_new_network_device(datacenter)
+      network_obj = fetch_network(datacenter)
+      network_device = RbVmomi::VIM.VirtualVmxnet3(
+        key: 0,
+        deviceInfo: {
+          label: options[:network_name],
+          summary: options[:network_name],
+        }
+      )
+
+      config_spec = RbVmomi::VIM.VirtualMachineConfigSpec(
+        {
+          deviceChange: network_change_spec(network_device, network_obj, operation: :add),
+        }
+      )
+
+      task = vm.ReconfigVM_Task(spec: config_spec)
+      task.wait_for_completion
+    end
+
     def clone
       benchmark_start if benchmark?
 
@@ -507,41 +591,9 @@ class Support
       network_device = network_device(src_vm)
       Kitchen.logger.warn format("Source VM/template does not have any network device (use VMware IPPools and vsphere-gom transport or govc to access)") unless network_device
 
-      unless network_device.nil? || options[:network_name].nil?
-        networks = dc.network.select { |n| n.name == options[:network_name] }
-        raise Support::CloneError.new(format("Could not find network named %s", options[:network_name])) if networks.empty?
-
-        Kitchen.logger.warn format("Found %d networks named %s, picking first one", networks.count, options[:network_name]) if networks.count > 1
-        network_obj = networks.first
-
-        if network_obj.is_a? RbVmomi::VIM::DistributedVirtualPortgroup
-          Kitchen.logger.info format("Assigning network %s...", network_obj.pretty_path)
-
-          vds_obj = network_obj.config.distributedVirtualSwitch
-          Kitchen.logger.info format("Using vDS '%s' for network connectivity...", vds_obj.name)
-
-          network_device.backing = RbVmomi::VIM.VirtualEthernetCardDistributedVirtualPortBackingInfo(
-            port: RbVmomi::VIM.DistributedVirtualSwitchPortConnection(
-              portgroupKey: network_obj.key,
-              switchUuid: vds_obj.uuid
-            )
-          )
-        elsif network_obj.is_a? RbVmomi::VIM::Network
-          Kitchen.logger.info format("Assigning network %s...", options[:network_name])
-
-          network_device.backing = RbVmomi::VIM.VirtualEthernetCardNetworkBackingInfo(
-            deviceName: options[:network_name]
-          )
-        else
-          raise Support::CloneError.new(format("Unknown network type %s for network name %s", network_obj.class.to_s, options[:network_name]))
-        end
-
-        relocate_spec.deviceChange = [
-          RbVmomi::VIM.VirtualDeviceConfigSpec(
-            operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation("edit"),
-            device: network_device
-          ),
-        ]
+      if update_network?(network_device)
+        network_obj = fetch_network(dc)
+        relocate_spec.deviceChange = network_change_spec(network_device, network_obj)
       end
 
       # Set the folder to use
@@ -625,6 +677,8 @@ class Support
       end
 
       vm_customization if options[:vm_customization]
+
+      add_new_network_device(dc) if add_network?(network_device)
 
       # Start only if specified or customizations wanted; no need for instant clones as they start in running state
       if options[:poweron] && !options[:vm_customization].nil? && !instant_clone?

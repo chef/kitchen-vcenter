@@ -194,5 +194,27 @@ describe Support::CloneVm do
         end
       end
     end
+
+    context "attaching a new vm" do
+      before do
+        options[:network_name] = "my-network"
+
+        allow(subject).to receive(:network_device).and_return(nil)
+      end
+
+      context "#add_network?" do
+        it "should return true" do
+          expect(subject.add_network?(nil)).to be_truthy
+        end
+      end
+
+      it "should call the reconfig vm task to add vm" do
+        expect(RbVmomi::VIM).to receive(:VirtualMachineConfigSpec)
+        expect(created_vm).to receive(:ReconfigVM_Task).and_return(created_vm_reconfigure_task)
+        expect(subject).to receive(:network_change_spec)
+
+        subject.clone
+      end
+    end
   end
 end
