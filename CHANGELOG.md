@@ -1,19 +1,17 @@
 # Change Log
 
-<!-- latest_release 2.11.9 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+
+<!-- latest_stable_release -->
 ## [v2.11.9](https://github.com/chef/kitchen-vcenter/tree/v2.11.9) (2022-03-03)
 
 #### Merged Pull Requests
 - Support for adding new NIC while cloning the vm [#167](https://github.com/chef/kitchen-vcenter/pull/167) ([ashiqueps](https://github.com/ashiqueps))
-<!-- latest_release -->
-<!-- release_rollup since=2.11.8 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Support for adding new NIC while cloning the vm [#167](https://github.com/chef/kitchen-vcenter/pull/167) ([ashiqueps](https://github.com/ashiqueps)) <!-- 2.11.9 -->
-<!-- release_rollup -->
-
 <!-- latest_stable_release -->
+
 ## [v2.11.8](https://github.com/chef/kitchen-vcenter/tree/v2.11.8) (2022-02-28)
 
 #### Merged Pull Requests
@@ -21,7 +19,6 @@
 - Move config docs to kitchen.ci [#164](https://github.com/chef/kitchen-vcenter/pull/164) ([tas50](https://github.com/tas50))
 - Cleanup the readme [#163](https://github.com/chef/kitchen-vcenter/pull/163) ([tas50](https://github.com/tas50))
 - Update chefstyle requirement from 2.1.3 to 2.2.2 [#166](https://github.com/chef/kitchen-vcenter/pull/166) ([dependabot[bot]](https://github.com/dependabot[bot]))
-<!-- latest_stable_release -->
 
 ## [v2.11.4](https://github.com/chef/kitchen-vcenter/tree/v2.11.4) (2021-11-22)
 
