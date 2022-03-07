@@ -16,6 +16,6 @@ group :debug do
 end
 
 # This is a required dependency for windows platforms
-platforms :mswin, :mingw, :x64_mingw do
+platforms :mswin, :mswin64, :mingw, :x64_mingw do
   gem "win32-security"
 end
