@@ -14,3 +14,8 @@ group :debug do
   gem "pry-stack_explorer"
   gem "rb-readline"
 end
+
+# This is a required dependency for windows platforms
+platforms :mswin, :mingw, :x64_mingw do
+  gem "win32-security"
+end
