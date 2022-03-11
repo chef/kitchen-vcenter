@@ -1,25 +1,22 @@
 # Change Log
 
-<!-- latest_release 2.11.11 -->
-## [v2.11.11](https://github.com/chef/kitchen-vcenter/tree/v2.11.11) (2022-03-11)
-
-#### Merged Pull Requests
-- Add vm name to initial clone log [#170](https://github.com/chef/kitchen-vcenter/pull/170) ([jasonwbarnett](https://github.com/jasonwbarnett))
 <!-- latest_release -->
-<!-- release_rollup since=2.11.9 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Add vm name to initial clone log [#170](https://github.com/chef/kitchen-vcenter/pull/170) ([jasonwbarnett](https://github.com/jasonwbarnett)) <!-- 2.11.11 -->
-- Bundle win32-security for windows platforms dependency [#169](https://github.com/chef/kitchen-vcenter/pull/169) ([ashiqueps](https://github.com/ashiqueps)) <!-- 2.11.10 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.11.11](https://github.com/chef/kitchen-vcenter/tree/v2.11.11) (2022-03-11)
+
+#### Merged Pull Requests
+- Bundle win32-security for windows platforms dependency [#169](https://github.com/chef/kitchen-vcenter/pull/169) ([ashiqueps](https://github.com/ashiqueps))
+- Add vm name to initial clone log [#170](https://github.com/chef/kitchen-vcenter/pull/170) ([jasonwbarnett](https://github.com/jasonwbarnett))
+<!-- latest_stable_release -->
+
 ## [v2.11.9](https://github.com/chef/kitchen-vcenter/tree/v2.11.9) (2022-03-03)
 
 #### Merged Pull Requests
 - Support for adding new NIC while cloning the vm [#167](https://github.com/chef/kitchen-vcenter/pull/167) ([ashiqueps](https://github.com/ashiqueps))
-<!-- latest_stable_release -->
 
 ## [v2.11.8](https://github.com/chef/kitchen-vcenter/tree/v2.11.8) (2022-02-28)
 
