@@ -599,7 +599,7 @@ class Support
       # Set the folder to use
       dest_folder = options[:folder].nil? ? dc.vmFolder : options[:folder][:id]
 
-      Kitchen.logger.info format("Cloning '%s' to create the VM...", options[:template])
+      Kitchen.logger.info format("Cloning '%s' to create the %s VM...", options[:template], vm_name)
       if instant_clone?
         vcenter_data = vim.serviceInstance.content.about
         raise Support::CloneError.new("Instant clones only supported with vCenter 6.7 or higher") unless vcenter_data.version.to_f >= 6.7
