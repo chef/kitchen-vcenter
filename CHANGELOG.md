@@ -1,25 +1,22 @@
 # Change Log
 
-<!-- latest_release 2.11.12 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+
+<!-- latest_stable_release -->
 ## [v2.11.12](https://github.com/chef/kitchen-vcenter/tree/v2.11.12) (2022-03-17)
 
 #### Merged Pull Requests
 - Dummy PR to test the gem upload to Artifactory [#171](https://github.com/chef/kitchen-vcenter/pull/171) ([ashiqueps](https://github.com/ashiqueps))
-<!-- latest_release -->
-<!-- release_rollup since=2.11.9 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Dummy PR to test the gem upload to Artifactory [#171](https://github.com/chef/kitchen-vcenter/pull/171) ([ashiqueps](https://github.com/ashiqueps)) <!-- 2.11.12 -->
-<!-- release_rollup -->
-
 <!-- latest_stable_release -->
+
 ## [v2.11.11](https://github.com/chef/kitchen-vcenter/tree/v2.11.11) (2022-03-11)
 
 #### Merged Pull Requests
 - Bundle win32-security for windows platforms dependency [#169](https://github.com/chef/kitchen-vcenter/pull/169) ([ashiqueps](https://github.com/ashiqueps))
 - Add vm name to initial clone log [#170](https://github.com/chef/kitchen-vcenter/pull/170) ([jasonwbarnett](https://github.com/jasonwbarnett))
-<!-- latest_stable_release -->
 
 ## [v2.11.9](https://github.com/chef/kitchen-vcenter/tree/v2.11.9) (2022-03-03)
 
