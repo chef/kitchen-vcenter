@@ -41,7 +41,7 @@ describe Support::CloneVm do
       },
       resource_pool: "resgroup-123",
       clone_type: :full,
-      network_name: network_name,
+      networks: [network_hash],
       interface: nil,
       wait_timeout: 540,
       wait_interval: 2.0,
@@ -60,6 +60,7 @@ describe Support::CloneVm do
   }
   let(:vm_name) { "my-vm-name" }
   let(:network_name) { "my-network" }
+  let(:network_hash) { { name: "my-network", operation: "edit" } }
   let(:target_host) { instance_double("VSphereAutomation::VCenter::VcenterHostSummary", host: "host-123", name: "host-123.company.com", connection_state: "CONNECTED", power_state: "POWERED_ON") }
   let(:datacenter_name) { "my-datacenter" }
   let(:datacenter) { instance_double("RbVmomi::VIM::Datacenter", network: [network]) }
@@ -202,9 +203,9 @@ describe Support::CloneVm do
         allow(subject).to receive(:network_device).and_return(nil)
       end
 
-      context "#add_network?" do
+      context "#attach_new_network?" do
         it "should return true" do
-          expect(subject.add_network?(nil)).to be_truthy
+          expect(subject.attach_new_network?(nil)).to be_truthy
         end
       end
 
@@ -214,6 +215,60 @@ describe Support::CloneVm do
         expect(subject).to receive(:network_change_spec)
 
         subject.clone
+      end
+    end
+
+    context "clone with multiple networks" do
+
+      let(:network2) {
+        instance_double(
+          "RbVmomi::VIM::DistributedVirtualPortgroup",
+          name: "my-network-2",
+          pretty_path: "#{datacenter_name}/network/my-network-2",
+          config: network_config, key: "dvportgroup-123"
+        )
+      }
+      let(:network2_config) {
+        instance_double(
+          "RbVmomi::VIM::DVPortgroupConfigInfo",
+          distributedVirtualSwitch: distributed_virtual_switch
+        )
+      }
+
+      let(:datacenter) {
+        instance_double("RbVmomi::VIM::Datacenter", network: [network, network2])
+      }
+
+      before(:each) do
+        allow(network)
+          .to receive(:is_a?)
+          .with(RbVmomi::VIM::DistributedVirtualPortgroup)
+          .and_return(true)
+
+        allow(network2)
+          .to receive(:is_a?)
+          .with(RbVmomi::VIM::DistributedVirtualPortgroup)
+          .and_return(true)
+
+        options[:networks] = [network_hash, { name: "my-network-2", operation: "add" }]
+        allow(created_vm).to receive(:ReconfigVM_Task).and_return(created_vm_reconfigure_task)
+      end
+
+      it "task should be successful" do
+        expect { subject.clone }.not_to raise_error
+      end
+
+      it 'network_change_spec should invoke twice' do
+        expect(subject).to receive(:network_change_spec).twice
+
+        subject.clone
+      end
+
+      it 'helper method should return correct values' do
+        expect(subject.add_network?).to be_truthy
+        expect(subject.update_network?(network)).to be_truthy
+        expect(subject.networks_to_update.first[:name]).to eq 'my-network'
+        expect(subject.networks_to_add.first[:name]).to eq 'my-network-2'
       end
     end
   end

@@ -173,12 +173,37 @@ class Support
       options[:vm_os].downcase.to_sym == :linux
     end
 
-    def update_network?(network_device)
-      options[:network_name] && network_device
+    # Network configured to update the existing one in the template
+    #
+    def networks_to_update
+      options[:networks].select { |n| n[:operation] == "edit" }
     end
 
-    def add_network?(network_device)
-      options[:network_name] && network_device.nil?
+    # New networks that needs to be attached to newly created vm
+    #
+    def networks_to_add
+      options[:networks].select { |n| [nil, "add"].include?(n[:operation]) }
+    end
+
+    # A network should update if there is a network_device available in the template
+    # and the user configured a new network with edit operation.
+    #
+    def update_network?(network_device)
+      networks_to_update.any? && network_device
+    end
+
+    # Checks whether any networks configured for addition
+    def add_network?
+      networks_to_add.any?
+    end
+
+    # TODO: Remove this method and its invocations after the deprecation of `network_name` config
+    # For backward compatibility
+    # If the template doesn't have any NIC and the user use the old
+    # configuration(network_name), then that network should be attached to the vm.
+    #
+    def attach_new_network?(network_device)
+      network_device.nil? && networks_to_update.any?
     end
 
     def network_device(vm)
@@ -477,13 +502,13 @@ class Support
     #
     # @return Network object
     #
-    def fetch_network(datacenter)
-      networks = datacenter.network.select { |n| n.name == options[:network_name] }
-      raise Support::CloneError, format("Could not find network named %s", options[:network_name]) if networks.empty?
+    def fetch_network(datacenter, network_name)
+      networks = datacenter.network.select { |n| n.name == network_name }
+      raise Support::CloneError, format("Could not find network named %s", network_name) if networks.empty?
 
       if networks.count > 1
         Kitchen.logger.warn(
-          format("Found %d networks named %s, picking first one", networks.count, options[:network_name])
+          format("Found %d networks named %s, picking first one", networks.count, network_name)
         )
       end
       networks.first
@@ -493,7 +518,7 @@ class Support
     # to add a new network device or update the existing network device
     #
     # The network_obj will be used as a backing for the network_device.
-    def network_change_spec(network_device, network_obj, operation: :edit)
+    def network_change_spec(network_device, network_obj, network_name, operation: :edit)
       if network_obj.is_a? RbVmomi::VIM::DistributedVirtualPortgroup
         Kitchen.logger.info format("Assigning network %s...", network_obj.pretty_path)
 
@@ -507,39 +532,42 @@ class Support
           )
         )
       elsif network_obj.is_a? RbVmomi::VIM::Network
-        Kitchen.logger.info format("Assigning network %s...", options[:network_name])
+        Kitchen.logger.info format("Assigning network %s...", network_name)
 
         network_device.backing = RbVmomi::VIM.VirtualEthernetCardNetworkBackingInfo(
-          deviceName: options[:network_name]
+          deviceName: network_name
         )
       else
-        raise Support::CloneError, format("Unknown network type %s for network name %s", network_obj.class.to_s, options[:network_name])
+        raise Support::CloneError, format("Unknown network type %s for network name %s", network_obj.class.to_s, network_name)
       end
 
-      [
-        RbVmomi::VIM.VirtualDeviceConfigSpec(
-          operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation(operation),
-          device: network_device
-        ),
-      ]
+      RbVmomi::VIM.VirtualDeviceConfigSpec(
+        operation: RbVmomi::VIM::VirtualDeviceConfigSpecOperation(operation),
+        device: network_device
+      )
     end
 
     # This method can be used to add new network device to the target vm
     # This fill find the network which defined in kitchen.yml in network_name configuration
     # and attach that to the target vm.
-    def add_new_network_device(datacenter)
-      network_obj = fetch_network(datacenter)
-      network_device = RbVmomi::VIM.VirtualVmxnet3(
-        key: 0,
-        deviceInfo: {
-          label: options[:network_name],
-          summary: options[:network_name],
-        }
-      )
+    def add_new_network_device(datacenter, networks)
+      device_change = []
+      networks.each do |network|
+        network_obj = fetch_network(datacenter, network[:name])
+        network_device = RbVmomi::VIM.VirtualVmxnet3(
+          key: 0,
+          deviceInfo: {
+            label: network[:name],
+            summary: network[:name],
+          }
+        )
+
+        device_change << network_change_spec(network_device, network_obj, network[:name], operation: :add)
+      end
 
       config_spec = RbVmomi::VIM.VirtualMachineConfigSpec(
         {
-          deviceChange: network_change_spec(network_device, network_obj, operation: :add),
+          deviceChange: device_change
         }
       )
 
@@ -592,8 +620,12 @@ class Support
       Kitchen.logger.warn format("Source VM/template does not have any network device (use VMware IPPools and vsphere-gom transport or govc to access)") unless network_device
 
       if update_network?(network_device)
-        network_obj = fetch_network(dc)
-        relocate_spec.deviceChange = network_change_spec(network_device, network_obj)
+        network_spec = []
+        networks_to_update.each do |network|
+          network_obj = fetch_network(dc, network[:name])
+          network_spec << network_change_spec(network_device, network_obj, network[:name])
+        end
+        relocate_spec.deviceChange = network_spec
       end
 
       # Set the folder to use
@@ -678,7 +710,10 @@ class Support
 
       vm_customization if options[:vm_customization]
 
-      add_new_network_device(dc) if add_network?(network_device)
+      # TODO: Remove this line after the deprecation of `network_name` config
+      add_new_network_device(dc, networks_to_update) if attach_new_network?(network_device)
+
+      add_new_network_device(dc, networks_to_add) if add_network?
 
       # Start only if specified or customizations wanted; no need for instant clones as they start in running state
       if options[:poweron] && !options[:vm_customization].nil? && !instant_clone?
