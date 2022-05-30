@@ -258,17 +258,17 @@ describe Support::CloneVm do
         expect { subject.clone }.not_to raise_error
       end
 
-      it 'network_change_spec should invoke twice' do
+      it "network_change_spec should invoke twice" do
         expect(subject).to receive(:network_change_spec).twice
 
         subject.clone
       end
 
-      it 'helper method should return correct values' do
+      it "helper method should return correct values" do
         expect(subject.add_network?).to be_truthy
         expect(subject.update_network?(network)).to be_truthy
-        expect(subject.networks_to_update.first[:name]).to eq 'my-network'
-        expect(subject.networks_to_add.first[:name]).to eq 'my-network-2'
+        expect(subject.networks_to_update.first[:name]).to eq "my-network"
+        expect(subject.networks_to_add.first[:name]).to eq "my-network-2"
       end
     end
   end

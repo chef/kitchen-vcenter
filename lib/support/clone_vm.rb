@@ -567,7 +567,7 @@ class Support
 
       config_spec = RbVmomi::VIM.VirtualMachineConfigSpec(
         {
-          deviceChange: device_change
+          deviceChange: device_change,
         }
       )
 
