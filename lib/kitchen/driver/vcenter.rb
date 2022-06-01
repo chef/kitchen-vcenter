@@ -56,6 +56,7 @@ module Kitchen
       default_config :clone_type, :full
       default_config :cluster, nil
       default_config :network_name, nil
+      default_config :networks, []
       default_config :tags, nil
       default_config :vm_wait_timeout, 90
       default_config :vm_wait_interval, 2.0
@@ -93,6 +94,11 @@ module Kitchen
       deprecate_config_for :customize, Util.outdent!(<<-MSG)
         The `customize` setting was renamed to `vm_customization` and will
         be removed in future versions.
+      MSG
+      deprecate_config_for :network_name, Util.outdent!(<<-MSG)
+        The `network_name` setting is deprecated and will be removed in the
+        future version. Please use the new settings `networks` and refer
+        documentation for the usage.
       MSG
 
       # The main create method
@@ -145,7 +151,7 @@ module Kitchen
         config[:targethost] = get_host(config[:targethost], datacenter, cluster_id)
 
         # Check if network exists, if to be changed
-        network_exists?(config[:network_name]) unless config[:network_name].nil?
+        config[:networks].each { |network| network_exists?(network[:name]) }
 
         # Same thing needs to happen with the folder name if it has been set
         unless config[:folder].nil?
@@ -172,7 +178,7 @@ module Kitchen
           folder: config[:folder],
           resource_pool: config[:resource_pool],
           clone_type: config[:clone_type].to_sym,
-          network_name: config[:network_name],
+          networks: config[:networks],
           interface: config[:interface],
           wait_timeout: config[:vm_wait_timeout],
           wait_interval: config[:vm_wait_interval],
@@ -286,6 +292,13 @@ module Kitchen
         config[:vm_username] = config[:aggressive_username] unless config[:aggressive_username].nil?
         config[:vm_password] = config[:aggressive_password] unless config[:aggressive_password].nil?
         config[:vm_customization] = config[:customize] unless config[:customize].nil?
+        validate_network_parameters
+      end
+
+      def validate_network_parameters
+        return if config[:network_name].nil?
+
+        config[:networks] = [{ name: config[:network_name], operation: "edit" }]
       end
 
       # A helper method to validate the state
