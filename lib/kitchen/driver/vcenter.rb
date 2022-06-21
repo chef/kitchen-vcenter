@@ -296,7 +296,7 @@ module Kitchen
       end
 
       def validate_network_parameters
-        return if config[:network_name].nil?
+        return if config[:networks].any? || config[:network_name].nil?
 
         config[:networks] = [{ name: config[:network_name], operation: "edit" }]
       end

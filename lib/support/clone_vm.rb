@@ -687,8 +687,6 @@ class Support
           template: false
         )
 
-        clone_spec.customization = guest_customization_spec if options[:guest_customization]
-
         benchmark_checkpoint("initialized") if benchmark?
         task = src_vm.CloneVM_Task(spec: clone_spec, folder: dest_folder, name: vm_name)
       end
@@ -714,6 +712,8 @@ class Support
       add_new_network_device(dc, networks_to_update) if attach_new_network?(network_device)
 
       add_new_network_device(dc, networks_to_add) if add_network?
+
+      guest_customization_task if options[:guest_customization]
 
       # Start only if specified or customizations wanted; no need for instant clones as they start in running state
       if options[:poweron] && !options[:vm_customization].nil? && !instant_clone?

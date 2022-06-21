@@ -12,6 +12,11 @@ class Support
     DEFAULT_TIMEOUT_TASK = 600
     DEFAULT_TIMEOUT_IP = 60
 
+    CUSTOMIZATION_FAILED_ERRORS = [
+      RbVmomi::VIM::CustomizationFailed,
+      RbVmomi::VIM::CustomizationUnknownFailure
+    ]
+
     # Generic Volume License Keys for temporary Windows Server setup.
     #
     # @see https://docs.microsoft.com/en-us/windows-server/get-started/kmsclientkeys
@@ -27,6 +32,11 @@ class Support
     # @returns [Hash] Configuration values from file
     def guest_customization
       options[:guest_customization]
+    end
+
+    def guest_customization_task
+      task = vm.CustomizeVM_Task(spec: guest_customization_spec)
+      task.wait_for_completion
     end
 
     # Build CustomizationSpec for Guest OS Customization
@@ -289,9 +299,9 @@ class Support
       while waited_seconds < timeout
         events = guest_customization_events
 
-        if events.any? { |event| event.is_a? RbVmomi::VIM::CustomizationSucceeded }
+        if events.any? { |event| event.is_a? RbVmomi::VIM::CustomizationSucceeded } || events.empty?
           return
-        elsif (failed = events.detect { |event| event.is_a? RbVmomi::VIM::CustomizationFailed })
+        elsif (failed = events.detect { |event| CUSTOMIZATION_FAILED_ERRORS.include?(event.class) })
           # Only matters for Linux, as Windows won't come up at all to report a failure via VMware Tools
           raise Support::GuestCustomizationError.new("Customization of VM failed: #{failed.fullFormattedMessage}")
         end
@@ -330,7 +340,7 @@ class Support
     #
     # @returns [Array<RbVmomi::VIM::CustomizationEvent>] All matching events
     def guest_customization_events
-      vm_events %w{CustomizationSucceeded CustomizationFailed CustomizationStartedEvent}
+      vm_events %w{CustomizationSucceeded CustomizationFailed CustomizationStartedEvent CustomizationUnknownFailure}
     end
   end
 end
