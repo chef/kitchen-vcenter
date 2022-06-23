@@ -14,8 +14,8 @@ class Support
 
     CUSTOMIZATION_FAILED_ERRORS = [
       RbVmomi::VIM::CustomizationFailed,
-      RbVmomi::VIM::CustomizationUnknownFailure
-    ]
+      RbVmomi::VIM::CustomizationUnknownFailure,
+    ].freeze
 
     # Generic Volume License Keys for temporary Windows Server setup.
     #
