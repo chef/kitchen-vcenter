@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.6"
 
   spec.add_dependency "net-ping", ">= 2.0.0", "< 3.0"
-  spec.add_dependency "rbvmomi", ">= 1.11", "< 4.0"
+  spec.add_dependency "rbvmomi2", ">= 1.11", "< 4.0"
   spec.add_dependency "test-kitchen", ">= 1.16", "< 4"
   spec.add_dependency "vsphere-automation-sdk", "~> 0.4"
 end
