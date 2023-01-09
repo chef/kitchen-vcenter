@@ -1,24 +1,21 @@
 # Change Log
 
-<!-- latest_release 2.12.0 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+
+<!-- latest_stable_release -->
 ## [v2.12.0](https://github.com/chef/kitchen-vcenter/tree/v2.12.0) (2023-01-09)
 
 #### Merged Pull Requests
 - Use rbvmomi2 gem [#174](https://github.com/chef/kitchen-vcenter/pull/174) ([ashiqueps](https://github.com/ashiqueps))
-<!-- latest_release -->
-<!-- release_rollup since=2.11.13 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Use rbvmomi2 gem [#174](https://github.com/chef/kitchen-vcenter/pull/174) ([ashiqueps](https://github.com/ashiqueps)) <!-- 2.12.0 -->
-<!-- release_rollup -->
-
 <!-- latest_stable_release -->
+
 ## [v2.11.13](https://github.com/chef/kitchen-vcenter/tree/v2.11.13) (2022-06-01)
 
 #### Merged Pull Requests
 - [INFCT-53] Support for managing multiple networks [#172](https://github.com/chef/kitchen-vcenter/pull/172) ([ashiqueps](https://github.com/ashiqueps))
-<!-- latest_stable_release -->
 
 ## [v2.11.12](https://github.com/chef/kitchen-vcenter/tree/v2.11.12) (2022-03-17)
 
