@@ -408,7 +408,7 @@ class Support
 
           disk_spec.device.controllerKey = controller.key
 
-          next_id = next_id + 1
+          next_id = +=
 
           # Avoid the SCSI controller ID
           next_id += 1 if next_id == controller.scsiCtlrUnitNumber
