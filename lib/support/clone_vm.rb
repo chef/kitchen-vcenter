@@ -375,6 +375,9 @@ class Support
         # Storage Controller and ID mapping
         controller = vm.config.hardware.device.select { |device| device.is_a? RbVmomi::VIM::VirtualSCSIController }.first
 
+        highest_id = vm.disks.map(&:unitNumber).max
+        next_id = highest_id
+
         add_disks.each_with_index do |disk_config, idx|
           # Default to Thin Provisioning and 10GB disk size
           disk_config[:type]    ||= :thin
@@ -405,8 +408,7 @@ class Support
 
           disk_spec.device.controllerKey = controller.key
 
-          highest_id = vm.disks.map(&:unitNumber).max
-          next_id = highest_id + idx + 1
+          next_id = next_id + 1
 
           # Avoid the SCSI controller ID
           next_id += 1 if next_id == controller.scsiCtlrUnitNumber
