@@ -11,6 +11,7 @@ echo "--- bundle install"
 
 bundle config --local path vendor/bundle
 bundle install --jobs=7 --retry=3
+bundle config set force_ruby_platform true
 
 echo "+++ bundle exec task"
 bundle exec $@
