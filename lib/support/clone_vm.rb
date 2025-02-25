@@ -409,6 +409,7 @@ class Support
 
           disk_spec.device.controllerKey = controller.key
 
+          # The linter pipeline doesn't like this for some reason
           next_id += 1
 
           # Avoid the SCSI controller ID
