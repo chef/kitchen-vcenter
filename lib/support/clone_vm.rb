@@ -375,7 +375,7 @@ class Support
         # Storage Controller and ID mapping
         controller = vm.config.hardware.device.select { |device| device.is_a? RbVmomi::VIM::VirtualSCSIController }.first
 
-        # Move these variables outside the loop so they persist
+        # Move these variables outside the loop so they aren't overwritten
         highest_id = vm.disks.map(&:unitNumber).max
         next_id = highest_id
 
