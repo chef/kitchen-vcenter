@@ -409,9 +409,10 @@ class Support
 
           disk_spec.device.controllerKey = controller.key
 
-          # Avoid the SCSI controller ID
-          next_id += (next_id == controller.scsiCtlrUnitNumber ? 2 : 1)
+          next_id += 1
 
+          # Avoid the SCSI controller ID
+          next_id += 1 if next_id == controller.scsiCtlrUnitNumber
 
           # Theoretically could add another SCSI controller, but there are limits to what kitchen should support
           if next_id > 14
