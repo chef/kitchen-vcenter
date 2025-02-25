@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.12.1 -->
+## [v2.12.1](https://github.com/chef/kitchen-vcenter/tree/v2.12.1) (2025-02-25)
+
+#### Merged Pull Requests
+- updating to newer images for tests [#181](https://github.com/chef/kitchen-vcenter/pull/181) ([sean-simmons-progress](https://github.com/sean-simmons-progress))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.12.0 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- updating to newer images for tests [#181](https://github.com/chef/kitchen-vcenter/pull/181) ([sean-simmons-progress](https://github.com/sean-simmons-progress)) <!-- 2.12.1 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
