@@ -1,25 +1,22 @@
 # Change Log
 
-<!-- latest_release 2.12.2 -->
-## [v2.12.2](https://github.com/chef/kitchen-vcenter/tree/v2.12.2) (2025-02-26)
-
-#### Merged Pull Requests
-- Fix scsinumber [#179](https://github.com/chef/kitchen-vcenter/pull/179) ([jarvin521](https://github.com/jarvin521))
 <!-- latest_release -->
-<!-- release_rollup since=2.12.0 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Fix scsinumber [#179](https://github.com/chef/kitchen-vcenter/pull/179) ([jarvin521](https://github.com/jarvin521)) <!-- 2.12.2 -->
-- updating to newer images for tests [#181](https://github.com/chef/kitchen-vcenter/pull/181) ([sean-simmons-progress](https://github.com/sean-simmons-progress)) <!-- 2.12.1 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [v2.12.2](https://github.com/chef/kitchen-vcenter/tree/v2.12.2) (2025-02-26)
+
+#### Merged Pull Requests
+- updating to newer images for tests [#181](https://github.com/chef/kitchen-vcenter/pull/181) ([sean-simmons-progress](https://github.com/sean-simmons-progress))
+- Fix scsinumber [#179](https://github.com/chef/kitchen-vcenter/pull/179) ([jarvin521](https://github.com/jarvin521))
+<!-- latest_stable_release -->
+
 ## [v2.12.0](https://github.com/chef/kitchen-vcenter/tree/v2.12.0) (2023-01-09)
 
 #### Merged Pull Requests
 - Use rbvmomi2 gem [#174](https://github.com/chef/kitchen-vcenter/pull/174) ([ashiqueps](https://github.com/ashiqueps))
-<!-- latest_stable_release -->
 
 ## [v2.11.13](https://github.com/chef/kitchen-vcenter/tree/v2.11.13) (2022-06-01)
 
