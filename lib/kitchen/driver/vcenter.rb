@@ -107,6 +107,7 @@ module Kitchen
       def create(state)
         debug format("Starting kitchen-vcenter %s", ::KitchenVcenter::VERSION)
 
+        enable_op_ignore_eof_flag!
         save_and_validate_parameters
         connect
 
@@ -597,6 +598,12 @@ module Kitchen
         session_id = session_api.create("").value
 
         api_client.default_headers["vmware-api-session-id"] = session_id
+      end
+
+      def enable_op_ignore_eof_flag!
+        return unless OpenSSL::SSL.const_defined?(:OP_IGNORE_UNEXPECTED_EOF)
+
+        OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:options] |= OpenSSL::SSL::OP_IGNORE_UNEXPECTED_EOF
       end
     end
   end
