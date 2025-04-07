@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "kitchen-vcenter/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "ash-kitchen-vcenter"
+  spec.name          = "kitchen-vcenter"
   spec.version       = KitchenVcenter::VERSION
   spec.authors       = ["Chef Software"]
   spec.email         = ["oss@chef.io"]
