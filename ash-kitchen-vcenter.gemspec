@@ -12,6 +12,8 @@ Gem::Specification.new do |spec|
   spec.description   = "Test Kitchen driver for VMware vCenter using SDK"
   spec.homepage      = "https://github.com/chef/kitchen-vcenter"
   spec.license       = "Apache-2.0"
+  spec.metadata["allowed_push_host"] = "https://rubygems.pkg.github.com/ashiqueps"
+  spec.metadata["homepage_uri"] = "https://github.com/ashiqueps/kitchen-vcenter"
 
   spec.files         = Dir["LICENSE", "lib/**/*"]
   spec.require_paths = ["lib"]

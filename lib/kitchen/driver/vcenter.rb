@@ -600,6 +600,9 @@ module Kitchen
         api_client.default_headers["vmware-api-session-id"] = session_id
       end
 
+      # From OpenSSL v3.x, The vCenter server not sending the close_notify alert will result in openssl raising the
+      # SSL_read: unexpected eof while reading error. This method will add the OP_IGNORE_UNEXPECTED_EOF flag to the
+      # default SSLContext so that these kind of issues will not break the kitchen run.
       def enable_op_ignore_eof_flag!
         return unless OpenSSL::SSL.const_defined?(:OP_IGNORE_UNEXPECTED_EOF)
 
