@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "kitchen-vcenter/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "kitchen-vcenter"
+  spec.name          = "ash-kitchen-vcenter"
   spec.version       = KitchenVcenter::VERSION
   spec.authors       = ["Chef Software"]
   spec.email         = ["oss@chef.io"]
@@ -12,8 +12,6 @@ Gem::Specification.new do |spec|
   spec.description   = "Test Kitchen driver for VMware vCenter using SDK"
   spec.homepage      = "https://github.com/chef/kitchen-vcenter"
   spec.license       = "Apache-2.0"
-  spec.metadata["allowed_push_host"] = "https://rubygems.pkg.github.com/ashiqueps"
-  spec.metadata["homepage_uri"] = "https://github.com/ashiqueps/kitchen-vcenter"
 
   spec.files         = Dir["LICENSE", "lib/**/*"]
   spec.require_paths = ["lib"]
