@@ -601,8 +601,8 @@ module Kitchen
         api_client.default_headers["vmware-api-session-id"] = session_id
       rescue OpenSSL::SSL::SSLError => e
         altered_message = if e.message.match?(/eof while reading/)
-                            'SSLError happened while connecting to server: Try setting ignore_openssl_eof_errors ' \
-                              'to true in kitchen.yml to ignore these errors'
+                            "SSLError happened while connecting to server: Try setting ignore_openssl_eof_errors " \
+                              "to true in kitchen.yml to ignore these errors"
                           else
                             e.message
                           end
