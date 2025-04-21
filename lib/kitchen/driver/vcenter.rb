@@ -74,6 +74,7 @@ module Kitchen
 
       default_config :benchmark, false
       default_config :benchmark_file, "kitchen-vcenter.csv"
+      default_config :ignore_openssl_eof_errors, false
 
       deprecate_config_for :aggressive_mode, Util.outdent!(<<-MSG)
         The 'aggressive_mode' setting was renamed to 'active_discovery' and
@@ -107,7 +108,7 @@ module Kitchen
       def create(state)
         debug format("Starting kitchen-vcenter %s", ::KitchenVcenter::VERSION)
 
-        enable_op_ignore_eof_flag!
+        enable_op_ignore_eof_flag! if config[:ignore_openssl_eof_errors]
         save_and_validate_parameters
         connect
 
@@ -598,6 +599,15 @@ module Kitchen
         session_id = session_api.create("").value
 
         api_client.default_headers["vmware-api-session-id"] = session_id
+      rescue OpenSSL::SSL::SSLError => e
+        altered_message = if e.message.match?(/eof while reading/)
+                            'SSLError happened while connecting to server: Try setting ignore_openssl_eof_errors ' \
+                              'to true in kitchen.yml to ignore these errors'
+                          else
+                            e.message
+                          end
+
+        raise e.class, altered_message
       end
 
       # From OpenSSL v3.x, The vCenter server not sending the close_notify alert will result in openssl raising the
