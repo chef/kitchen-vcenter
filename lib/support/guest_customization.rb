@@ -195,7 +195,7 @@ class Support
 
       RbVmomi::VIM::CustomizationSysprep.new(
         guiUnattended: RbVmomi::VIM::CustomizationGuiUnattended.new(
-          timeZone: timezone.to_i || DEFAULT_WINDOWS_TIMEZONE,
+          timeZone: windows_timezone_convert(timezone || DEFAULT_WINDOWS_TIMEZONE),
           autoLogon: false,
           autoLogonCount: 1,
           password: customization_pass
@@ -242,9 +242,36 @@ class Support
     def valid_windows_timezone?(input)
       # Accept decimals and hex
       # See https://support.microsoft.com/en-us/help/973627/microsoft-time-zone-index-values
-      windows_timezone_pattern = /^([0-9]+|0x[0-9a-fA-F]+)$/
+      windows_timezone_pattern = /^((-){,1}[0-9]+|0x[0-9a-fA-F]+)$/
 
       input.to_s.match? windows_timezone_pattern
+    end
+
+    # convert the value provided to a signed int
+    #
+    # @param input - Value to convert
+    # @returns [Integer] of converted value
+    def windows_timezone_convert(input)
+        mid = 2**(32-1)
+        max = 2**32
+        #ret = input
+        if input.kind_of?(String)
+            if input.match? /^0x[0-9a-fA-F]+$/
+                input = input.to_i(16)
+            else
+                input = input.to_i()
+            end
+        end
+        if input.kind_of?(Integer)
+            input = input
+        else
+            puts "not an integer"
+            input = input.to_i(16)
+        end
+        if input >= mid
+            input = input - max
+        end
+        input
     end
 
     # Check for format of Windows Product IDs
