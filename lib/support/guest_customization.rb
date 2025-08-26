@@ -265,7 +265,6 @@ class Support
         if input.kind_of?(Integer)
             input = input
         else
-            puts "not an integer"
             input = input.to_i(16)
         end
         if input >= mid
