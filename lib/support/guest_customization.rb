@@ -252,25 +252,24 @@ class Support
     # @param input - Value to convert
     # @returns [Integer] of converted value
     def windows_timezone_convert(input)
-        mid = 2**(32-1)
-        max = 2**32
-        #ret = input
-        if input.kind_of?(String)
-            if input.match? /^0x[0-9a-fA-F]+$/
-                input = input.to_i(16)
-            else
-                input = input.to_i()
-            end
-        end
-        if input.kind_of?(Integer)
-            input = input
+      mid = 2**(32 - 1)
+      max = 2**32
+      if input.is_a?(String)
+        if input.match?(/^0x[0-9a-fA-F]+$/)
+          input = input.to_i(16)
         else
-            input = input.to_i(16)
+          input = input.to_i
         end
-        if input >= mid
-            input = input - max
-        end
-        input
+      end
+      if input.is_a?(Integer)
+        input = input
+      else
+        input = input.to_i(16)
+      end
+      if input >= mid
+        input -= max
+      end
+      input
     end
 
     # Check for format of Windows Product IDs
