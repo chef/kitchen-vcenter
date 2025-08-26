@@ -271,6 +271,7 @@ describe Support::CloneVm do
         expect(subject.networks_to_add.first[:name]).to eq "my-network-2"
       end
     end
+
     windows_timezone_tests = [
       ["Coordinated Universal Time", [0x80000050, "0x80000050", "-2147483568", -2147483568], -2147483568],
       ["Eastern Time (US & Canada)", ["35", 35, 0x23, "0x23"], 35],
@@ -295,13 +296,13 @@ describe Support::CloneVm do
               dns_suffix_list: [],
             }
           end
-          it "properly validates the passed timezone" do
+          it "helper method properly validates the passed timezone" do
             expect(subject.valid_windows_timezone?(options[:guest_customization][:timezone])).to be_truthy
           end
-          it "properly converts the passed timezone to a 32-bit signed integer" do
+          it "helper method properly converts the passed timezone to a 32-bit signed integer" do
             expect(subject.windows_timezone_convert(options[:guest_customization][:timezone])).to eq this_timezone[2]
           end
-          it "includes guest customizaiton with the correct timezone code" do
+          it "sets guest customization data with the correct timezone code" do
             expect(source_vm).to receive(:CloneVM_Task).with(spec: a_hash_including(customization: a_hash_including(identity: a_hash_including(guiUnattended: a_hash_including(timeZone: this_timezone[2])))), folder: folder_id, name: vm_name).and_return(clone_vm_task)
             subject.clone
           end
