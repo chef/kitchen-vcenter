@@ -277,6 +277,7 @@ describe Support::CloneVm do
       ["Central Time (US & Canada)", ["20", 20, 0x14, "0x14"], 20],
       ["Dublin, Edinburgh, Lisbon, London", ["85", 85, "0x55", 0x55], 85],
       ["Istanbul", [-2147483560, "-2147483560", 0x80000058, "0x80000058"], -2147483560],
+      ["Casablanca", [-2147483571, "-2147483571", 0x8000004d, "0x8000004d"], -2147483571],
     ]
     windows_timezone_tests.each do |this_timezone|
       context "when windows guest_customization timezone for \"#{this_timezone[0]}\" is provided" do
