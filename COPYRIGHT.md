@@ -1,1 +1,1 @@
-Copyright ©  2017-2022 Chef Software Inc. and/or its subsidiaries or affiliates. All rights reserved.
+Copyright ©  2017-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All rights reserved.
