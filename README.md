@@ -47,7 +47,7 @@ For information on contributing to this project see <https://github.com/chef/che
 
 ## Development
 
-- Report issues/questions/feature requests on [GitHub Issues][issues]
+* Report issues/questions/feature requests on [GitHub Issues][issues]
 
 Pull requests are very welcome! Make sure your patches are well tested. Ideally create a topic branch for every separate change you make. For example:
 
