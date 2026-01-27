@@ -1,25 +1,22 @@
 # Change Log
 
-<!-- latest_release 2.12.3 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+
+<!-- latest_stable_release -->
 ## [v2.12.3](https://github.com/chef/kitchen-vcenter/tree/v2.12.3) (2026-01-27)
 
 #### Merged Pull Requests
 - fix: bump tk dep to allow tk 4 [#194](https://github.com/chef/kitchen-vcenter/pull/194) ([Stromweld](https://github.com/Stromweld))
-<!-- latest_release -->
-<!-- release_rollup since=2.12.2 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- fix: bump tk dep to allow tk 4 [#194](https://github.com/chef/kitchen-vcenter/pull/194) ([Stromweld](https://github.com/Stromweld)) <!-- 2.12.3 -->
-<!-- release_rollup -->
-
 <!-- latest_stable_release -->
+
 ## [v2.12.2](https://github.com/chef/kitchen-vcenter/tree/v2.12.2) (2025-02-26)
 
 #### Merged Pull Requests
 - updating to newer images for tests [#181](https://github.com/chef/kitchen-vcenter/pull/181) ([sean-simmons-progress](https://github.com/sean-simmons-progress))
 - Fix scsinumber [#179](https://github.com/chef/kitchen-vcenter/pull/179) ([jarvin521](https://github.com/jarvin521))
-<!-- latest_stable_release -->
 
 ## [v2.12.0](https://github.com/chef/kitchen-vcenter/tree/v2.12.0) (2023-01-09)
 
