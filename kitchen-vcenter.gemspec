@@ -20,6 +20,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "net-ping", ">= 2.0.0", "< 3.0"
   spec.add_dependency "rbvmomi2", ">= 3.5.0", "< 4.0"
-  spec.add_dependency "test-kitchen", ">= 1.16", "< 4"
+  spec.add_dependency "test-kitchen", ">= 1.16", "< 5"
   spec.add_dependency "vsphere-automation-sdk", "~> 0.4"
 end
