@@ -1,8 +1,16 @@
 # Change Log
 
+<!-- latest_release 2.12.4 -->
+## [v2.12.4](https://github.com/chef/kitchen-vcenter/tree/v2.12.4) (2026-03-17)
+
+#### Merged Pull Requests
+- CHEF-27658 Update and standardize copyright notices to Progress Software Corporation - copyright_update [#193](https://github.com/chef/kitchen-vcenter/pull/193) ([clintoncwolfe](https://github.com/clintoncwolfe))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=2.12.3 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- CHEF-27658 Update and standardize copyright notices to Progress Software Corporation - copyright_update [#193](https://github.com/chef/kitchen-vcenter/pull/193) ([clintoncwolfe](https://github.com/clintoncwolfe)) <!-- 2.12.4 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
