@@ -65,8 +65,6 @@ Pull requests are very welcome! Make sure your patches are well tested. Ideally 
 - Author:: Thomas Heinen ([theinen@tecracer.de](mailto:theinen@tecracer.de))
 - Author:: Michael Kennedy ([michael_l_kennedy@me.com](mailto:michael_l_kennedy@me.com))
 
-Copyright:: Copyright (c) 2017-2022 Chef Software, Inc.
-
 License:: Apache License, Version 2.0
 
 ```text
@@ -84,3 +82,7 @@ limitations under the License.
 ```
 
 [issues]: https://github.com/chef/kitchen-vcenter/issues
+
+# Copyright
+
+See [COPYRIGHT.md](./COPYRIGHT.md).
